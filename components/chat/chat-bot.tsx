@@ -43,7 +43,7 @@ export function ChatBot() {
               <div className="space-y-4">
                 {messages.length === 0 && (
                   <div className="text-sm text-muted-foreground">
-                    💡 Olá! Sou o assistente da Waze Clothing. Como posso ajudá-lo com iluminação inteligente hoje?
+                    💡 Olá! Sou o assistente da Waze Clothing. Como posso ajudá-lo com estilo hoje?
                   </div>
                 )}
 
@@ -74,7 +74,7 @@ export function ChatBot() {
               <Input
                 value={input}
                 onChange={handleInputChange}
-                placeholder="Pergunte sobre iluminação..."
+                placeholder="Pergunte sobre moda..."
                 disabled={isLoading}
               />
               <Button type="submit" size="icon" disabled={isLoading} className="bg-black-500 hover:bg-black-600">
