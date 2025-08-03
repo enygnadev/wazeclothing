@@ -132,3 +132,4 @@ O script `setup-products` adiciona automaticamente 10 produtos de iluminação:
 ---
 
 **Waze Clothing** - *Iluminando o futuro com inteligência* 💡✨
+# wazeclothing
