@@ -1,3 +1,4 @@
+
 "use client"
 
 import React from "react"
@@ -29,6 +30,18 @@ const AuthContext = createContext<AuthContextType>({
   initializeAuth: async () => {},
 })
 
+// Helper function to set auth cookie
+const setAuthCookie = async (user: User | null) => {
+  if (typeof window !== 'undefined') {
+    if (user) {
+      const token = await user.getIdToken()
+      document.cookie = `auth-token=${token}; path=/; max-age=86400; secure; samesite=strict`
+    } else {
+      document.cookie = `auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;`
+    }
+  }
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [userProfile, setUserProfile] = useState<any | null>(null)
@@ -51,9 +64,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       const unsubscribe = onAuthStateChanged(auth, async (user) => {
         setUser(user)
+        await setAuthCookie(user)
 
         if (user) {
           try {
+            // Aguardar um pouco para garantir que o documento foi criado
             const profile = await getUserProfile(user.uid)
             setUserProfile(profile)
           } catch (error) {
@@ -83,7 +98,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const app = (await import("@/lib/firebase/config")).default
 
     const auth = getAuth(app)
-    await signInWithEmailAndPassword(auth, email, password)
+    const result = await signInWithEmailAndPassword(auth, email, password)
+    await setAuthCookie(result.user)
   }
 
   const signUp = async (email: string, password: string) => {
@@ -100,16 +116,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Create user profile in Firestore
     const db = getDb()
-    await setDoc(doc(db, "users", result.user.uid), {
+    const userData = {
       email: result.user.email,
       name: result.user.displayName || email.split('@')[0],
       displayName: result.user.displayName || email.split('@')[0],
-      isAdmin: email === 'admin@waze.com' || email === 'admin@admin.com', // Fazer primeiro usuário admin
+      isAdmin: email === 'admin@waze.com' || email === 'admin@admin.com' || email === 'guga1trance@gmail.com',
       createdAt: new Date(),
       updatedAt: new Date(),
       consentDate: new Date(),
       consentVersion: "1.0"
-    })
+    }
+
+    await setDoc(doc(db, "users", result.user.uid), userData)
+    await setAuthCookie(result.user)
+    
+    // Atualizar o profile localmente
+    setUserProfile(userData)
   }
 
   const signInWithGoogle = async () => {
@@ -128,18 +150,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Check if user profile exists, if not create it
     const db = getDb()
     const userDoc = await getDoc(doc(db, "users", result.user.uid))
+    
+    let userData
     if (!userDoc.exists()) {
-      await setDoc(doc(db, "users", result.user.uid), {
+      userData = {
         email: result.user.email,
         name: result.user.displayName || result.user.email?.split('@')[0] || "",
         displayName: result.user.displayName || result.user.email?.split('@')[0] || "",
-        isAdmin: result.user.email === 'admin@waze.com' || result.user.email === 'admin@admin.com',
+        isAdmin: result.user.email === 'admin@waze.com' || result.user.email === 'admin@admin.com' || result.user.email === 'guga1trance@gmail.com',
         createdAt: new Date(),
         updatedAt: new Date(),
         consentDate: new Date(),
         consentVersion: "1.0"
-      })
+      }
+      await setDoc(doc(db, "users", result.user.uid), userData)
+      setUserProfile(userData)
+    } else {
+      userData = userDoc.data()
+      setUserProfile(userData)
     }
+
+    await setAuthCookie(result.user)
   }
 
   const signOut = async () => {
@@ -151,6 +182,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const auth = getAuth(app)
     await firebaseSignOut(auth)
+    await setAuthCookie(null)
+    
+    // Limpar estado local
+    setUser(null)
+    setUserProfile(null)
   }
 
   // Cleanup on unmount
