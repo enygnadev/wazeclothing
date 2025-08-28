@@ -17,6 +17,9 @@ interface CartContextType {
   getTotalItems: () => number
   getTotalPrice: () => number
   isLoading: boolean
+  itemCount: number
+  isOpen: boolean
+  setIsOpen: (open: boolean) => void
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined)
@@ -24,6 +27,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined)
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([])
   const [isLoading, setIsLoading] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
   const { user } = useAuth()
 
   // Carregar carrinho do Firestore quando usuário logado
@@ -172,6 +176,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     return items.reduce((total, item) => total + (item.product.price * item.quantity), 0)
   }
 
+  const itemCount = getTotalItems()
+
   return (
     <CartContext.Provider
       value={{
@@ -182,7 +188,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         clearCart,
         getTotalItems,
         getTotalPrice,
-        isLoading
+        isLoading,
+        itemCount,
+        isOpen,
+        setIsOpen
       }}
     >
       {children}
