@@ -6,7 +6,7 @@ import { AuthForm } from "@/components/auth/auth-form"
 import { useAuth } from "@/components/providers/auth-provider"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Loader2 } from "lucide-react"
-import Header from "@/components/Header" // Assumindo que o Header está em "@/components/Header"
+import { Header } from "@/components/layout/header"
 
 function AuthPageContent() {
   const searchParams = useSearchParams()
