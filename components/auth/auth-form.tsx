@@ -12,14 +12,16 @@ import { useAuth } from "@/components/providers/auth-provider"
 import { Chrome, Loader2 } from "lucide-react"
 
 interface AuthFormProps {
-  mode: "login" | "register"
+  mode?: "login" | "register"
 }
 
-export function AuthForm({ mode }: AuthFormProps) {
+export function AuthForm({ mode: initialMode = "login" }: AuthFormProps) {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
   const [loading, setLoading] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [mode, setMode] = useState<"login" | "register">(initialMode)
 
   const { toast } = useToast()
   const router = useRouter()
@@ -88,6 +90,17 @@ export function AuthForm({ mode }: AuthFormProps) {
           description: "Bem-vindo de volta à Waze Clothing!",
         })
       } else {
+        // Validar confirmação de senha
+        if (password !== confirmPassword) {
+          toast({
+            title: "Erro",
+            description: "As senhas não coincidem.",
+            variant: "destructive",
+          })
+          setLoading(false)
+          return
+        }
+        
         await signUp(email, password)
         toast({
           title: "Conta criada com sucesso!",
@@ -191,13 +204,29 @@ export function AuthForm({ mode }: AuthFormProps) {
           />
         </div>
 
+        {mode === "register" && (
+          <div className="space-y-2">
+            <Label htmlFor="confirmPassword">Confirmar Senha</Label>
+            <Input
+              id="confirmPassword"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              disabled={loading}
+              minLength={6}
+              placeholder="Confirme sua senha"
+            />
+          </div>
+        )}
+
         <Button type="submit" className="w-full" disabled={loading}>
           {loading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Entrando...
+              {mode === "login" ? "Entrando..." : "Criando conta..."}
             </>
-          ) : mode === "login" ? "Entrar" : "Cadastrar"}
+          ) : mode === "login" ? "Entrar" : "Criar Conta"}
         </Button>
       </form>
 
@@ -218,6 +247,25 @@ export function AuthForm({ mode }: AuthFormProps) {
         )}
         Google
       </Button>
+
+      <div className="text-center">
+        <Button
+          variant="link"
+          className="p-0 h-auto text-sm"
+          onClick={() => {
+            setMode(mode === "login" ? "register" : "login")
+            setEmail("")
+            setPassword("")
+            setConfirmPassword("")
+          }}
+          disabled={loading}
+        >
+          {mode === "login" 
+            ? "Não tem uma conta? Criar nova conta"
+            : "Já tem uma conta? Fazer login"
+          }
+        </Button>
+      </div>
     </div>
   )
 }
