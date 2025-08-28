@@ -1,9 +1,29 @@
 
+"use client"
+
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Home, ArrowLeft, Search, ShoppingBag, Phone } from "lucide-react"
 import { Header } from "@/components/layout/header"
+
+function BackButton() {
+  return (
+    <div className="pt-4">
+      <p className="text-sm text-muted-foreground">
+        Ou volte para a página anterior
+      </p>
+      <Button 
+        variant="link" 
+        onClick={() => window.history.back()}
+        className="text-primary"
+      >
+        <ArrowLeft className="w-4 h-4 mr-2" />
+        Voltar
+      </Button>
+    </div>
+  )
+}
 
 export default function NotFound() {
   return (
@@ -52,19 +72,7 @@ export default function NotFound() {
                   </Button>
                 </div>
 
-                <div className="pt-4">
-                  <p className="text-sm text-muted-foreground">
-                    Ou volte para a página anterior
-                  </p>
-                  <Button 
-                    variant="link" 
-                    onClick={() => window.history.back()}
-                    className="text-primary"
-                  >
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    Voltar
-                  </Button>
-                </div>
+                <BackButton />
               </div>
             </CardContent>
           </Card>
