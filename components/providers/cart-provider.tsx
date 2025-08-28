@@ -1,3 +1,4 @@
+
 "use client"
 
 import type React from "react"
@@ -9,104 +10,167 @@ import { getProductById } from "@/lib/firebase/products"
 
 interface CartContextType {
   items: CartItem[]
-  addItem: (item: Omit<CartItem, "quantity">) => void
-  removeItem: (id: string) => void
-  updateQuantity: (id: string, quantity: number) => void
-  clearCart: () => void
-  total: number
-  itemCount: number
+  addItem: (productId: string, quantity?: number) => Promise<void>
+  removeItem: (productId: string) => Promise<void>
+  updateItemQuantity: (productId: string, quantity: number) => Promise<void>
+  clearCart: () => Promise<void>
   getTotalItems: () => number
-  isOpen: boolean
-  setIsOpen: (open: boolean) => void
+  getTotalPrice: () => number
+  isLoading: boolean
 }
 
-const CartContext = createContext<CartContextType>({
-  items: [],
-  addItem: () => {},
-  removeItem: () => {},
-  updateQuantity: () => {},
-  clearCart: () => {},
-  total: 0,
-  itemCount: 0,
-  getTotalItems: () => 0,
-  isOpen: false,
-  setIsOpen: () => {},
-})
+const CartContext = createContext<CartContextType | undefined>(undefined)
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([])
-  const [isOpen, setIsOpen] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const { user } = useAuth()
 
-  const addItem = (newItem: Omit<CartItem, "quantity">) => {
-    setItems((prev) => {
-      const exists = prev.find((item) => item.id === newItem.id)
-      if (exists) {
-        return prev.map((item) =>
-          item.id === newItem.id ? { ...item, quantity: item.quantity + 1 } : item
-        )
+  // Carregar carrinho do Firestore quando usuário logado
+  useEffect(() => {
+    if (user) {
+      loadCart()
+    } else {
+      // Se não logado, carregar do localStorage
+      loadCartFromLocalStorage()
+    }
+  }, [user])
+
+  const loadCart = async () => {
+    if (!user) return
+    
+    try {
+      setIsLoading(true)
+      const cartData = await getCart(user.uid)
+      
+      if (cartData?.items) {
+        const cartItems: CartItem[] = []
+        
+        for (const item of cartData.items) {
+          const product = await getProductById(item.productId)
+          if (product) {
+            cartItems.push({
+              id: product.id,
+              product,
+              quantity: item.quantity
+            })
+          }
+        }
+        
+        setItems(cartItems)
       }
-      return [...prev, { ...newItem, quantity: 1 }]
+    } catch (error) {
+      console.error("Erro ao carregar carrinho:", error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const loadCartFromLocalStorage = () => {
+    try {
+      const savedCart = localStorage.getItem('cart')
+      if (savedCart) {
+        setItems(JSON.parse(savedCart))
+      }
+    } catch (error) {
+      console.error("Erro ao carregar carrinho do localStorage:", error)
+    }
+  }
+
+  const saveToLocalStorage = (cartItems: CartItem[]) => {
+    try {
+      localStorage.setItem('cart', JSON.stringify(cartItems))
+    } catch (error) {
+      console.error("Erro ao salvar no localStorage:", error)
+    }
+  }
+
+  const saveCart = async (cartItems: CartItem[]) => {
+    if (user) {
+      try {
+        const cartData = cartItems.map(item => ({
+          productId: item.id,
+          quantity: item.quantity
+        }))
+        await updateCart(user.uid, cartData)
+      } catch (error) {
+        console.error("Erro ao salvar carrinho:", error)
+      }
+    } else {
+      saveToLocalStorage(cartItems)
+    }
+  }
+
+  const addItem = async (productId: string, quantity = 1) => {
+    try {
+      const product = await getProductById(productId)
+      if (!product) {
+        throw new Error("Produto não encontrado")
+      }
+
+      setItems(currentItems => {
+        const existingItem = currentItems.find(item => item.id === productId)
+        
+        let newItems: CartItem[]
+        if (existingItem) {
+          newItems = currentItems.map(item =>
+            item.id === productId
+              ? { ...item, quantity: item.quantity + quantity }
+              : item
+          )
+        } else {
+          newItems = [...currentItems, { id: productId, product, quantity }]
+        }
+        
+        saveCart(newItems)
+        return newItems
+      })
+    } catch (error) {
+      console.error("Erro ao adicionar item:", error)
+    }
+  }
+
+  const removeItem = async (productId: string) => {
+    setItems(currentItems => {
+      const newItems = currentItems.filter(item => item.id !== productId)
+      saveCart(newItems)
+      return newItems
     })
   }
 
-  const removeItem = (id: string) => {
-    setItems((prev) => prev.filter((item) => item.id !== id))
-  }
-
-  const updateQuantity = (id: string, quantity: number) => {
+  const updateItemQuantity = async (productId: string, quantity: number) => {
     if (quantity <= 0) {
-      removeItem(id)
-    } else {
-      setItems((prev) =>
-        prev.map((item) => (item.id === id ? { ...item, quantity } : item))
+      await removeItem(productId)
+      return
+    }
+
+    setItems(currentItems => {
+      const newItems = currentItems.map(item =>
+        item.id === productId
+          ? { ...item, quantity }
+          : item
       )
+      saveCart(newItems)
+      return newItems
+    })
+  }
+
+  const clearCart = async () => {
+    setItems([])
+    if (user) {
+      await updateCart(user.uid, [])
+    } else {
+      localStorage.removeItem('cart')
     }
   }
 
-  const clearCart = () => setItems([])
+  const getTotalItems = (): number => {
+    return items.reduce((total, item) => total + item.quantity, 0)
+  }
 
-  const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
-  const itemCount = items.reduce((sum, item) => sum + item.quantity, 0)
-
-  // ✅ Carrega carrinho do Firestore e preenche com dados reais do produto
-  useEffect(() => {
-    const loadCart = async () => {
-      if (!user?.uid) return
-      const saved = await getCart(user.uid)
-      if (saved?.items?.length) {
-        const enriched: CartItem[] = await Promise.all(
-          saved.items.map(async (i: { productId: string; quantity: number }) => {
-            const product = await getProductById(i.productId)
-            return {
-              id: product?.id || i.productId,
-              title: product?.title || "Produto",
-              price: product?.price || 0,
-              image: product?.image || "/placeholder.svg",
-              quantity: i.quantity,
-            }
-          })
-        )
-        setItems(enriched)
-      }
-    }
-    loadCart()
-  }, [user])
-
-  // ✅ Sempre que alterar o carrinho, salva no Firestore (apenas id + quantity)
-  useEffect(() => {
-    const syncToFirebase = async () => {
-      if (!user?.uid) return
-      const minimal = items.map((item) => ({
-        productId: item.id,
-        quantity: item.quantity,
-      }))
-      await updateCart(user.uid, minimal)
-    }
-    syncToFirebase()
-  }, [items, user])
-
-  const getTotalItems = () => itemCount
+  const getTotalPrice = (): number => {
+    return items.reduce((total, item) => total + (item.product.price * item.quantity), 0)
+  }
 
   return (
     <CartContext.Provider
@@ -114,13 +178,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         items,
         addItem,
         removeItem,
-        updateQuantity,
+        updateItemQuantity,
         clearCart,
-        total,
-        itemCount,
         getTotalItems,
-        isOpen,
-        setIsOpen,
+        getTotalPrice,
+        isLoading
       }}
     >
       {children}
@@ -128,4 +190,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   )
 }
 
-export const useCart = () => useContext(CartContext)
+export function useCart() {
+  const context = useContext(CartContext)
+  if (context === undefined) {
+    throw new Error("useCart deve ser usado dentro de um CartProvider")
+  }
+  return context
+}

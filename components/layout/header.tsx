@@ -1,34 +1,47 @@
+
 "use client"
 
-import Link from "next/link"
 import { useState, useEffect } from "react"
-import { ShoppingCart, User, Search, Crown, LogOut } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import Link from "next/link"
 import { useAuth } from "@/components/providers/auth-provider"
-import { CartDrawer } from "@/components/cart/cart-drawer"
 import { useCart } from "@/components/providers/cart-provider"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import { Button } from "@/components/ui/button"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { CartDrawer } from "@/components/cart/cart-drawer"
+import { ThemeToggle } from "@/components/theme/theme-toggle"
+import { SearchBar } from "@/components/search/search-bar"
+import { Badge } from "@/components/ui/badge"
+import { 
+  ShoppingCart, 
+  Menu, 
+  User, 
+  LogOut, 
+  Settings,
+  Package
+} from "lucide-react"
 
 export function Header() {
-  const [scrolled, setScrolled] = useState(false)
-  const { user, userProfile, signOut } = useAuth()
+  const { user, signOut, isAdmin } = useAuth()
   const { getTotalItems } = useCart()
+  const [scrolled, setScrolled] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 50)
+      setScrolled(window.scrollY > 0)
     }
 
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
+
+  const handleSignOut = async () => {
+    try {
+      await signOut()
+    } catch (error) {
+      console.error("Erro ao fazer logout:", error)
+    }
+  }
 
   return (
     <header
@@ -36,130 +49,156 @@ export function Header() {
         scrolled ? "backdrop-blur-luxury bg-background/95 border-b border-border/50 shadow-lg" : "bg-transparent"
       }`}
     >
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex items-center justify-between">
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
-            <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xl">W</span>
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+              <span className="text-primary-foreground font-bold text-lg">W</span>
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Waze Clothing
-            </span>
+            <span className="font-bold text-xl">Waze Clothing</span>
           </Link>
 
-          {/* Navigation */}
-          <nav className="hidden md:flex items-center space-x-6">
-            <Link 
-              href="/" 
-              className="text-foreground/80 hover:text-foreground font-medium transition-colors"
-            >
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center space-x-8">
+            <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors">
               Home
             </Link>
-            <Link 
-              href="/products" 
-              className="text-foreground/80 hover:text-foreground font-medium transition-colors"
-            >
+            <Link href="/products" className="text-muted-foreground hover:text-foreground transition-colors">
               Produtos
             </Link>
-            <Link 
-              href="/categories" 
-              className="text-foreground/80 hover:text-foreground font-medium transition-colors"
-            >
+            <Link href="/categories" className="text-muted-foreground hover:text-foreground transition-colors">
               Categorias
             </Link>
-            <Link 
-              href="/contato" 
-              className="text-foreground/80 hover:text-foreground font-medium transition-colors"
-            >
+            <Link href="/contato" className="text-muted-foreground hover:text-foreground transition-colors">
               Contato
             </Link>
-
-            {/* Admin Button - Visible only for admins */}
-            {userProfile?.isAdmin && (
-              <Link 
-                href="/admin" 
-                className="flex items-center space-x-1 bg-gradient-to-r from-amber-500 to-yellow-500 text-white px-3 py-1 rounded-full text-sm font-medium hover:from-amber-600 hover:to-yellow-600 transition-all duration-300 shadow-md hover:shadow-lg"
-              >
-                <Crown className="h-3 w-3" />
-                <span>Admin</span>
-              </Link>
-            )}
           </nav>
 
-          {/* Right Side */}
+          {/* Search Bar */}
+          <div className="hidden lg:block flex-1 max-w-md mx-8">
+            <SearchBar />
+          </div>
+
+          {/* Right Side Actions */}
           <div className="flex items-center space-x-4">
-            {/* Search Bar */}
-            <div className="hidden md:flex relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input
-                type="search"
-                placeholder="Buscar produtos..."
-                className="pl-10 w-64 bg-background/50 backdrop-blur-sm border-border/50"
-              />
-            </div>
+            {/* Theme Toggle */}
+            <ThemeToggle />
 
             {/* Cart */}
             <CartDrawer>
-              <Button variant="ghost" size="icon" className="relative">
-                <ShoppingCart className="h-5 w-5" />
+              <Button variant="outline" size="icon" className="relative">
+                <ShoppingCart className="h-4 w-4" />
                 {getTotalItems() > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground rounded-full text-xs w-5 h-5 flex items-center justify-center">
+                  <Badge 
+                    variant="destructive" 
+                    className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center text-xs"
+                  >
                     {getTotalItems()}
-                  </span>
+                  </Badge>
                 )}
+                <span className="sr-only">Carrinho</span>
               </Button>
             </CartDrawer>
 
             {/* User Menu */}
             {user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon">
-                    <User className="h-5 w-5" />
+              <div className="flex items-center space-x-2">
+                {isAdmin && (
+                  <Link href="/admin">
+                    <Button variant="outline" size="sm">
+                      <Settings className="h-4 w-4 mr-2" />
+                      Admin
+                    </Button>
+                  </Link>
+                )}
+                
+                <Link href="/cliente">
+                  <Button variant="outline" size="sm">
+                    <User className="h-4 w-4 mr-2" />
+                    {user.displayName || user.email}
                   </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <div className="px-2 py-1.5">
-                    <p className="text-sm font-medium">{userProfile?.name || user.displayName}</p>
-                    <p className="text-xs text-muted-foreground">{user.email}</p>
-                    {userProfile?.isAdmin && (
-                      <div className="flex items-center mt-1">
-                        <Crown className="h-3 w-3 text-amber-500 mr-1" />
-                        <span className="text-xs text-amber-600 font-medium">Administrador</span>
-                      </div>
-                    )}
-                  </div>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link href="/cliente">Minha Conta</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/checkout">Meus Pedidos</Link>
-                  </DropdownMenuItem>
-                  {userProfile?.isAdmin && (
-                    <DropdownMenuItem asChild>
-                      <Link href="/admin" className="text-amber-600">
-                        <Crown className="h-4 w-4 mr-2" />
-                        Painel Admin
-                      </Link>
-                    </DropdownMenuItem>
-                  )}
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={signOut}>
-                    <LogOut className="h-4 w-4 mr-2" />
-                    Sair
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                </Link>
+
+                <Button variant="outline" size="sm" onClick={handleSignOut}>
+                  <LogOut className="h-4 w-4" />
+                </Button>
+              </div>
             ) : (
               <Link href="/auth">
-                <Button variant="outline" size="sm">
+                <Button variant="default" size="sm">
                   <User className="h-4 w-4 mr-2" />
                   Entrar
                 </Button>
               </Link>
             )}
+
+            {/* Mobile Menu */}
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+              <SheetTrigger asChild className="md:hidden">
+                <Button variant="outline" size="icon">
+                  <Menu className="h-4 w-4" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+                <nav className="flex flex-col space-y-4 mt-8">
+                  <div className="lg:hidden mb-4">
+                    <SearchBar />
+                  </div>
+                  
+                  <Link 
+                    href="/" 
+                    className="text-lg font-medium hover:text-primary transition-colors"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Home
+                  </Link>
+                  <Link 
+                    href="/products" 
+                    className="text-lg font-medium hover:text-primary transition-colors"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Produtos
+                  </Link>
+                  <Link 
+                    href="/categories" 
+                    className="text-lg font-medium hover:text-primary transition-colors"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Categorias
+                  </Link>
+                  <Link 
+                    href="/contato" 
+                    className="text-lg font-medium hover:text-primary transition-colors"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Contato
+                  </Link>
+
+                  {user && isAdmin && (
+                    <Link 
+                      href="/admin" 
+                      className="text-lg font-medium hover:text-primary transition-colors flex items-center"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <Settings className="h-4 w-4 mr-2" />
+                      Admin
+                    </Link>
+                  )}
+
+                  {user && (
+                    <Link 
+                      href="/cliente" 
+                      className="text-lg font-medium hover:text-primary transition-colors flex items-center"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <User className="h-4 w-4 mr-2" />
+                      Minha Conta
+                    </Link>
+                  )}
+                </nav>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
       </div>
