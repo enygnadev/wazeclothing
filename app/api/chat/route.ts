@@ -1,7 +1,11 @@
 
 import { OpenAIStream, StreamingTextResponse } from 'ai'
-import { openai } from '@ai-sdk/openai'
+import OpenAI from 'openai'
 import { type NextRequest } from 'next/server'
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+})
 
 export async function POST(req: NextRequest) {
   try {
