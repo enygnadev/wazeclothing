@@ -9,7 +9,11 @@
     "start": "next start",
     "lint": "next lint",
     "deploy": "npm run build && vercel --prod",
-    "setup-products": "node scripts/setup-blasius-products.js"
+    "setup-products": "node scripts/setup-blasius-products.js",
+    "packageManager": "pnpm@10.15.0",
+    "preinstall": "corepack enable && corepack prepare pnpm@10.15.0 --activate",
+
+    "check:errors": "npm run lint && tsc --noEmit && next build"
   },
   "dependencies": {
     "@ai-sdk/openai": "latest",
