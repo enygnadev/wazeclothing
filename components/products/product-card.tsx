@@ -22,31 +22,42 @@ export function ProductCard({ product }: ProductCardProps) {
   const router = useRouter()
 
   const handleAddToCart = async () => {
-    if (!initialized) {
-      await initializeAuth()
-    }
+    try {
+      if (!initialized) {
+        await initializeAuth()
+      }
 
-    if (!user) {
+      if (!user) {
+        toast({
+          title: "Login necessário",
+          description: "Faça login para adicionar produtos ao carrinho.",
+          action: (
+            <Button variant="outline" size="sm" onClick={() => router.push("/auth")}>
+              Fazer Login
+            </Button>
+          ),
+        })
+        return
+      }
+
+      console.log("Adicionando produto ao carrinho:", product.title)
+      
+      await addItem(product.id)
+
+      setIsOpen(true)
+
       toast({
-        title: "Login necessário",
-        description: "Faça login para adicionar produtos ao carrinho.",
-        action: (
-          <Button variant="outline" size="sm" onClick={() => router.push("/auth")}>
-            Fazer Login
-          </Button>
-        ),
+        title: "Produto adicionado!",
+        description: `${product.title} foi adicionado ao carrinho.`,
       })
-      return
+    } catch (error) {
+      console.error("Erro ao adicionar produto:", error)
+      toast({
+        title: "Erro",
+        description: "Não foi possível adicionar o produto ao carrinho.",
+        variant: "destructive"
+      })
     }
-
-    await addItem(product.id)
-
-    setIsOpen(true)
-
-    toast({
-      title: "Produto adicionado!",
-      description: `${product.title} foi adicionado ao carrinho.`,
-    })
   }
 
   return (
