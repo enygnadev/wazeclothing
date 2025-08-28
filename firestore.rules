@@ -6,7 +6,7 @@ service cloud.firestore {
     function isAdmin() {
       return request.auth != null && 
         exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('isAdmin', false) == true;
     }
     
     // Função para verificar se é o próprio usuário
@@ -28,9 +28,11 @@ service cloud.firestore {
     match /products/{productId} {
       allow read: if true;
       allow create: if isAdmin() && 
-        hasRequiredFields(['name', 'price', 'category']) &&
+        hasRequiredFields(['name', 'price']) &&
         request.resource.data.price is number &&
-        request.resource.data.price > 0;
+        request.resource.data.price > 0 &&
+        request.resource.data.name is string &&
+        request.resource.data.name.size() > 0;
       allow update: if isAdmin();
       allow delete: if isAdmin();
     }
@@ -43,7 +45,7 @@ service cloud.firestore {
         request.resource.data.email == request.auth.token.email;
       allow update: if (isOwner(userId) || isAdmin()) &&
         // Usuário não pode alterar próprio status de admin
-        (isAdmin() || !('isAdmin' in request.resource.data.diff(resource.data).affectedKeys()));
+        (isAdmin() || !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isAdmin']));
       allow delete: if isAdmin();
       
       // LGPD - Consentimento obrigatório para criar perfil

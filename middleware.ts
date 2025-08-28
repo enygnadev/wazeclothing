@@ -25,7 +25,7 @@ export function middleware(request: NextRequest) {
   const authToken = request.cookies.get('auth-token')?.value
 
   // Se não tem token, redirecionar para login
-  if (!authToken) {
+  if (!authToken || authToken === 'undefined' || authToken === '') {
     const loginUrl = new URL('/auth', request.url)
     loginUrl.searchParams.set('returnUrl', pathname)
 

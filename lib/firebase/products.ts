@@ -202,3 +202,6 @@ export async function createSize(sizeName: string): Promise<boolean> {
 export async function createProduct(product: Omit<Product, "id">): Promise<string | null> {
   return addProduct(product)
 }
+
+// Re-export to ensure they are available
+export { getCategories, getSizes } from "./products"

@@ -27,21 +27,15 @@ const requiredEnvVars = [
   'NEXT_PUBLIC_FIREBASE_APP_ID'
 ]
 
-const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar])
-
-if (missingEnvVars.length > 0) {
+const missingVars = requiredEnvVars.filter(varName => !process.env[varName])
+if (missingVars.length > 0) {
   console.warn('⚠️ Usando configuração Firebase padrão para desenvolvimento')
 } else {
   console.log('✅ Configuração Firebase carregada com sucesso')
 }
 
-const missingVars = requiredEnvVars.filter(varName => !process.env[varName])
-if (missingVars.length > 0) {
-  console.warn('⚠️ Usando configuração Firebase padrão para desenvolvimento')
-}
-
 // ⚙️ Inicializa o app somente uma vez
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp()
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0]
 
 // 📦 Exportações para Firebase services
 export let auth: Auth
