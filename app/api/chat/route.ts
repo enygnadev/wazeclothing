@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
       Seja amigável, prestativo e sempre focado em moda e vestuário.`,
     })
 
-    return result.toAIStreamResponse()
+    return result.toDataStreamResponse()
   } catch (error) {
     console.error('Chat error:', error)
     return new Response(JSON.stringify({ error: 'Internal server error' }), {

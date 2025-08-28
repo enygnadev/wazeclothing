@@ -1,4 +1,4 @@
-import { doc, getDoc, getDocs, collection, updateDoc, query, orderBy } from "firebase/firestore"
+import { doc, getDoc, getDocs, collection, updateDoc, deleteDoc, query, orderBy } from "firebase/firestore"
 import { getDb } from "./firestore"
 import type { User } from "@/lib/types"
 
@@ -58,6 +58,18 @@ export async function updateUserProfile(userId: string, data: Partial<User>): Pr
     return true
   } catch (error) {
     console.error("Error updating user profile:", error)
+    return false
+  }
+}
+
+export async function deleteUser(userId: string): Promise<boolean> {
+  try {
+    const db = getDb()
+    const docRef = doc(db, USERS_COLLECTION, userId)
+    await deleteDoc(docRef)
+    return true
+  } catch (error) {
+    console.error("Error deleting user:", error)
     return false
   }
 }

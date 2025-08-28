@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Search, Shield, UserIcon, Mail, Calendar } from "lucide-react"
-import { getUsers, updateUserRole } from "@/lib/firebase/users"
+import { getUsers, updateUserRole, deleteUser } from "@/lib/firebase/users"
 import type { User } from "@/lib/types"
 
 export function UsersManager() {
