@@ -1,10 +1,12 @@
+
 import { type NextRequest, NextResponse } from "next/server"
 import { deleteProduct, updateProduct, getProduct } from "@/lib/firebase/products"
 
 // 🔍 GET único produto (opcional)
-export async function GET(_: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const product = await getProduct(params.id)
+    const { id } = await params
+    const product = await getProduct(id)
     if (!product) {
       return NextResponse.json({ error: "Produto não encontrado" }, { status: 404 })
     }
@@ -16,18 +18,20 @@ export async function GET(_: NextRequest, { params }: { params: { id: string } }
 }
 
 // ✏️ PUT para atualizar
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params
     const data = await request.json()
 
-    await updateProduct(params.id, {
-      name: data.name, // Changed from title to name
+    await updateProduct(id, {
+      name: data.name,
       description: data.description,
       price: parseFloat(data.price),
       image: data.image,
       category: data.category,
       features: Array.isArray(data.features) ? data.features : [],
       featured: data.featured,
+      sizes: data.sizes,
       size: data.size,
       isSmart: data.isSmart,
     })
@@ -40,9 +44,10 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 }
 
 // 🗑 DELETE para excluir
-export async function DELETE(_: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    await deleteProduct(params.id)
+    const { id } = await params
+    await deleteProduct(id)
     return NextResponse.json({ message: "Produto excluído com sucesso" }, { status: 200 })
   } catch (error) {
     console.error("Erro ao deletar produto:", error)

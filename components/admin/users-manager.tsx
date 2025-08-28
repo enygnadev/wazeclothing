@@ -2,13 +2,13 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Search, Shield, User, Mail, Calendar } from "lucide-react"
-import { getUsers, updateUserRole } from "@/lib/firebase/users"
+import { Badge } from "@/components/ui/badge"
+import { Skeleton } from "@/components/ui/skeleton"
+import { Search, Shield, UserIcon, Mail, Calendar } from "lucide-react"
+import { getUsers, deleteUser, updateUserRole } from "@/lib/firebase/users"
 import type { User } from "@/lib/types"
 
 export function UsersManager() {
@@ -20,8 +20,9 @@ export function UsersManager() {
     loadUsers()
   }, [])
 
-  const loadUsers = async () => {
+  async function loadUsers() {
     try {
+      setLoading(true)
       const usersData = await getUsers()
       setUsers(usersData)
     } catch (error) {
@@ -31,35 +32,58 @@ export function UsersManager() {
     }
   }
 
-  const handleRoleChange = async (userId: string, isAdmin: boolean) => {
+  async function handleDeleteUser(userId: string) {
+    if (confirm("Tem certeza que deseja excluir este usuário?")) {
+      try {
+        await deleteUser(userId)
+        setUsers(users.filter(user => user.id !== userId))
+      } catch (error) {
+        console.error("Erro ao excluir usuário:", error)
+      }
+    }
+  }
+
+  async function handleToggleRole(userId: string, currentRole: string) {
     try {
-      await updateUserRole(userId, isAdmin)
-      await loadUsers()
+      const newRole = currentRole === 'admin' ? 'customer' : 'admin'
+      await updateUserRole(userId, newRole as 'admin' | 'customer')
+      setUsers(users.map(user => 
+        user.id === userId ? { ...user, role: newRole as 'admin' | 'customer' } : user
+      ))
     } catch (error) {
-      console.error("Erro ao atualizar permissão:", error)
+      console.error("Erro ao alterar papel do usuário:", error)
     }
   }
 
   const filteredUsers = users.filter(user =>
-    user.displayName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.email.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   if (loading) {
-    return <div>Carregando usuários...</div>
+    return (
+      <div className="space-y-4">
+        <Skeleton className="h-10 w-full" />
+        <div className="grid gap-4">
+          {[...Array(5)].map((_, i) => (
+            <Skeleton key={i} className="h-24 w-full" />
+          ))}
+        </div>
+      </div>
+    )
   }
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Gerenciar Usuários</h2>
+        <h2 className="text-2xl font-bold">Usuários</h2>
         <div className="relative w-64">
-          <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Buscar usuários..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
+            className="pl-8"
           />
         </div>
       </div>
@@ -67,49 +91,43 @@ export function UsersManager() {
       <div className="grid gap-4">
         {filteredUsers.map((user) => (
           <Card key={user.id}>
-            <CardContent className="p-6">
+            <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <Avatar>
-                    <AvatarImage src={user.photoURL} />
-                    <AvatarFallback>
-                      {user.displayName?.charAt(0) || user.email.charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  
-                  <div>
-                    <h3 className="font-medium">{user.displayName || "Nome não informado"}</h3>
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <Mail className="w-4 h-4 mr-1" />
-                      {user.email}
-                    </div>
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <Calendar className="w-4 h-4 mr-1" />
-                      Membro desde {user.createdAt.toLocaleDateString()}
-                    </div>
-                  </div>
+                <div className="flex items-center space-x-2">
+                  <UserIcon className="h-5 w-5 text-muted-foreground" />
+                  <CardTitle className="text-lg">{user.name || "Usuário"}</CardTitle>
+                  <Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>
+                    {user.role === 'admin' ? 'Admin' : 'Cliente'}
+                  </Badge>
                 </div>
-
-                <div className="flex items-center space-x-4">
-                  {user.isAdmin ? (
-                    <Badge className="bg-green-500 text-white">
-                      <Shield className="w-3 h-3 mr-1" />
-                      Admin
-                    </Badge>
-                  ) : (
-                    <Badge variant="secondary">
-                      <User className="w-3 h-3 mr-1" />
-                      Cliente
-                    </Badge>
-                  )}
-                  
+                <div className="flex space-x-2">
                   <Button
-                    variant={user.isAdmin ? "destructive" : "default"}
+                    variant="outline"
                     size="sm"
-                    onClick={() => handleRoleChange(user.id, !user.isAdmin)}
+                    onClick={() => handleToggleRole(user.id, user.role)}
                   >
-                    {user.isAdmin ? "Remover Admin" : "Tornar Admin"}
+                    <Shield className="h-4 w-4 mr-1" />
+                    {user.role === 'admin' ? 'Remover Admin' : 'Tornar Admin'}
                   </Button>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => handleDeleteUser(user.id)}
+                  >
+                    Excluir
+                  </Button>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <div className="flex items-center text-sm text-muted-foreground">
+                  <Mail className="h-4 w-4 mr-2" />
+                  {user.email}
+                </div>
+                <div className="flex items-center text-sm text-muted-foreground">
+                  <Calendar className="h-4 w-4 mr-2" />
+                  Cadastrado em {user.createdAt.toLocaleDateString()}
                 </div>
               </div>
             </CardContent>

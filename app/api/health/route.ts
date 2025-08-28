@@ -15,10 +15,11 @@ export async function GET() {
       { status: 200 }
     )
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     return NextResponse.json(
       { 
         status: "error",
-        error: error.message 
+        error: errorMessage 
       },
       { status: 500 }
     )

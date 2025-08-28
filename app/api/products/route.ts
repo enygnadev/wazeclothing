@@ -1,114 +1,71 @@
-import { NextRequest, NextResponse } from "next/server"
-import { getProducts } from "@/lib/firebase/products"
+import { type NextRequest, NextResponse } from "next/server"
+import { getProducts, addProduct } from "@/lib/firebase/products"
 
-export async function GET() {
+// 📋 GET todos os produtos
+export async function GET(request: NextRequest) {
   try {
-    console.log("🔍 API: Iniciando busca de produtos...")
+    console.log("🚀 API: Iniciando busca de produtos...")
 
-    // Verificar se Firebase está configurado
-    if (!process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID) {
-      console.error("❌ API: Firebase não configurado")
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: "Firebase não configurado",
-          data: []
-        },
-        { status: 500 }
+    const { searchParams } = new URL(request.url)
+    const category = searchParams.get('category')
+    const featured = searchParams.get('featured')
+
+    console.log("🔍 API: Filtros recebidos:", { category, featured })
+
+    const products = await getProducts()
+    console.log("✅ API: Produtos encontrados:", products.length)
+
+    // Filtrar por categoria se especificada
+    let filteredProducts = products
+    if (category && category !== 'all') {
+      filteredProducts = products.filter(product => 
+        product.category.toLowerCase() === category.toLowerCase()
       )
     }
 
-    console.log("🔥 API: Firebase configurado, buscando produtos...")
-    const products = await getProducts()
+    // Filtrar por destaque se especificado
+    if (featured === 'true') {
+      filteredProducts = filteredProducts.filter(product => product.featured)
+    }
 
-    console.log("📦 API: Produtos encontrados:", products.length)
+    console.log("🎯 API: Produtos filtrados:", filteredProducts.length)
+
+    return NextResponse.json(filteredProducts, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+      },
+    })
+  } catch (error) {
+    console.error("❌ API: Erro ao buscar produtos:", error)
+
+    const errorMessage = error instanceof Error ? error.message : 'Erro interno do servidor'
+    const stack = error instanceof Error ? error.stack : undefined
+
+    console.error("❌ API: Stack trace:", stack)
 
     return NextResponse.json(
       {
-        success: true,
-        data: products || [],
-        count: products?.length || 0
-      },
-      { 
-        status: 200,
-        headers: {
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'Pragma': 'no-cache',
-          'Expires': '0'
-        }
-      }
-    )
-  } catch (error) {
-    console.error("❌ API: Erro ao buscar produtos:", error)
-    console.error("❌ API: Stack trace:", error.stack)
-
-    return NextResponse.json(
-      { 
-        success: false, 
-        error: error?.message || "Erro interno do servidor",
-        data: [],
-        count: 0,
-        details: process.env.NODE_ENV === 'development' ? error : undefined
+        error: errorMessage,
+        message: "Falha ao carregar produtos"
       },
       { status: 500 }
     )
   }
 }
 
+// ➕ POST para adicionar novo produto
 export async function POST(request: NextRequest) {
   try {
-    const product = await request.json()
-    console.log("📥 API: Dados recebidos para criar produto:", product)
+    const data = await request.json()
+    const productId = await addProduct(data)
 
-    // Validação com os campos corretos que vêm do formulário
-    if (!product.title || !product.price) {
-      console.error("❌ API: Validação falhou - título ou preço ausente")
-      return NextResponse.json(
-        { error: "Título e preço são obrigatórios" },
-        { status: 400 }
-      )
-    }
-
-    // Importar a função de criação de produto
-    const { createProduct } = await import("@/lib/firebase/products")
-
-    // Criar o produto no Firestore
-    const productData = {
-      title: product.title,
-      description: product.description || "",
-      price: product.price,
-      image: product.image || "",
-      category: product.category || "",
-      features: product.features || [],
-      featured: product.featured || false,
-      size: product.size || "",
-      isSmart: product.isSmart || false,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    }
-
-    console.log("💾 API: Criando produto:", productData)
-    const productId = await createProduct(productData)
-
-    if (productId) {
-      console.log("✅ API: Produto criado com ID:", productId)
-      return NextResponse.json({ 
-        success: true, 
-        id: productId,
-        message: "Produto criado com sucesso!"
-      })
-    } else {
-      console.error("❌ API: Falha ao criar produto no Firestore")
-      return NextResponse.json(
-        { error: "Erro ao salvar produto no banco de dados" },
-        { status: 500 }
-      )
-    }
-  } catch (error) {
-    console.error("❌ API: Erro ao criar produto:", error)
     return NextResponse.json(
-      { error: "Erro interno do servidor" },
-      { status: 500 }
+      { id: productId, message: "Produto criado com sucesso" },
+      { status: 201 }
     )
+  } catch (error) {
+    console.error("Erro ao criar produto:", error)
+    const errorMessage = error instanceof Error ? error.message : 'Erro interno do servidor'
+    return NextResponse.json({ error: errorMessage }, { status: 500 })
   }
 }

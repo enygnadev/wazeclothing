@@ -114,7 +114,7 @@ export function AuthForm({ mode: initialMode = "login" }: AuthFormProps) {
       router.push(returnUrl)
 
     } catch (error: unknown) {
-      const errorCode = error?.code || ""
+      const errorCode = (error as any)?.code || ""
       let errorMessage = "Ocorreu um erro. Tente novamente."
 
       if (errorCode.includes("user-not-found")) {
@@ -155,7 +155,7 @@ export function AuthForm({ mode: initialMode = "login" }: AuthFormProps) {
       router.push(returnUrl)
 
     } catch (error: unknown) {
-      const errorCode = error?.code || ""
+      const errorCode = (error as any)?.code || ""
       let errorMessage = "Erro ao fazer login com Google."
 
       if (errorCode.includes("popup-closed-by-user")) {

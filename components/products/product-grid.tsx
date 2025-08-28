@@ -22,10 +22,10 @@ export function ProductGrid() {
         setError(null)
 
         console.log("🔍 Buscando produtos... (tentativa:", retryCount + 1, ")")
-        
+
         const controller = new AbortController()
         const timeoutId = setTimeout(() => controller.abort(), 10000) // 10s timeout
-        
+
         const response = await fetch("/api/products", {
           method: "GET",
           headers: {
@@ -33,10 +33,10 @@ export function ProductGrid() {
           },
           signal: controller.signal,
         })
-        
+
         clearTimeout(timeoutId)
         console.log("📡 Resposta da API:", response.status, response.statusText)
-        
+
         if (!response.ok) {
           // Se for erro 502 e primeira tentativa, tentar novamente
           if (response.status === 502 && retryCount < 2) {
@@ -44,11 +44,11 @@ export function ProductGrid() {
             setTimeout(() => fetchProducts(retryCount + 1), 2000)
             return
           }
-          
+
           console.error("❌ Erro na resposta:", response.status, response.statusText)
           throw new Error(`HTTP ${response.status}: ${response.statusText}`)
         }
-        
+
         const data = await response.json()
         console.log("📦 Dados recebidos:", data)
 
@@ -65,10 +65,10 @@ export function ProductGrid() {
       } catch (error) {
         console.error("❌ Erro ao buscar produtos:", error)
         setProducts([])
-        
-        if (error.name === 'AbortError') {
+
+        if ((error as any).name === 'AbortError') {
           setError("Tempo limite excedido. Tente recarregar a página.")
-        } else if (error.message.includes("502")) {
+        } else if ((error as Error).message.includes("502")) {
           setError("Servidor temporariamente indisponível. Tentando reconectar...")
           if (retryCount < 2) {
             setTimeout(() => fetchProducts(retryCount + 1), 3000)

@@ -50,11 +50,11 @@ export async function getProducts(): Promise<Product[]> {
     return products
   } catch (error) {
     console.error("❌ Firebase: Erro ao buscar produtos:", error)
-    console.error("🔍 Firebase: Tipo do erro:", error.code)
-    console.error("📝 Firebase: Mensagem:", error.message)
+    console.error("🔍 Firebase: Tipo do erro:", (error as any).code)
+    console.error("📝 Firebase: Mensagem:", (error as Error).message)
 
-    // Se há erro de permissão, tentar buscar sem orderBy
-    if (error.code === 'permission-denied' || error.message?.includes('permission')) {
+    // Handle specific Firebase errors
+    if ((error as any).code === 'permission-denied' || (error as Error).message?.includes('permission')) {
       try {
         console.log("🔄 Firebase: Tentando busca simples sem orderBy...")
         const db = getDb()
