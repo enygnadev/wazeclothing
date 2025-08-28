@@ -77,10 +77,8 @@ export function AuthForm({ mode }: AuthFormProps) {
       setTimeout(() => {
         const urlParams = new URLSearchParams(window.location.search)
         const returnUrl = urlParams.get('returnUrl') || '/'
-
-        // Força recarregar a página para garantir que o estado seja atualizado
-        window.location.href = returnUrl
-      }, 1000)
+        router.push(returnUrl)
+      }, 500)
 
     } catch (error: any) {
       const errorCode = error?.code || ""
@@ -123,10 +121,8 @@ export function AuthForm({ mode }: AuthFormProps) {
       setTimeout(() => {
         const urlParams = new URLSearchParams(window.location.search)
         const returnUrl = urlParams.get('returnUrl') || '/'
-
-        // Força recarregar a página para garantir que o estado seja atualizado
-        window.location.href = returnUrl
-      }, 1000)
+        router.push(returnUrl)
+      }, 500)
 
     } catch (error: any) {
       const errorCode = error?.code || ""

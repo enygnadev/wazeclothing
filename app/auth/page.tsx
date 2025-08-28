@@ -64,7 +64,7 @@ function AuthPageContent() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <AuthForm returnUrl={returnUrl} type={type} />
+          <AuthForm mode={type === 'admin' ? 'login' : 'login'} />
         </CardContent>
       </Card>
     </div>

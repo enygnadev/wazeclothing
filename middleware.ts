@@ -1,64 +1,50 @@
 import { NextRequest, NextResponse } from "next/server"
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // Lista de rotas protegidas
-  const protectedRoutes = ['/admin', '/cliente', '/checkout']
-
-  // Verificar se é uma rota protegida
-  const isProtectedRoute = protectedRoutes.some(route =>
-    pathname.startsWith(route)
-  )
-
-  // Se não for rota protegida, permitir acesso
-  if (!isProtectedRoute) {
+  // Skip middleware for static files and API routes (except auth-related)
+  if (
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/static') ||
+    pathname.includes('.') ||
+    pathname.startsWith('/api/health') ||
+    pathname.startsWith('/api/products') ||
+    pathname.startsWith('/api/chat')
+  ) {
     return NextResponse.next()
   }
 
-  // Verificar token de autenticação no cookie
-  const authToken = request.cookies.get('auth-token')?.value
+  // Public routes that don't require authentication
+  const publicRoutes = ['/', '/auth', '/products', '/categories', '/contato']
+  if (publicRoutes.includes(pathname)) {
+    return NextResponse.next()
+  }
 
-  // Lista de tokens inválidos
-  const invalidTokens = ['', 'undefined', 'null', undefined, null]
-  
-  // Se não tem token válido, redirecionar para login
-  if (!authToken || invalidTokens.includes(authToken) || authToken.length < 10) {
-    console.log("🚫 Token inválido ou ausente:", { 
-      authToken: authToken ? authToken.substring(0, 10) + '...' : 'null',
-      pathname,
-      hasToken: !!authToken,
-      tokenLength: authToken?.length || 0
-    })
-    
-    const loginUrl = new URL('/auth', request.url)
-    loginUrl.searchParams.set('returnUrl', pathname)
+  // Admin routes protection
+  if (pathname.startsWith('/admin')) {
+    const token = request.cookies.get('auth-token')?.value
 
-    if (pathname.startsWith('/admin')) {
-      loginUrl.searchParams.set('type', 'admin')
+    if (!token) {
+      const url = new URL('/auth', request.url)
+      url.searchParams.set('returnUrl', pathname)
+      url.searchParams.set('type', 'admin')
+      return NextResponse.redirect(url)
     }
 
-    return NextResponse.redirect(loginUrl)
-  }
-
-  // Para rotas admin - verificação do token
-  if (pathname.startsWith('/admin')) {
-    // Token existe e parece válido, deixar componente fazer verificação mais detalhada
-    console.log("🔐 Admin route access:", { 
-      pathname, 
-      hasToken: !!authToken, 
-      tokenLength: authToken?.length || 0,
-      tokenPreview: authToken ? authToken.substring(0, 20) + '...' : 'none'
-    })
     return NextResponse.next()
   }
 
-  // Se tem token válido, deixar passar
-  return NextResponse.next()
-}
+  // Cliente area protection
+  if (pathname.startsWith('/cliente') || pathname.startsWith('/checkout')) {
+    const token = request.cookies.get('auth-token')?.value
 
-export const config = {
-  matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico|manifest.json|.*\\.png$|.*\\.jpg$|.*\\.svg$|.*\\.gif$).*)',
-  ],
+    if (!token) {
+      const url = new URL('/auth', request.url)
+      url.searchParams.set('returnUrl', pathname)
+      return NextResponse.redirect(url)
+    }
+  }
+
+  return NextResponse.next()
 }
