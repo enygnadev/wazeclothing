@@ -2,73 +2,28 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { ShoppingCart, User, LogOut, Loader2, Crown, Sparkles, Menu, X } from "lucide-react"
+import { Sparkles, ShoppingCart, User, Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useAuth } from "@/components/providers/auth-provider"
+import { CartDrawer } from "@/components/cart/cart-drawer"
 import { useCart } from "@/components/providers/cart-provider"
-import { Badge } from "@/components/ui/badge"
-import { ThemeToggle } from "@/components/theme/theme-toggle"
-import { useToast } from "@/hooks/use-toast"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { useAuth } from "@/components/providers/auth-provider"
 
 export function Header() {
-  const { user, userProfile, loading, initialized, signOut, initializeAuth } = useAuth()
-  const { itemCount, setIsOpen } = useCart()
-  const { toast } = useToast()
-  const [mounted, setMounted] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [cartOpen, setCartOpen] = useState(false)
+  const { items } = useCart()
+  const { user, signOut } = useAuth()
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  // Handle scroll effect
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20)
+      setScrolled(window.scrollY > 10)
     }
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  // Initialize auth when component mounts (but don't block rendering)
-  useEffect(() => {
-    if (mounted && !initialized) {
-      initializeAuth().catch((error) => {
-        console.error("Background auth initialization failed:", error)
-      })
-    }
-  }, [mounted, initialized, initializeAuth])
-
-  const handleSignOut = async () => {
-    try {
-      await signOut()
-      toast({
-        title: "Logout realizado",
-        description: "Você foi desconectado com sucesso.",
-      })
-    } catch (error) {
-      console.error("Error signing out:", error)
-      toast({
-        title: "Erro",
-        description: "Erro ao fazer logout.",
-        variant: "destructive",
-      })
-    }
-  }
-
-  if (!mounted) {
-    return (
-      <header className="fixed top-0 z-50 w-full backdrop-blur-luxury bg-background/80 border-b border-border/50">
-        <div className="container mx-auto px-4">
-          <div className="flex h-16 items-center justify-between">
-            <div className="w-8 h-8 animate-pulse bg-muted rounded-full" />
-          </div>
-        </div>
-      </header>
-    )
-  }
+  const itemCount = items.reduce((total, item) => total + item.quantity, 0)
 
   return (
     <header
@@ -87,136 +42,89 @@ export function Header() {
               </div>
             </div>
             <div>
-              <h1 className="font-luxury text-lg font-bold text-zinc">Waze</h1>
-              <p className="font-elegant text-xs text-muted-foreground -mt-1 hidden sm:block">Lighting</p>
+              <h1 className="font-luxury text-lg font-bold text-foreground">Waze</h1>
+              <p className="text-xs text-muted-foreground -mt-1">Clothing</p>
             </div>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-6">
+          <nav className="hidden md:flex items-center space-x-8">
             <Link
               href="/"
-              className="font-elegant text-sm font-medium hover:text-black-500 transition-colors relative group"
+              className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors"
             >
-              Início
-              <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-green-400 to-white-500 group-hover:w-full transition-all duration-300"></div>
+              Home
             </Link>
             <Link
               href="/products"
-              className="font-elegant text-sm font-medium hover:text-green-500 transition-colors relative group"
+              className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors"
             >
               Produtos
-              <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-green-400 to-white-500 group-hover:w-full transition-all duration-300"></div>
             </Link>
-            {/* Navigation */}
-            <nav className="hidden md:flex items-center space-x-8">
-              <Link href="/products" className="text-sm font-medium transition-colors hover:text-primary">
-                Produtos
+            <Link
+              href="/categories"
+              className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors"
+            >
+              Categorias
+            </Link>
+            <Link
+              href="/contato"
+              className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors"
+            >
+              Contato
+            </Link>
+            {user && (
+              <Link
+                href="/cliente"
+                className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors"
+              >
+                Área Cliente
               </Link>
-              <Link href="/categories" className="text-sm font-medium transition-colors hover:text-primary">
-                Categorias
-              </Link>
-              <Link href="/cliente" className="text-sm font-medium transition-colors hover:text-primary">
-                Área do Cliente
-              </Link>
-              <Link href="/about" className="text-sm font-medium transition-colors hover:text-primary">
-                Sobre
-              </Link>
-              <Link href="/contact" className="text-sm font-medium transition-colors hover:text-primary">
-                Contato
-              </Link>
-            </nav>
+            )}
           </nav>
 
-
-          {/* Right side actions */}
-          <div className="flex items-center space-x-2">
-            {/* Theme toggle - hidden on mobile */}
-            <div className="hidden sm:block">
-              <ThemeToggle />
-            </div>
-
+          {/* Actions */}
+          <div className="flex items-center space-x-4">
             {/* Cart */}
             <Button
               variant="ghost"
-              size="icon"
-              onClick={() => setIsOpen(true)}
-              className="relative group hover:bg-amber-50 dark:hover:bg-amber-950/20 transition-colors h-9 w-9"
+              size="sm"
+              className="relative"
+              onClick={() => setCartOpen(true)}
             >
-              <ShoppingCart className="h-4 w-4 group-hover:text-amber-500 transition-colors" />
+              <ShoppingCart className="h-4 w-4" />
               {itemCount > 0 && (
-                <Badge className="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center p-0 text-xs bg-gradient-to-r from-amber-400 to-yellow-500 text-black font-bold animate-pulse">
+                <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground rounded-full text-xs w-5 h-5 flex items-center justify-center">
                   {itemCount}
-                </Badge>
+                </span>
               )}
             </Button>
 
-            {/* Auth section */}
-            {!initialized ? (
-              <div className="flex items-center space-x-1">
-                <Loader2 className="h-3 w-3 animate-spin text-amber-500" />
-                <span className="text-xs text-muted-foreground font-elegant hidden sm:inline">Carregando...</span>
-              </div>
-            ) : loading ? (
-              <Loader2 className="h-4 w-4 animate-spin text-amber-500" />
-            ) : user ? (
+            {/* User */}
+            {user ? (
               <div className="flex items-center space-x-2">
-                {userProfile?.isAdmin && (
-                  <Link href="/admin" className="hidden sm:block">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="font-elegant border-amber-400/50 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/20 h-8 px-3 text-xs"
-                    >
-                      <Crown className="w-3 h-3 mr-1" />
-                      Admin
-                    </Button>
+                <Button variant="ghost" size="sm" asChild>
+                  <Link href="/cliente">
+                    <User className="h-4 w-4" />
                   </Link>
-                )}
-
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="relative group h-9 w-9">
-                      <div className="absolute inset-0 bg-gradient-to-r from-amber-400/20 to-yellow-400/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                      <User className="h-4 w-4 relative z-10 group-hover:text-amber-500 transition-colors" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    align="end"
-                    className="w-40 bg-background/95 backdrop-blur-sm border border-border/50"
-                  >
-                    {userProfile?.isAdmin && (
-                      <DropdownMenuItem asChild className="sm:hidden">
-                        <Link href="/admin" className="font-elegant hover:bg-amber-50 dark:hover:bg-amber-950/20">
-                          <Crown className="mr-2 h-3 w-3" />
-                          Admin
-                        </Link>
-                      </DropdownMenuItem>
-                    )}
-                    <DropdownMenuItem
-                      onClick={handleSignOut}
-                      className="font-elegant hover:bg-amber-50 dark:hover:bg-amber-950/20"
-                    >
-                      <LogOut className="mr-2 h-3 w-3" />
-                      Sair
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                </Button>
+                <Button variant="ghost" size="sm" onClick={signOut}>
+                  Sair
+                </Button>
               </div>
             ) : (
-              <Link href="/auth">
-                <Button className="font-elegant font-semibold bg-white from-black-400 to-green-500 hover:from-white-500 hover:to-white-600 text-black border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 h-9 px-4 text-sm">
-                  <Crown className="w-3 h-3 mr-1 sm:mr-2" />
-                  <span className="hidden sm:inline">Entrar</span>
-                </Button>
-              </Link>
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/auth">
+                  <User className="h-4 w-4" />
+                </Link>
+              </Button>
             )}
 
-            {/* Mobile menu button */}
+            {/* Mobile Menu Toggle */}
             <Button
               variant="ghost"
-              size="icon"
-              className="md:hidden h-9 w-9"
+              size="sm"
+              className="md:hidden"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
@@ -230,32 +138,47 @@ export function Header() {
             <nav className="flex flex-col space-y-2 p-4">
               <Link
                 href="/"
-                className="font-elegant text-sm font-medium hover:text-amber-500 transition-colors py-2"
+                className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Início
+                Home
               </Link>
               <Link
                 href="/products"
-                className="font-elegant text-sm font-medium hover:text-amber-500 transition-colors py-2"
+                className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Produtos
               </Link>
               <Link
-                href="/cliente"
-                className="font-elegant text-sm font-medium hover:text-amber-500 transition-colors py-2"
+                href="/categories"
+                className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Área do Cliente
+                Categorias
               </Link>
-              <div className="pt-2">
-                <ThemeToggle />
-              </div>
+              <Link
+                href="/contato"
+                className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Contato
+              </Link>
+              {user && (
+                <Link
+                  href="/cliente"
+                  className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors py-2"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Área Cliente
+                </Link>
+              )}
             </nav>
           </div>
         )}
       </div>
+
+      <CartDrawer open={cartOpen} onOpenChange={setCartOpen} />
     </header>
   )
 }

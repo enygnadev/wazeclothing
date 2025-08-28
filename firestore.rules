@@ -5,6 +5,7 @@ service cloud.firestore {
     // Função para verificar se o usuário é admin
     function isAdmin() {
       return request.auth != null && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
     }
     
@@ -13,41 +14,69 @@ service cloud.firestore {
       return request.auth != null && request.auth.uid == userId;
     }
     
+    // Função para verificar autenticação
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Função para validar dados obrigatórios
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+    
     // Produtos - leitura pública, escrita apenas admin
     match /products/{productId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow create: if isAdmin() && 
+        hasRequiredFields(['name', 'price', 'category']) &&
+        request.resource.data.price is number &&
+        request.resource.data.price > 0;
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
     }
     
     // Usuários - ler/escrever apenas próprios dados ou admin
     match /users/{userId} {
       allow read: if isOwner(userId) || isAdmin();
-      allow write: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId) && 
+        hasRequiredFields(['email', 'name']) &&
+        request.resource.data.email == request.auth.token.email;
+      allow update: if (isOwner(userId) || isAdmin()) &&
+        // Usuário não pode alterar próprio status de admin
+        (isAdmin() || !('isAdmin' in request.resource.data.diff(resource.data).affectedKeys()));
+      allow delete: if isAdmin();
       
-      // LGPD - Log de acesso aos dados
-      allow read: if isOwner(userId) && 
-        resource != null && 
-        resource.data.consentDate != null;
+      // LGPD - Consentimento obrigatório para criar perfil
+      allow create: if isOwner(userId) && 
+        request.resource.data.consentDate is timestamp &&
+        request.resource.data.consentVersion is string;
     }
     
     // Pedidos - ler próprios pedidos ou admin gerenciar todos
     match /orders/{orderId} {
-      allow read: if isOwner(resource.data.userId) || isAdmin();
-      allow create: if request.auth != null && 
-        request.auth.uid == request.resource.data.userId;
+      allow read: if isAuthenticated() && 
+        (isOwner(resource.data.userId) || isAdmin());
+      allow create: if isAuthenticated() && 
+        request.auth.uid == request.resource.data.userId &&
+        hasRequiredFields(['items', 'total', 'status']) &&
+        request.resource.data.total is number &&
+        request.resource.data.total > 0 &&
+        request.resource.data.items is list &&
+        request.resource.data.items.size() > 0;
       allow update: if isAdmin() || 
         (isOwner(resource.data.userId) && 
-         request.resource.data.diff(resource.data).affectedKeys()
-         .hasOnly(['status']) && 
-         request.resource.data.status == 'cancelled');
+         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']) && 
+         request.resource.data.status in ['cancelled']);
+      allow delete: if isAdmin();
     }
     
     // Carrinho - apenas próprio usuário
     match /carts/{userId} {
       allow read, write: if isOwner(userId);
+      allow create: if isOwner(userId) && request.resource.data.items is list;
     }
     
-    // Configurações da loja - apenas admin
+    // Configurações da loja - leitura pública, escrita admin
     match /settings/{document} {
       allow read: if true;
       allow write: if isAdmin();
@@ -56,12 +85,13 @@ service cloud.firestore {
     // Categorias - leitura pública, escrita admin
     match /categories/{categoryId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow create, update, delete: if isAdmin();
     }
     
     // Logs de auditoria LGPD - apenas admin
     match /audit_logs/{logId} {
       allow read, write: if isAdmin();
+      allow create: if isAuthenticated(); // Para logs automáticos
     }
     
     // Dados sensíveis (LGPD) - apenas próprio usuário
@@ -70,26 +100,43 @@ service cloud.firestore {
       allow delete: if isOwner(userId); // Direito ao esquecimento LGPD
     }
     
-    // Consentimentos LGPD
+    // Consentimentos LGPD - próprio usuário ou admin
     match /consents/{userId} {
-      allow read, write: if isOwner(userId) || isAdmin();
+      allow read: if isOwner(userId) || isAdmin();
+      allow write: if isOwner(userId);
+      allow create: if isOwner(userId) && 
+        hasRequiredFields(['consentDate', 'version', 'accepted']) &&
+        request.resource.data.accepted is bool;
     }
     
     // Solicitações de exclusão de dados (LGPD)
     match /data_deletion_requests/{requestId} {
-      allow read, write: if isOwner(resource.data.userId) || isAdmin();
+      allow read: if isAuthenticated() && 
+        (isOwner(resource.data.userId) || isAdmin());
+      allow create: if isAuthenticated() && 
+        request.auth.uid == request.resource.data.userId;
+      allow update: if isAdmin(); // Admin processa as solicitações
     }
     
-    // Newsletters - usuário pode se inscrever/desinscrever
+    // Newsletters - controle de inscrição
     match /newsletters/{email} {
-      allow read, write: if request.auth != null;
-      allow delete: if request.auth != null; // Unsubscribe
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && 
+        request.resource.data.email == request.auth.token.email;
+      allow delete: if isAuthenticated() && 
+        resource.data.email == request.auth.token.email; // Unsubscribe
+      allow update: if isAdmin();
     }
     
-    // Avaliações de produtos - usuário pode criar, admin pode moderar
+    // Avaliações de produtos - usuários autenticados podem criar
     match /reviews/{reviewId} {
       allow read: if true;
-      allow create: if request.auth != null;
+      allow create: if isAuthenticated() && 
+        request.auth.uid == request.resource.data.userId &&
+        hasRequiredFields(['productId', 'rating', 'comment']) &&
+        request.resource.data.rating is number &&
+        request.resource.data.rating >= 1 &&
+        request.resource.data.rating <= 5;
       allow update, delete: if isOwner(resource.data.userId) || isAdmin();
     }
     
@@ -97,14 +144,39 @@ service cloud.firestore {
     match /user_addresses/{userId} {
       match /addresses/{addressId} {
         allow read, write: if isOwner(userId);
+        allow create: if isOwner(userId) && 
+          hasRequiredFields(['street', 'city', 'state', 'zipCode']);
       }
     }
     
-    // Histórico de compras para recomendações (anonimizado)
+    // Histórico de compras para recomendações (dados anonimizados)
     match /purchase_history/{userId} {
       allow read, write: if isOwner(userId);
+      // Admin pode ler apenas dados anonimizados para analytics
       allow read: if isAdmin() && 
-        resource.data.keys().hasOnly(['productCategories', 'timestamp']);
+        resource.data.keys().hasOnly(['productCategories', 'timestamp', 'totalAmount']);
+    }
+    
+    // Sessões de usuário (para controle de acesso)
+    match /user_sessions/{sessionId} {
+      allow read, write: if isAuthenticated() && 
+        resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() && 
+        request.resource.data.userId == request.auth.uid;
+      allow delete: if isAuthenticated() && 
+        resource.data.userId == request.auth.uid;
+    }
+    
+    // Logs de segurança
+    match /security_logs/{logId} {
+      allow read: if isAdmin();
+      allow create: if true; // Para logs automáticos do sistema
+    }
+    
+    // Configurações de privacidade do usuário (LGPD)
+    match /privacy_settings/{userId} {
+      allow read, write: if isOwner(userId);
+      allow read: if isAdmin(); // Admin pode visualizar para compliance
     }
   }
 }
