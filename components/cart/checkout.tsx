@@ -23,7 +23,7 @@ interface CheckoutData {
 }
 
 export function Checkout() {
-  const { cartItems, getTotalPrice, clearCart } = useCart()
+  const { items: cartItems, getTotalPrice, clearCart } = useCart()
   const { user } = useAuth()
   const [loading, setLoading] = useState(false)
   const [checkoutData, setCheckoutData] = useState<CheckoutData>({
@@ -53,10 +53,10 @@ export function Checkout() {
     
     message += `🛒 *ITENS DO PEDIDO:*\n`
     cartItems.forEach((item, index) => {
-      message += `${index + 1}. ${item.title}\n`
+      message += `${index + 1}. ${item.product.title}\n`
       message += `   Quantidade: ${item.quantity}\n`
-      message += `   Valor unitário: R$ ${item.price.toFixed(2)}\n`
-      message += `   Subtotal: R$ ${(item.price * item.quantity).toFixed(2)}\n\n`
+      message += `   Valor unitário: R$ ${item.product.price.toFixed(2)}\n`
+      message += `   Subtotal: R$ ${(item.product.price * item.quantity).toFixed(2)}\n\n`
     })
     
     message += `💰 *RESUMO DO PAGAMENTO:*\n`
@@ -92,9 +92,17 @@ export function Checkout() {
 
     setLoading(true)
     try {
+      const orderItems = cartItems.map(item => ({
+        id: item.id,
+        title: item.product.title,
+        price: item.product.price,
+        quantity: item.quantity,
+        image: item.product.image
+      }))
+
       const order = {
         userId: user.uid,
-        items: cartItems,
+        items: orderItems,
         total,
         shippingFee: finalShippingFee,
         status: "pending" as const,
@@ -109,7 +117,7 @@ export function Checkout() {
       }
 
       await createOrder(order)
-      clearCart()
+      await clearCart()
       
       if (paymentMethod === "pix") {
         // Redirecionar para página de confirmação PIX
@@ -252,13 +260,13 @@ export function Checkout() {
               {cartItems.map((item) => (
                 <div key={item.id} className="flex justify-between items-center">
                   <div>
-                    <p className="font-medium">{item.title}</p>
+                    <p className="font-medium">{item.product.title}</p>
                     <p className="text-sm text-muted-foreground">
                       Quantidade: {item.quantity}
                     </p>
                   </div>
                   <p className="font-medium">
-                    R$ {(item.price * item.quantity).toFixed(2)}
+                    R$ {(item.product.price * item.quantity).toFixed(2)}
                   </p>
                 </div>
               ))}
