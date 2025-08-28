@@ -1,0 +1,50 @@
+ Unsupported metadata viewport is configured in metadata export in /auth. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+Mt.forEach.n.<computed> @ Console.js:61
+react-stack-bottom-frame @ react-server-dom-webpack-client.browser.development.js:2648
+resolveConsoleEntry @ react-server-dom-webpack-client.browser.development.js:2115
+processFullStringRow @ react-server-dom-webpack-client.browser.development.js:2250
+processFullBinaryRow @ react-server-dom-webpack-client.browser.development.js:2213
+progress @ react-server-dom-webpack-client.browser.development.js:2459
+<__next_metadata_boundary__>
+buildFakeTask @ react-server-dom-webpack-client.browser.development.js:2021
+initializeFakeTask @ react-server-dom-webpack-client.browser.development.js:2007
+resolveDebugInfo @ react-server-dom-webpack-client.browser.development.js:2043
+processFullStringRow @ react-server-dom-webpack-client.browser.development.js:2241
+processFullBinaryRow @ react-server-dom-webpack-client.browser.development.js:2213
+progress @ react-server-dom-webpack-client.browser.development.js:2459
+<MetadataTree>
+buildFakeTask @ react-server-dom-webpack-client.browser.development.js:2020
+initializeFakeTask @ react-server-dom-webpack-client.browser.development.js:2007
+resolveDebugInfo @ react-server-dom-webpack-client.browser.development.js:2043
+processFullStringRow @ react-server-dom-webpack-client.browser.development.js:2241
+processFullBinaryRow @ react-server-dom-webpack-client.browser.development.js:2213
+progress @ react-server-dom-webpack-client.browser.development.js:2459
+"use server"
+ResponseInstance @ react-server-dom-webpack-client.browser.development.js:1567
+createResponseFromOptions @ react-server-dom-webpack-client.browser.development.js:2376
+exports.createFromReadableStream @ react-server-dom-webpack-client.browser.development.js:2696
+eval @ app-index.js:133
+(app-pages-browser)/./node_modules/next/dist/client/app-index.js @ main-app.js?v=1756400716147:160
+options.factory @ webpack.js?v=1756400716147:712
+__webpack_require__ @ webpack.js?v=1756400716147:37
+fn @ webpack.js?v=1756400716147:369
+eval @ app-next-dev.js:10
+eval @ app-bootstrap.js:62
+loadScriptsInSequence @ app-bootstrap.js:23
+appBootstrap @ app-bootstrap.js:56
+eval @ app-next-dev.js:9
+(app-pages-browser)/./node_modules/next/dist/client/app-next-dev.js @ main-app.js?v=1756400716147:182
+options.factory @ webpack.js?v=1756400716147:712
+__webpack_require__ @ webpack.js?v=1756400716147:37
+__webpack_exec__ @ main-app.js?v=1756400716147:2792
+(anonymous) @ main-app.js?v=1756400716147:2793
+webpackJsonpCallback @ webpack.js?v=1756400716147:1388
+(anonymous) @ main-app.js?v=1756400716147:9Understand this warning
+Console.js:61 🔒 Persistência local configurada
+Console.js:61 🔄 Auth state changed: {user: true, email: 'guga1trance@gmail.com'}
+Console.js:61 🔒 Persistência local configurada
+Console.js:61 🔄 Auth state changed: {user: true, email: 'guga1trance@gmail.com'}
+2Console.js:61 🍪 Token atualizado no cookie (1 hora)
+Console.js:61 👤 Profile carregado: {isAdmin: true}
+Console.js:61 👤 Profile carregado: {isAdmin: true}

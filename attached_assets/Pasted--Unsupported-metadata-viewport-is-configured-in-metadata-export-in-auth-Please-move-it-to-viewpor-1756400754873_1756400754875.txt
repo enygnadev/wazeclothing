@@ -1,0 +1,455 @@
+⚠ Unsupported metadata viewport is configured in metadata export in /auth. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+Mt.forEach.n.<computed> @ VM1849 eruda.js:2
+react-stack-bottom-frame @ VM1947 react-server-dom-webpack-client.browser.development.js:2648
+resolveConsoleEntry @ VM1947 react-server-dom-webpack-client.browser.development.js:2115
+processFullStringRow @ VM1947 react-server-dom-webpack-client.browser.development.js:2250
+processFullBinaryRow @ VM1947 react-server-dom-webpack-client.browser.development.js:2213
+progress @ VM1947 react-server-dom-webpack-client.browser.development.js:2459
+<__next_metadata_boundary__>
+buildFakeTask @ VM1947 react-server-dom-webpack-client.browser.development.js:2021
+initializeFakeTask @ VM1947 react-server-dom-webpack-client.browser.development.js:2007
+resolveDebugInfo @ VM1947 react-server-dom-webpack-client.browser.development.js:2043
+processFullStringRow @ VM1947 react-server-dom-webpack-client.browser.development.js:2241
+processFullBinaryRow @ VM1947 react-server-dom-webpack-client.browser.development.js:2213
+progress @ VM1947 react-server-dom-webpack-client.browser.development.js:2459
+<MetadataTree>
+buildFakeTask @ VM1947 react-server-dom-webpack-client.browser.development.js:2020
+initializeFakeTask @ VM1947 react-server-dom-webpack-client.browser.development.js:2007
+resolveDebugInfo @ VM1947 react-server-dom-webpack-client.browser.development.js:2043
+processFullStringRow @ VM1947 react-server-dom-webpack-client.browser.development.js:2241
+processFullBinaryRow @ VM1947 react-server-dom-webpack-client.browser.development.js:2213
+progress @ VM1947 react-server-dom-webpack-client.browser.development.js:2459
+"use server"
+ResponseInstance @ VM1947 react-server-dom-webpack-client.browser.development.js:1567
+createResponseFromOptions @ VM1947 react-server-dom-webpack-client.browser.development.js:2376
+exports.createFromReadableStream @ VM1947 react-server-dom-webpack-client.browser.development.js:2696
+eval @ VM1915 app-index.js:133
+(app-pages-browser)/./node_modules/next/dist/client/app-index.js @ VM1852 main-app.js:160
+options.factory @ VM1851 webpack.js:712
+__webpack_require__ @ VM1851 webpack.js:37
+fn @ VM1851 webpack.js:369
+eval @ VM1903 app-next-dev.js:10
+eval @ VM1907 app-bootstrap.js:62
+loadScriptsInSequence @ VM1907 app-bootstrap.js:23
+appBootstrap @ VM1907 app-bootstrap.js:56
+eval @ VM1903 app-next-dev.js:9
+(app-pages-browser)/./node_modules/next/dist/client/app-next-dev.js @ VM1852 main-app.js:182
+options.factory @ VM1851 webpack.js:712
+__webpack_require__ @ VM1851 webpack.js:37
+__webpack_exec__ @ VM1852 main-app.js:2792
+(anonymous) @ VM1852 main-app.js:2793
+webpackJsonpCallback @ VM1851 webpack.js:1388
+(anonymous) @ VM1852 main-app.js:9Understand this warning
+VM1849 eruda.js:2 🔒 Persistência local configurada
+VM1849 eruda.js:2 🔄 Auth state changed: {user: true, email: 'guga1trance@gmail.com'}
+VM1849 eruda.js:2 🔒 Persistência local configurada
+VM1849 eruda.js:2 🔄 Auth state changed: {user: true, email: 'guga1trance@gmail.com'}
+2VM1849 eruda.js:2 🍪 Token atualizado no cookie (1 hora)
+VM1849 eruda.js:2 👤 Profile carregado: {isAdmin: true}
+VM1849 eruda.js:2 👤 Profile carregado: {isAdmin: true}
+2VM1849 eruda.js:2 [Fast Refresh] rebuilding
+VM1849 eruda.js:2 [Fast Refresh] done in 394ms
+VM1849 eruda.js:2 [Fast Refresh] rebuilding
+VM1849 eruda.js:2 [Fast Refresh] done in 37ms
+VM1849 eruda.js:2  GET https://8b283c02-ec74-4c62-80d5-f9e1b7c7cff5-00-1wawv1jiet4it.kirk.replit.dev/auth?returnUrl=%2Fadmin&type=admin&_rsc=u2h8d 500 (Internal Server Error)
+window.fetch @ VM1849 eruda.js:2
+apply @ VM1850 injected.js:253
+createFetch @ VM1964 fetch-server-response.js:163
+fetchServerResponse @ VM1964 fetch-server-response.js:98
+hmrRefreshReducerImpl @ VM2031 hmr-refresh-reducer.js:33
+clientReducer @ VM1962 router-reducer.js:41
+action @ VM1961 action-queue.js:141
+runAction @ VM1961 action-queue.js:51
+dispatchAction @ VM1961 action-queue.js:105
+dispatch @ VM1961 action-queue.js:139
+eval @ VM1994 use-reducer.js:40
+startTransition @ VM1940 react-dom-client.development.js:6249
+eval @ VM1994 use-reducer.js:39
+eval @ VM1992 app-router.js:262
+exports.startTransition @ VM1912 react.development.js:1129
+hmrRefresh @ VM1992 app-router.js:261
+eval @ VM2204 hot-reloader-client.js:343
+exports.startTransition @ VM1912 react.development.js:1129
+processMessage @ VM2204 hot-reloader-client.js:342
+handler @ VM2204 hot-reloader-client.js:525Understand this error
+VM1849 eruda.js:2 [Fast Refresh] done in 3714ms
+VM1849 eruda.js:2  Server   ⚠ Unsupported metadata themeColor is configured in metadata export in /auth. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+Mt.forEach.n.<computed> @ VM1849 eruda.js:2
+react-stack-bottom-frame @ VM1947 react-server-dom-webpack-client.browser.development.js:2648
+resolveConsoleEntry @ VM1947 react-server-dom-webpack-client.browser.development.js:2115
+processFullStringRow @ VM1947 react-server-dom-webpack-client.browser.development.js:2250
+processFullBinaryRow @ VM1947 react-server-dom-webpack-client.browser.development.js:2213
+progress @ VM1947 react-server-dom-webpack-client.browser.development.js:2459
+<StreamingMetadataOutlet>
+buildFakeTask @ VM1947 react-server-dom-webpack-client.browser.development.js:2020
+initializeFakeTask @ VM1947 react-server-dom-webpack-client.browser.development.js:2007
+resolveDebugInfo @ VM1947 react-server-dom-webpack-client.browser.development.js:2043
+processFullStringRow @ VM1947 react-server-dom-webpack-client.browser.development.js:2241
+processFullBinaryRow @ VM1947 react-server-dom-webpack-client.browser.development.js:2213
+progress @ VM1947 react-server-dom-webpack-client.browser.development.js:2459
+"use server"
+ResponseInstance @ VM1947 react-server-dom-webpack-client.browser.development.js:1567
+createResponseFromOptions @ VM1947 react-server-dom-webpack-client.browser.development.js:2376
+exports.createFromReadableStream @ VM1947 react-server-dom-webpack-client.browser.development.js:2696
+createFromNextReadableStream @ VM1964 fetch-server-response.js:172
+fetchServerResponse @ VM1964 fetch-server-response.js:126
+await in fetchServerResponse
+hmrRefreshReducerImpl @ VM2031 hmr-refresh-reducer.js:33
+clientReducer @ VM1962 router-reducer.js:41
+action @ VM1961 action-queue.js:141
+runAction @ VM1961 action-queue.js:51
+runRemainingActions @ VM1961 action-queue.js:29
+handleResult @ VM1961 action-queue.js:58
+Promise.then
+runAction @ VM1961 action-queue.js:63
+dispatchAction @ VM1961 action-queue.js:105
+dispatch @ VM1961 action-queue.js:139
+eval @ VM1994 use-reducer.js:40
+startTransition @ VM1940 react-dom-client.development.js:6249
+eval @ VM1994 use-reducer.js:39
+eval @ VM1992 app-router.js:262
+exports.startTransition @ VM1912 react.development.js:1129
+hmrRefresh @ VM1992 app-router.js:261
+eval @ VM2204 hot-reloader-client.js:343
+exports.startTransition @ VM1912 react.development.js:1129
+processMessage @ VM2204 hot-reloader-client.js:342
+handler @ VM2204 hot-reloader-client.js:525Understand this warning
+VM1849 eruda.js:2  Server   ⚠ Unsupported metadata viewport is configured in metadata export in /auth. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+Mt.forEach.n.<computed> @ VM1849 eruda.js:2
+react-stack-bottom-frame @ VM1947 react-server-dom-webpack-client.browser.development.js:2648
+resolveConsoleEntry @ VM1947 react-server-dom-webpack-client.browser.development.js:2115
+processFullStringRow @ VM1947 react-server-dom-webpack-client.browser.development.js:2250
+processFullBinaryRow @ VM1947 react-server-dom-webpack-client.browser.development.js:2213
+progress @ VM1947 react-server-dom-webpack-client.browser.development.js:2459
+<StreamingMetadataOutlet>
+buildFakeTask @ VM1947 react-server-dom-webpack-client.browser.development.js:2020
+initializeFakeTask @ VM1947 react-server-dom-webpack-client.browser.development.js:2007
+resolveDebugInfo @ VM1947 react-server-dom-webpack-client.browser.development.js:2043
+processFullStringRow @ VM1947 react-server-dom-webpack-client.browser.development.js:2241
+processFullBinaryRow @ VM1947 react-server-dom-webpack-client.browser.development.js:2213
+progress @ VM1947 react-server-dom-webpack-client.browser.development.js:2459
+"use server"
+ResponseInstance @ VM1947 react-server-dom-webpack-client.browser.development.js:1567
+createResponseFromOptions @ VM1947 react-server-dom-webpack-client.browser.development.js:2376
+exports.createFromReadableStream @ VM1947 react-server-dom-webpack-client.browser.development.js:2696
+createFromNextReadableStream @ VM1964 fetch-server-response.js:172
+fetchServerResponse @ VM1964 fetch-server-response.js:126
+await in fetchServerResponse
+hmrRefreshReducerImpl @ VM2031 hmr-refresh-reducer.js:33
+clientReducer @ VM1962 router-reducer.js:41
+action @ VM1961 action-queue.js:141
+runAction @ VM1961 action-queue.js:51
+runRemainingActions @ VM1961 action-queue.js:29
+handleResult @ VM1961 action-queue.js:58
+Promise.then
+runAction @ VM1961 action-queue.js:63
+dispatchAction @ VM1961 action-queue.js:105
+dispatch @ VM1961 action-queue.js:139
+eval @ VM1994 use-reducer.js:40
+startTransition @ VM1940 react-dom-client.development.js:6249
+eval @ VM1994 use-reducer.js:39
+eval @ VM1992 app-router.js:262
+exports.startTransition @ VM1912 react.development.js:1129
+hmrRefresh @ VM1992 app-router.js:261
+eval @ VM2204 hot-reloader-client.js:343
+exports.startTransition @ VM1912 react.development.js:1129
+processMessage @ VM2204 hot-reloader-client.js:342
+handler @ VM2204 hot-reloader-client.js:525Understand this warning
+VM1849 eruda.js:2  Server   ⚠ Unsupported metadata themeColor is configured in metadata export in /auth. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+Mt.forEach.n.<computed> @ VM1849 eruda.js:2
+react-stack-bottom-frame @ VM1947 react-server-dom-webpack-client.browser.development.js:2648
+resolveConsoleEntry @ VM1947 react-server-dom-webpack-client.browser.development.js:2115
+processFullStringRow @ VM1947 react-server-dom-webpack-client.browser.development.js:2250
+processFullBinaryRow @ VM1947 react-server-dom-webpack-client.browser.development.js:2213
+progress @ VM1947 react-server-dom-webpack-client.browser.development.js:2459
+<StreamingMetadataOutlet>
+buildFakeTask @ VM1947 react-server-dom-webpack-client.browser.development.js:2020
+initializeFakeTask @ VM1947 react-server-dom-webpack-client.browser.development.js:2007
+resolveDebugInfo @ VM1947 react-server-dom-webpack-client.browser.development.js:2043
+processFullStringRow @ VM1947 react-server-dom-webpack-client.browser.development.js:2241
+processFullBinaryRow @ VM1947 react-server-dom-webpack-client.browser.development.js:2213
+progress @ VM1947 react-server-dom-webpack-client.browser.development.js:2459
+"use server"
+ResponseInstance @ VM1947 react-server-dom-webpack-client.browser.development.js:1567
+createResponseFromOptions @ VM1947 react-server-dom-webpack-client.browser.development.js:2376
+exports.createFromReadableStream @ VM1947 react-server-dom-webpack-client.browser.development.js:2696
+createFromNextReadableStream @ VM1964 fetch-server-response.js:172
+fetchServerResponse @ VM1964 fetch-server-response.js:126
+await in fetchServerResponse
+hmrRefreshReducerImpl @ VM2031 hmr-refresh-reducer.js:33
+clientReducer @ VM1962 router-reducer.js:41
+action @ VM1961 action-queue.js:141
+runAction @ VM1961 action-queue.js:51
+runRemainingActions @ VM1961 action-queue.js:29
+handleResult @ VM1961 action-queue.js:58
+Promise.then
+runAction @ VM1961 action-queue.js:63
+runRemainingActions @ VM1961 action-queue.js:29
+handleResult @ VM1961 action-queue.js:58
+Promise.then
+runAction @ VM1961 action-queue.js:63
+dispatchAction @ VM1961 action-queue.js:105
+dispatch @ VM1961 action-queue.js:139
+eval @ VM1994 use-reducer.js:40
+startTransition @ VM1940 react-dom-client.development.js:6249
+eval @ VM1994 use-reducer.js:39
+eval @ VM1992 app-router.js:262
+exports.startTransition @ VM1912 react.development.js:1129
+hmrRefresh @ VM1992 app-router.js:261
+eval @ VM2204 hot-reloader-client.js:343
+exports.startTransition @ VM1912 react.development.js:1129
+processMessage @ VM2204 hot-reloader-client.js:342
+handler @ VM2204 hot-reloader-client.js:525Understand this warning
+VM1849 eruda.js:2  Server   ⚠ Unsupported metadata viewport is configured in metadata export in /auth. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+Mt.forEach.n.<computed> @ VM1849 eruda.js:2
+react-stack-bottom-frame @ VM1947 react-server-dom-webpack-client.browser.development.js:2648
+resolveConsoleEntry @ VM1947 react-server-dom-webpack-client.browser.development.js:2115
+processFullStringRow @ VM1947 react-server-dom-webpack-client.browser.development.js:2250
+processFullBinaryRow @ VM1947 react-server-dom-webpack-client.browser.development.js:2213
+progress @ VM1947 react-server-dom-webpack-client.browser.development.js:2459
+<StreamingMetadataOutlet>
+buildFakeTask @ VM1947 react-server-dom-webpack-client.browser.development.js:2020
+initializeFakeTask @ VM1947 react-server-dom-webpack-client.browser.development.js:2007
+resolveDebugInfo @ VM1947 react-server-dom-webpack-client.browser.development.js:2043
+processFullStringRow @ VM1947 react-server-dom-webpack-client.browser.development.js:2241
+processFullBinaryRow @ VM1947 react-server-dom-webpack-client.browser.development.js:2213
+progress @ VM1947 react-server-dom-webpack-client.browser.development.js:2459
+"use server"
+ResponseInstance @ VM1947 react-server-dom-webpack-client.browser.development.js:1567
+createResponseFromOptions @ VM1947 react-server-dom-webpack-client.browser.development.js:2376
+exports.createFromReadableStream @ VM1947 react-server-dom-webpack-client.browser.development.js:2696
+createFromNextReadableStream @ VM1964 fetch-server-response.js:172
+fetchServerResponse @ VM1964 fetch-server-response.js:126
+await in fetchServerResponse
+hmrRefreshReducerImpl @ VM2031 hmr-refresh-reducer.js:33
+clientReducer @ VM1962 router-reducer.js:41
+action @ VM1961 action-queue.js:141
+runAction @ VM1961 action-queue.js:51
+runRemainingActions @ VM1961 action-queue.js:29
+handleResult @ VM1961 action-queue.js:58
+Promise.then
+runAction @ VM1961 action-queue.js:63
+runRemainingActions @ VM1961 action-queue.js:29
+handleResult @ VM1961 action-queue.js:58
+Promise.then
+runAction @ VM1961 action-queue.js:63
+dispatchAction @ VM1961 action-queue.js:105
+dispatch @ VM1961 action-queue.js:139
+eval @ VM1994 use-reducer.js:40
+startTransition @ VM1940 react-dom-client.development.js:6249
+eval @ VM1994 use-reducer.js:39
+eval @ VM1992 app-router.js:262
+exports.startTransition @ VM1912 react.development.js:1129
+hmrRefresh @ VM1992 app-router.js:261
+eval @ VM2204 hot-reloader-client.js:343
+exports.startTransition @ VM1912 react.development.js:1129
+processMessage @ VM2204 hot-reloader-client.js:342
+handler @ VM2204 hot-reloader-client.js:525Understand this warning
+VM1849 eruda.js:2  Server   ⚠ Unsupported metadata themeColor is configured in metadata export in /auth. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+Mt.forEach.n.<computed> @ VM1849 eruda.js:2
+react-stack-bottom-frame @ VM1947 react-server-dom-webpack-client.browser.development.js:2648
+resolveConsoleEntry @ VM1947 react-server-dom-webpack-client.browser.development.js:2115
+processFullStringRow @ VM1947 react-server-dom-webpack-client.browser.development.js:2250
+processFullBinaryRow @ VM1947 react-server-dom-webpack-client.browser.development.js:2213
+progress @ VM1947 react-server-dom-webpack-client.browser.development.js:2459
+<StreamingMetadataOutlet>
+buildFakeTask @ VM1947 react-server-dom-webpack-client.browser.development.js:2020
+initializeFakeTask @ VM1947 react-server-dom-webpack-client.browser.development.js:2007
+resolveDebugInfo @ VM1947 react-server-dom-webpack-client.browser.development.js:2043
+processFullStringRow @ VM1947 react-server-dom-webpack-client.browser.development.js:2241
+processFullBinaryRow @ VM1947 react-server-dom-webpack-client.browser.development.js:2213
+progress @ VM1947 react-server-dom-webpack-client.browser.development.js:2459
+"use server"
+ResponseInstance @ VM1947 react-server-dom-webpack-client.browser.development.js:1567
+createResponseFromOptions @ VM1947 react-server-dom-webpack-client.browser.development.js:2376
+exports.createFromReadableStream @ VM1947 react-server-dom-webpack-client.browser.development.js:2696
+createFromNextReadableStream @ VM1964 fetch-server-response.js:172
+fetchServerResponse @ VM1964 fetch-server-response.js:126
+await in fetchServerResponse
+hmrRefreshReducerImpl @ VM2031 hmr-refresh-reducer.js:33
+clientReducer @ VM1962 router-reducer.js:41
+action @ VM1961 action-queue.js:141
+runAction @ VM1961 action-queue.js:51
+runRemainingActions @ VM1961 action-queue.js:29
+handleResult @ VM1961 action-queue.js:58
+Promise.then
+runAction @ VM1961 action-queue.js:63
+runRemainingActions @ VM1961 action-queue.js:29
+handleResult @ VM1961 action-queue.js:58
+Promise.then
+runAction @ VM1961 action-queue.js:63
+runRemainingActions @ VM1961 action-queue.js:29
+handleResult @ VM1961 action-queue.js:58Understand this warning
+VM1849 eruda.js:2  Server   ⚠ Unsupported metadata viewport is configured in metadata export in /auth. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+Mt.forEach.n.<computed> @ VM1849 eruda.js:2
+react-stack-bottom-frame @ VM1947 react-server-dom-webpack-client.browser.development.js:2648
+resolveConsoleEntry @ VM1947 react-server-dom-webpack-client.browser.development.js:2115
+processFullStringRow @ VM1947 react-server-dom-webpack-client.browser.development.js:2250
+processFullBinaryRow @ VM1947 react-server-dom-webpack-client.browser.development.js:2213
+progress @ VM1947 react-server-dom-webpack-client.browser.development.js:2459
+<StreamingMetadataOutlet>
+buildFakeTask @ VM1947 react-server-dom-webpack-client.browser.development.js:2020
+initializeFakeTask @ VM1947 react-server-dom-webpack-client.browser.development.js:2007
+resolveDebugInfo @ VM1947 react-server-dom-webpack-client.browser.development.js:2043
+processFullStringRow @ VM1947 react-server-dom-webpack-client.browser.development.js:2241
+processFullBinaryRow @ VM1947 react-server-dom-webpack-client.browser.development.js:2213
+progress @ VM1947 react-server-dom-webpack-client.browser.development.js:2459
+"use server"
+ResponseInstance @ VM1947 react-server-dom-webpack-client.browser.development.js:1567
+createResponseFromOptions @ VM1947 react-server-dom-webpack-client.browser.development.js:2376
+exports.createFromReadableStream @ VM1947 react-server-dom-webpack-client.browser.development.js:2696
+createFromNextReadableStream @ VM1964 fetch-server-response.js:172
+fetchServerResponse @ VM1964 fetch-server-response.js:126
+await in fetchServerResponse
+hmrRefreshReducerImpl @ VM2031 hmr-refresh-reducer.js:33
+clientReducer @ VM1962 router-reducer.js:41
+action @ VM1961 action-queue.js:141
+runAction @ VM1961 action-queue.js:51
+runRemainingActions @ VM1961 action-queue.js:29
+handleResult @ VM1961 action-queue.js:58
+Promise.then
+runAction @ VM1961 action-queue.js:63
+runRemainingActions @ VM1961 action-queue.js:29
+handleResult @ VM1961 action-queue.js:58
+Promise.then
+runAction @ VM1961 action-queue.js:63
+runRemainingActions @ VM1961 action-queue.js:29
+handleResult @ VM1961 action-queue.js:58Understand this warning
+Console.js:61  Server   ⚠ Unsupported metadata themeColor is configured in metadata export in /auth. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+Mt.forEach.n.<computed> @ Console.js:61
+react-stack-bottom-frame @ react-server-dom-webpack-client.browser.development.js:2648
+resolveConsoleEntry @ react-server-dom-webpack-client.browser.development.js:2115
+processFullStringRow @ react-server-dom-webpack-client.browser.development.js:2250
+processFullBinaryRow @ react-server-dom-webpack-client.browser.development.js:2213
+progress @ react-server-dom-webpack-client.browser.development.js:2459
+<__next_metadata_boundary__>
+buildFakeTask @ react-server-dom-webpack-client.browser.development.js:2021
+initializeFakeTask @ react-server-dom-webpack-client.browser.development.js:2007
+resolveDebugInfo @ react-server-dom-webpack-client.browser.development.js:2043
+processFullStringRow @ react-server-dom-webpack-client.browser.development.js:2241
+processFullBinaryRow @ react-server-dom-webpack-client.browser.development.js:2213
+progress @ react-server-dom-webpack-client.browser.development.js:2459
+<MetadataTree>
+buildFakeTask @ react-server-dom-webpack-client.browser.development.js:2020
+initializeFakeTask @ react-server-dom-webpack-client.browser.development.js:2007
+resolveDebugInfo @ react-server-dom-webpack-client.browser.development.js:2043
+processFullStringRow @ react-server-dom-webpack-client.browser.development.js:2241
+processFullBinaryRow @ react-server-dom-webpack-client.browser.development.js:2213
+progress @ react-server-dom-webpack-client.browser.development.js:2459
+"use server"
+ResponseInstance @ react-server-dom-webpack-client.browser.development.js:1567
+createResponseFromOptions @ react-server-dom-webpack-client.browser.development.js:2376
+exports.createFromReadableStream @ react-server-dom-webpack-client.browser.development.js:2696
+eval @ app-index.js:133
+(app-pages-browser)/./node_modules/next/dist/client/app-index.js @ main-app.js?v=1756400734491:160
+options.factory @ webpack.js?v=1756400734491:712
+__webpack_require__ @ webpack.js?v=1756400734491:37
+fn @ webpack.js?v=1756400734491:369
+eval @ app-next-dev.js:10
+eval @ app-bootstrap.js:62
+loadScriptsInSequence @ app-bootstrap.js:23
+appBootstrap @ app-bootstrap.js:56
+eval @ app-next-dev.js:9
+(app-pages-browser)/./node_modules/next/dist/client/app-next-dev.js @ main-app.js?v=1756400734491:182
+options.factory @ webpack.js?v=1756400734491:712
+__webpack_require__ @ webpack.js?v=1756400734491:37
+__webpack_exec__ @ main-app.js?v=1756400734491:2792
+(anonymous) @ main-app.js?v=1756400734491:2793
+webpackJsonpCallback @ webpack.js?v=1756400734491:1388
+(anonymous) @ main-app.js?v=1756400734491:9Understand this warning
+Console.js:61  Server   ⚠ Unsupported metadata viewport is configured in metadata export in /auth. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+Mt.forEach.n.<computed> @ Console.js:61
+react-stack-bottom-frame @ react-server-dom-webpack-client.browser.development.js:2648
+resolveConsoleEntry @ react-server-dom-webpack-client.browser.development.js:2115
+processFullStringRow @ react-server-dom-webpack-client.browser.development.js:2250
+processFullBinaryRow @ react-server-dom-webpack-client.browser.development.js:2213
+progress @ react-server-dom-webpack-client.browser.development.js:2459
+<__next_metadata_boundary__>
+buildFakeTask @ react-server-dom-webpack-client.browser.development.js:2021
+initializeFakeTask @ react-server-dom-webpack-client.browser.development.js:2007
+resolveDebugInfo @ react-server-dom-webpack-client.browser.development.js:2043
+processFullStringRow @ react-server-dom-webpack-client.browser.development.js:2241
+processFullBinaryRow @ react-server-dom-webpack-client.browser.development.js:2213
+progress @ react-server-dom-webpack-client.browser.development.js:2459
+<MetadataTree>
+buildFakeTask @ react-server-dom-webpack-client.browser.development.js:2020
+initializeFakeTask @ react-server-dom-webpack-client.browser.development.js:2007
+resolveDebugInfo @ react-server-dom-webpack-client.browser.development.js:2043
+processFullStringRow @ react-server-dom-webpack-client.browser.development.js:2241
+processFullBinaryRow @ react-server-dom-webpack-client.browser.development.js:2213
+progress @ react-server-dom-webpack-client.browser.development.js:2459
+"use server"
+ResponseInstance @ react-server-dom-webpack-client.browser.development.js:1567
+createResponseFromOptions @ react-server-dom-webpack-client.browser.development.js:2376
+exports.createFromReadableStream @ react-server-dom-webpack-client.browser.development.js:2696
+eval @ app-index.js:133
+(app-pages-browser)/./node_modules/next/dist/client/app-index.js @ main-app.js?v=1756400734491:160
+options.factory @ webpack.js?v=1756400734491:712
+__webpack_require__ @ webpack.js?v=1756400734491:37
+fn @ webpack.js?v=1756400734491:369
+eval @ app-next-dev.js:10
+eval @ app-bootstrap.js:62
+loadScriptsInSequence @ app-bootstrap.js:23
+appBootstrap @ app-bootstrap.js:56
+eval @ app-next-dev.js:9
+(app-pages-browser)/./node_modules/next/dist/client/app-next-dev.js @ main-app.js?v=1756400734491:182
+options.factory @ webpack.js?v=1756400734491:712
+__webpack_require__ @ webpack.js?v=1756400734491:37
+__webpack_exec__ @ main-app.js?v=1756400734491:2792
+(anonymous) @ main-app.js?v=1756400734491:2793
+webpackJsonpCallback @ webpack.js?v=1756400734491:1388
+(anonymous) @ main-app.js?v=1756400734491:9Understand this warning
+Console.js:61 ⚠️ Usando configuração Firebase padrão para desenvolvimento
+Mt.forEach.n.<computed> @ Console.js:61
+eval @ config.ts:32
+(app-pages-browser)/./lib/firebase/config.ts @ not-found.js:161
+options.factory @ webpack.js?v=1756400734491:712
+__webpack_require__ @ webpack.js?v=1756400734491:37
+fn @ webpack.js?v=1756400734491:369
+eval @ firestore.ts:10
+(app-pages-browser)/./lib/firebase/firestore.ts @ not-found.js:172
+options.factory @ webpack.js?v=1756400734491:712
+__webpack_require__ @ webpack.js?v=1756400734491:37
+fn @ webpack.js?v=1756400734491:369
+eval @ users.ts:9
+(app-pages-browser)/./lib/firebase/users.ts @ not-found.js:194
+options.factory @ webpack.js?v=1756400734491:712
+__webpack_require__ @ webpack.js?v=1756400734491:37
+fn @ webpack.js?v=1756400734491:369
+eval @ auth-provider.tsx:9
+(app-pages-browser)/./components/providers/auth-provider.tsx @ not-found.js:62
+options.factory @ webpack.js?v=1756400734491:712
+__webpack_require__ @ webpack.js?v=1756400734491:37
+fn @ webpack.js?v=1756400734491:369
+eval @ header.tsx:10
+(app-pages-browser)/./components/layout/header.tsx @ not-found.js:51
+options.factory @ webpack.js?v=1756400734491:712
+__webpack_require__ @ webpack.js?v=1756400734491:37
+fn @ webpack.js?v=1756400734491:369
+Promise.then
+eval @ next-flight-client-entry-loader.js?modules=%7B%22request%22%3A%22%2Fhome%2Frunner%2Fworkspace%2Fcomponents%2Flayout%2Fheader.tsx%22%2C%22ids%22%3A%5B%22Header%22%5D%7D&modules=%7B%22request%22%3A%22%2Fhome%2Frunner%2Fworkspace%2Fnode_modules%2Fnext%2Fdist%2Fclient%2Fapp-dir%2Flink.js%22%2C%22ids%22%3A%5B%22__esModule%22%2C%22default%22%5D%7D&server=false!:1
+(app-pages-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-client-entry-loader.js?modules=%7B%22request%22%3A%22%2Fhome%2Frunner%2Fworkspace%2Fcomponents%2Flayout%2Fheader.tsx%22%2C%22ids%22%3A%5B%22Header%22%5D%7D&modules=%7B%22request%22%3A%22%2Fhome%2Frunner%2Fworkspace%2Fnode_modules%2Fnext%2Fdist%2Fclient%2Fapp-dir%2Flink.js%22%2C%22ids%22%3A%5B%22__esModule%22%2C%22default%22%5D%7D&server=false! @ not-found.js:875
+options.factory @ webpack.js?v=1756400734491:712
+__webpack_require__ @ webpack.js?v=1756400734491:37
+__webpack_exec__ @ not-found.js:1374
+(anonymous) @ not-found.js:1375
+__webpack_require__.O @ webpack.js?v=1756400734491:84
+(anonymous) @ not-found.js:1376
+webpackJsonpCallback @ webpack.js?v=1756400734491:1388
+(anonymous) @ not-found.js:9Understand this warning
+Console.js:61 🔒 Persistência local configurada
+Console.js:61 🔄 Auth state changed: {user: true, email: 'guga1trance@gmail.com'}
+Console.js:61 🔒 Persistência local configurada
+Console.js:61 🔄 Auth state changed: {user: true, email: 'guga1trance@gmail.com'}
+2Console.js:61 🍪 Token atualizado no cookie (1 hora)
+Console.js:61 👤 Profile carregado: {isAdmin: true}
+Console.js:61 👤 Profile carregado: {isAdmin: true}
