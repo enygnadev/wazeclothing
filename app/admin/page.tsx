@@ -24,40 +24,33 @@ export default function AdminPage() {
         return
       }
       
-      // Se chegou aqui e não tem usuário após inicializado, pode ter problema
-      if (initialized && !loading && !user) {
-        console.log("❌ Auth inicializado mas sem usuário - possível token expirado")
-        // Dar uma chance para o auth recuperar
-        setTimeout(() => {
-          if (!user) {
-            console.log("🔄 Forçando reinicialização do auth...")
-            initializeAuth()
-          }
-        }, 2000)
+      // Debug info
+      const currentState = {
+        user: !!user,
+        userEmail: user?.email,
+        userProfile,
+        isAdmin: userProfile?.isAdmin,
+        loading,
+        initialized
       }
       
-      // Debug info
-      console.log("🔍 Debug Auth State:", {
-        user: !!user,
-        userEmail: user?.email,
-        userProfile,
-        isAdmin: userProfile?.isAdmin,
-        loading,
-        initialized
-      })
+      console.log("🔍 Debug Auth State:", currentState)
+      setDebugInfo(currentState)
       
-      setDebugInfo({
-        user: !!user,
-        userEmail: user?.email,
-        userProfile,
-        isAdmin: userProfile?.isAdmin,
-        loading,
-        initialized
-      })
-      
-      // Só parar de verificar quando realmente inicializado
+      // Parar verificação apenas quando estiver inicializado e não carregando
       if (initialized && !loading) {
         setVerifying(false)
+        
+        // Se não há usuário após inicializado, dar um tempo e tentar recarregar
+        if (!user) {
+          console.log("⚠️ Usuário não encontrado após inicialização")
+          setTimeout(() => {
+            if (!user && initialized) {
+              console.log("🔄 Redirecionando para login...")
+              window.location.href = '/auth?returnUrl=/admin&type=admin'
+            }
+          }, 3000)
+        }
       }
     }
 

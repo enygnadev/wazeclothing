@@ -19,8 +19,13 @@ export function middleware(request: NextRequest) {
   // Verificar token de autenticação no cookie
   const authToken = request.cookies.get('auth-token')?.value
 
-  // Se não tem token, redirecionar para login
-  if (!authToken || authToken === 'undefined' || authToken === '') {
+  // Lista de tokens inválidos
+  const invalidTokens = ['', 'undefined', 'null', undefined, null]
+  
+  // Se não tem token válido, redirecionar para login
+  if (!authToken || invalidTokens.includes(authToken) || authToken.length < 10) {
+    console.log("🚫 Token inválido ou ausente:", { authToken: authToken?.substring(0, 10) + '...' })
+    
     const loginUrl = new URL('/auth', request.url)
     loginUrl.searchParams.set('returnUrl', pathname)
 
@@ -31,21 +36,11 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl)
   }
 
-  // Para rotas admin - verificação mais simples
+  // Para rotas admin - verificação do token
   if (pathname.startsWith('/admin')) {
-    // Se tem algum token, deixar o componente decidir
-    // Isso evita loops de redirecionamento
-    if (authToken && authToken !== 'undefined' && authToken !== 'null' && authToken.length > 10) {
-      console.log("🔐 Admin token found, allowing access to:", pathname)
-      return NextResponse.next()
-    }
-    
-    // Só redirecionar se realmente não tem token
-    console.log("🚫 No valid admin token, redirecting from:", pathname)
-    const url = new URL('/auth', request.url)
-    url.searchParams.set('returnUrl', pathname)
-    url.searchParams.set('type', 'admin')
-    return NextResponse.redirect(url)
+    // Token existe e parece válido, deixar componente fazer verificação mais detalhada
+    console.log("🔐 Token válido encontrado, permitindo acesso a:", pathname)
+    return NextResponse.next()
   }
 
   // Se tem token válido, deixar passar

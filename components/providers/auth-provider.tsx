@@ -36,10 +36,24 @@ const setAuthCookie = async (user: User | null) => {
     if (user) {
       try {
         const token = await user.getIdToken(true) // Force refresh
-        // Cookie com 7 dias de validade para ser mais estável
-        const maxAge = 7 * 24 * 60 * 60 // 7 dias em segundos
-        document.cookie = `auth-token=${token}; path=/; max-age=${maxAge}; secure; samesite=strict`
-        console.log("🍪 Token atualizado no cookie (válido por 7 dias)")
+        // Cookie com 1 hora de validade, mas com refresh automático
+        const maxAge = 60 * 60 // 1 hora em segundos
+        const isSecure = window.location.protocol === 'https:'
+        const cookieString = `auth-token=${token}; path=/; max-age=${maxAge}${isSecure ? '; secure' : ''}; samesite=strict`
+        document.cookie = cookieString
+        console.log("🍪 Token atualizado no cookie (1 hora)")
+        
+        // Agendar refresh do token em 50 minutos
+        setTimeout(async () => {
+          if (user && !user.isAnonymous) {
+            try {
+              await setAuthCookie(user)
+            } catch (error) {
+              console.error("❌ Erro no refresh automático:", error)
+            }
+          }
+        }, 50 * 60 * 1000) // 50 minutos
+        
       } catch (error) {
         console.error("❌ Erro ao obter token:", error)
         // Limpar cookie inválido
@@ -67,18 +81,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       // Dynamic imports to avoid SSR issues
       const { getAuth } = await import("firebase/auth")
-      const { onAuthStateChanged } = await import("firebase/auth")
+      const { onAuthStateChanged, setPersistence, browserLocalPersistence } = await import("firebase/auth")
       const app = (await import("@/lib/firebase/config")).default
 
       const auth = getAuth(app)
+      
+      // Configurar persistência local
+      try {
+        await setPersistence(auth, browserLocalPersistence)
+        console.log("🔒 Persistência local configurada")
+      } catch (persistError) {
+        console.warn("⚠️ Falha ao configurar persistência:", persistError)
+      }
 
       const unsubscribe = onAuthStateChanged(auth, async (user) => {
         console.log("🔄 Auth state changed:", { user: !!user, email: user?.email })
         
         setUser(user)
-        await setAuthCookie(user)
-
+        
         if (user) {
+          // Atualizar cookie apenas se realmente logado
+          await setAuthCookie(user)
+          
           try {
             const profile = await getUserProfile(user.uid)
             setUserProfile(profile)
@@ -88,10 +112,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setUserProfile(null)
           }
         } else {
+          // Limpar tudo se não há usuário
           setUserProfile(null)
-          console.log("👤 Usuário deslogado")
+          await setAuthCookie(null)
+          console.log("👤 Usuário deslogado - dados limpos")
         }
 
+        setLoading(false)
+      }, (error) => {
+        console.error("❌ Erro no onAuthStateChanged:", error)
         setLoading(false)
       })
 
@@ -100,6 +129,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.error("Error initializing auth:", error)
       setLoading(false)
+      setInitialized(true) // Mesmo com erro, marcar como inicializado
     }
   }
 
