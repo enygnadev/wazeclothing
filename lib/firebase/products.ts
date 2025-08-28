@@ -1,56 +1,35 @@
-import {
-  collection,
-  doc,
-  getDocs,
-  getDoc,
-  addDoc,
-  updateDoc,
+
+import { 
+  collection, 
+  addDoc, 
+  getDocs, 
+  doc, 
+  updateDoc, 
   deleteDoc,
   query,
-  orderBy,
   where,
-  limit,
+  orderBy,
+  Timestamp,
+  getDoc
 } from "firebase/firestore"
 import { getDb } from "./firestore"
 import type { Product } from "@/lib/types"
 
-const PRODUCTS_COLLECTION = "products"
-
 export async function getProducts(): Promise<Product[]> {
   try {
     const db = getDb()
-    const q = query(collection(db, PRODUCTS_COLLECTION), orderBy("createdAt", "desc"))
-    const querySnapshot = await getDocs(q)
-
-    return querySnapshot.docs.map(doc => ({
+    const productsRef = collection(db, "products")
+    const productsQuery = query(productsRef, orderBy("createdAt", "desc"))
+    
+    const snapshot = await getDocs(productsQuery)
+    return snapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
-      createdAt: doc.data().createdAt?.toDate() || new Date()
+      createdAt: doc.data().createdAt?.toDate() || new Date(),
+      updatedAt: doc.data().updatedAt?.toDate() || new Date(),
     })) as Product[]
   } catch (error) {
-    console.error("Error getting products:", error)
-    return []
-  }
-}
-
-export async function getFeaturedProducts(): Promise<Product[]> {
-  try {
-    const db = getDb()
-    const q = query(
-      collection(db, PRODUCTS_COLLECTION),
-      where("featured", "==", true),
-      orderBy("createdAt", "desc"),
-      limit(8)
-    )
-    const querySnapshot = await getDocs(q)
-
-    return querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-      createdAt: doc.data().createdAt?.toDate() || new Date()
-    })) as Product[]
-  } catch (error) {
-    console.error("Error getting featured products:", error)
+    console.error("Erro ao buscar produtos:", error)
     return []
   }
 }
@@ -58,46 +37,104 @@ export async function getFeaturedProducts(): Promise<Product[]> {
 export async function getProductById(id: string): Promise<Product | null> {
   try {
     const db = getDb()
-    const docRef = doc(db, PRODUCTS_COLLECTION, id)
-    const docSnap = await getDoc(docRef)
-
-    if (docSnap.exists()) {
-      return {
-        id: docSnap.id,
-        ...docSnap.data(),
-        createdAt: docSnap.data().createdAt?.toDate() || new Date()
-      } as Product
+    const productRef = doc(db, "products", id)
+    const snapshot = await getDoc(productRef)
+    
+    if (!snapshot.exists()) {
+      return null
     }
-
-    return null
+    
+    return {
+      id: snapshot.id,
+      ...snapshot.data(),
+      createdAt: snapshot.data().createdAt?.toDate() || new Date(),
+      updatedAt: snapshot.data().updatedAt?.toDate() || new Date(),
+    } as Product
   } catch (error) {
-    console.error("Error getting product:", error)
+    console.error("Erro ao buscar produto:", error)
     return null
+  }
+}
+
+export async function getProductsByCategory(category: string): Promise<Product[]> {
+  try {
+    const db = getDb()
+    const productsRef = collection(db, "products")
+    const categoryQuery = query(
+      productsRef, 
+      where("category", "==", category),
+      orderBy("createdAt", "desc")
+    )
+    
+    const snapshot = await getDocs(categoryQuery)
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+      createdAt: doc.data().createdAt?.toDate() || new Date(),
+      updatedAt: doc.data().updatedAt?.toDate() || new Date(),
+    })) as Product[]
+  } catch (error) {
+    console.error(`Erro ao buscar produtos da categoria ${category}:`, error)
+    return []
+  }
+}
+
+export async function getFeaturedProducts(): Promise<Product[]> {
+  try {
+    const db = getDb()
+    const productsRef = collection(db, "products")
+    const featuredQuery = query(
+      productsRef, 
+      where("featured", "==", true),
+      orderBy("createdAt", "desc")
+    )
+    
+    const snapshot = await getDocs(featuredQuery)
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+      createdAt: doc.data().createdAt?.toDate() || new Date(),
+      updatedAt: doc.data().updatedAt?.toDate() || new Date(),
+    })) as Product[]
+  } catch (error) {
+    console.error("Erro ao buscar produtos em destaque:", error)
+    return []
   }
 }
 
 export async function addProduct(product: Omit<Product, "id">): Promise<string | null> {
   try {
     const db = getDb()
-    const docRef = await addDoc(collection(db, PRODUCTS_COLLECTION), {
+    const productsRef = collection(db, "products")
+    
+    const productData = {
       ...product,
-      createdAt: new Date()
-    })
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now(),
+    }
+    
+    const docRef = await addDoc(productsRef, productData)
     return docRef.id
   } catch (error) {
-    console.error("Error adding product:", error)
+    console.error("Erro ao adicionar produto:", error)
     return null
   }
 }
 
-export async function updateProduct(id: string, product: Partial<Product>): Promise<boolean> {
+export async function updateProduct(id: string, updates: Partial<Product>): Promise<boolean> {
   try {
     const db = getDb()
-    const docRef = doc(db, PRODUCTS_COLLECTION, id)
-    await updateDoc(docRef, product)
+    const productRef = doc(db, "products", id)
+    
+    const updateData = {
+      ...updates,
+      updatedAt: Timestamp.now(),
+    }
+    
+    await updateDoc(productRef, updateData)
     return true
   } catch (error) {
-    console.error("Error updating product:", error)
+    console.error("Erro ao atualizar produto:", error)
     return false
   }
 }
@@ -105,97 +142,36 @@ export async function updateProduct(id: string, product: Partial<Product>): Prom
 export async function deleteProduct(id: string): Promise<boolean> {
   try {
     const db = getDb()
-    const docRef = doc(db, PRODUCTS_COLLECTION, id)
-    await deleteDoc(docRef)
+    const productRef = doc(db, "products", id)
+    
+    await deleteDoc(productRef)
     return true
   } catch (error) {
-    console.error("Error deleting product:", error)
+    console.error("Erro ao deletar produto:", error)
     return false
   }
 }
 
-export async function getProductsByCategory(category: string): Promise<Product[]> {
-  try {
-    const db = getDb()
-    const q = query(
-      collection(db, PRODUCTS_COLLECTION),
-      where("category", "==", category),
-      orderBy("createdAt", "desc")
-    )
-    const querySnapshot = await getDocs(q)
-
-    return querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-      createdAt: doc.data().createdAt?.toDate() || new Date()
-    })) as Product[]
-  } catch (error) {
-    console.error("Error getting products by category:", error)
-    return []
-  }
-}
-
+// Funções para categorias e tamanhos
 export async function getCategories(): Promise<string[]> {
   try {
-    const db = getDb()
-    const q = query(collection(db, PRODUCTS_COLLECTION))
-    const querySnapshot = await getDocs(q)
-    
-    const categories = new Set<string>()
-    querySnapshot.docs.forEach(doc => {
-      const data = doc.data()
-      if (data.category) {
-        categories.add(data.category)
-      }
-    })
-    
-    return Array.from(categories).sort()
+    const products = await getProducts()
+    const categories = [...new Set(products.map(product => product.category).filter(Boolean))]
+    return categories.length > 0 ? categories : ["camisetas", "calças", "vestidos", "acessórios"]
   } catch (error) {
-    console.error("Error getting categories:", error)
-    return []
+    console.error("Erro ao buscar categorias:", error)
+    return ["camisetas", "calças", "vestidos", "acessórios"]
   }
 }
 
 export async function getSizes(): Promise<string[]> {
   try {
-    const db = getDb()
-    const q = query(collection(db, PRODUCTS_COLLECTION))
-    const querySnapshot = await getDocs(q)
-    
-    const sizes = new Set<string>()
-    querySnapshot.docs.forEach(doc => {
-      const data = doc.data()
-      if (data.size) {
-        sizes.add(data.size)
-      }
-    })
-    
-    return Array.from(sizes).sort()
+    const products = await getProducts()
+    const sizes = [...new Set(products.map(product => product.size).filter(Boolean))]
+    return sizes.length > 0 ? sizes : ["PP", "P", "M", "G", "GG"]
   } catch (error) {
-    console.error("Error getting sizes:", error)
-    return []
-  }
-}
-
-export async function createCategory(categoryName: string): Promise<boolean> {
-  try {
-    // Categories are created implicitly when products are added
-    // This function exists for compatibility but doesn't need to do anything
-    return true
-  } catch (error) {
-    console.error("Error creating category:", error)
-    return false
-  }
-}
-
-export async function createSize(sizeName: string): Promise<boolean> {
-  try {
-    // Sizes are created implicitly when products are added
-    // This function exists for compatibility but doesn't need to do anything
-    return true
-  } catch (error) {
-    console.error("Error creating size:", error)
-    return false
+    console.error("Erro ao buscar tamanhos:", error)
+    return ["PP", "P", "M", "G", "GG"]
   }
 }
 

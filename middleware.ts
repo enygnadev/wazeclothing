@@ -1,3 +1,4 @@
+
 import { NextRequest, NextResponse } from "next/server"
 
 export function middleware(request: NextRequest) {
@@ -5,14 +6,9 @@ export function middleware(request: NextRequest) {
 
   // Lista de rotas protegidas
   const protectedRoutes = ['/admin', '/cliente', '/checkout']
-  const adminRoutes = ['/admin']
 
   // Verificar se é uma rota protegida
   const isProtectedRoute = protectedRoutes.some(route => 
-    pathname.startsWith(route)
-  )
-
-  const isAdminRoute = adminRoutes.some(route => 
     pathname.startsWith(route)
   )
 
@@ -29,15 +25,14 @@ export function middleware(request: NextRequest) {
     const loginUrl = new URL('/auth', request.url)
     loginUrl.searchParams.set('returnUrl', pathname)
 
-    if (isAdminRoute) {
+    if (pathname.startsWith('/admin')) {
       loginUrl.searchParams.set('type', 'admin')
     }
 
     return NextResponse.redirect(loginUrl)
   }
 
-  // Para rotas admin, vamos deixar o componente verificar as permissões
-  // pois o middleware não tem acesso direto ao Firestore
+  // Se tem token válido, deixar passar - a verificação de admin será feita no componente
   return NextResponse.next()
 }
 
