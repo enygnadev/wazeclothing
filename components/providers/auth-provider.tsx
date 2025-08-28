@@ -17,6 +17,7 @@ interface AuthContextType {
   userProfile: any | null
   loading: boolean
   initialized: boolean
+  isAdmin: boolean
   signIn: (email: string, password: string) => Promise<void>
   signUp: (email: string, password: string) => Promise<void>
   signInWithGoogle: () => Promise<void>
@@ -29,6 +30,7 @@ const AuthContext = createContext<AuthContextType>({
   userProfile: null,
   loading: false,
   initialized: false,
+  isAdmin: false,
   signIn: async () => {},
   signUp: async () => {},
   signInWithGoogle: async () => {},
@@ -314,6 +316,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [initialized, scheduleTokenRefresh]
   )
 
+  // Computed value for isAdmin
+  const isAdmin = Boolean(userProfile?.isAdmin)
+
   return (
     <AuthContext.Provider
       value={{
@@ -321,6 +326,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         userProfile,
         loading,
         initialized,
+        isAdmin,
         signIn,
         signUp,
         signInWithGoogle,
