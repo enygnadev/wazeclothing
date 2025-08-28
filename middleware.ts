@@ -40,8 +40,18 @@ export function middleware(request: NextRequest) {
       url.searchParams.set('type', 'admin')
       return NextResponse.redirect(url)
     }
-    // Se tem token, deixar o componente verificar se é admin
-    return NextResponse.next()
+    
+    // Se tem token válido (não vazio, não undefined), permitir acesso
+    // A verificação de admin será feita no componente
+    if (authToken && authToken !== 'undefined' && authToken !== 'null') {
+      return NextResponse.next()
+    }
+    
+    // Se token inválido, redirecionar
+    const url = new URL('/auth', request.url)
+    url.searchParams.set('returnUrl', pathname)
+    url.searchParams.set('type', 'admin')
+    return NextResponse.redirect(url)
   }
 
   // Se tem token válido, deixar passar

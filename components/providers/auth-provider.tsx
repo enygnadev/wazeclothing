@@ -34,10 +34,18 @@ const AuthContext = createContext<AuthContextType>({
 const setAuthCookie = async (user: User | null) => {
   if (typeof window !== 'undefined') {
     if (user) {
-      const token = await user.getIdToken()
-      document.cookie = `auth-token=${token}; path=/; max-age=86400; secure; samesite=strict`
+      try {
+        const token = await user.getIdToken(true) // Force refresh
+        document.cookie = `auth-token=${token}; path=/; max-age=86400; secure; samesite=strict`
+        console.log("🍪 Token atualizado no cookie")
+      } catch (error) {
+        console.error("❌ Erro ao obter token:", error)
+        // Limpar cookie inválido
+        document.cookie = `auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;`
+      }
     } else {
       document.cookie = `auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;`
+      console.log("🍪 Cookie removido")
     }
   }
 }
@@ -63,6 +71,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const auth = getAuth(app)
 
       const unsubscribe = onAuthStateChanged(auth, async (user) => {
+        console.log("🔄 Auth state changed:", { user: !!user, email: user?.email })
+        
         setUser(user)
         await setAuthCookie(user)
 
@@ -70,12 +80,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           try {
             const profile = await getUserProfile(user.uid)
             setUserProfile(profile)
+            console.log("👤 Profile carregado:", { isAdmin: profile?.isAdmin })
           } catch (error) {
             console.error("Error fetching user profile:", error)
             setUserProfile(null)
           }
         } else {
           setUserProfile(null)
+          console.log("👤 Usuário deslogado")
         }
 
         setLoading(false)

@@ -16,9 +16,12 @@ export default function AdminPage() {
 
   useEffect(() => {
     const init = async () => {
+      console.log("🔄 Admin page init...", { initialized, user: !!user, userProfile })
+      
       if (!initialized) {
         console.log("🔄 Inicializando auth...")
         await initializeAuth()
+        return
       }
       
       // Debug info
@@ -40,7 +43,10 @@ export default function AdminPage() {
         initialized
       })
       
-      setVerifying(false)
+      // Só parar de verificar quando realmente inicializado
+      if (initialized && !loading) {
+        setVerifying(false)
+      }
     }
 
     init()
