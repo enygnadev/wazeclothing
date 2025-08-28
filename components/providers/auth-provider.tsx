@@ -1,10 +1,10 @@
-
 "use client"
 
 import React from "react"
 import { createContext, useContext, useState } from "react"
 import type { User } from "firebase/auth"
 import { getUserProfile } from "@/lib/firebase/users"
+import { Timestamp } from "firebase/firestore" // Import Timestamp
 
 interface AuthContextType {
   user: User | null
@@ -68,7 +68,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         if (user) {
           try {
-            // Aguardar um pouco para garantir que o documento foi criado
             const profile = await getUserProfile(user.uid)
             setUserProfile(profile)
           } catch (error) {
@@ -129,7 +128,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     await setDoc(doc(db, "users", result.user.uid), userData)
     await setAuthCookie(result.user)
-    
+
     // Atualizar o profile localmente
     setUserProfile(userData)
   }
@@ -149,26 +148,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Check if user profile exists, if not create it
     const db = getDb()
-    const userDoc = await getDoc(doc(db, "users", result.user.uid))
-    
-    let userData
-    if (!userDoc.exists()) {
-      userData = {
-        email: result.user.email,
-        name: result.user.displayName || result.user.email?.split('@')[0] || "",
-        displayName: result.user.displayName || result.user.email?.split('@')[0] || "",
-        isAdmin: result.user.email === 'admin@waze.com' || result.user.email === 'admin@admin.com' || result.user.email === 'guga1trance@gmail.com',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        consentDate: new Date(),
-        consentVersion: "1.0"
+    const userDoc = await getDoc(doc(db, 'users', result.user.uid))
+      if (userDoc.exists()) {
+        const userData = userDoc.data()
+        const profile = {
+          id: result.user.uid,
+          email: result.user.email!,
+          name: userData.name || result.user.displayName || '',
+          isAdmin: userData.isAdmin === true, // Explicit boolean check
+          createdAt: userData.createdAt?.toDate() || new Date(),
+        }
+        setUserProfile(profile)
+        console.log('User profile loaded:', profile)
+      } else {
+        // Create user profile if it doesn't exist
+        const newProfile = {
+          email: result.user.email!,
+          name: result.user.displayName || result.user.email?.split('@')[0],
+          isAdmin: false,
+          createdAt: Timestamp.now(),
+          consentDate: Timestamp.now(),
+          consentVersion: "1.0"
+        }
+
+        await setDoc(doc(db, 'users', result.user.uid), newProfile)
+        const profile = {
+          id: result.user.uid,
+          email: result.user.email!,
+          name: newProfile.name,
+          isAdmin: false,
+          createdAt: newProfile.createdAt.toDate(),
+        }
+        setUserProfile(profile)
+        console.log('New user profile created:', profile)
       }
-      await setDoc(doc(db, "users", result.user.uid), userData)
-      setUserProfile(userData)
-    } else {
-      userData = userDoc.data()
-      setUserProfile(userData)
-    }
 
     await setAuthCookie(result.user)
   }
@@ -183,7 +196,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const auth = getAuth(app)
     await firebaseSignOut(auth)
     await setAuthCookie(null)
-    
+
     // Limpar estado local
     setUser(null)
     setUserProfile(null)

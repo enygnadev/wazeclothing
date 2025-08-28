@@ -1,4 +1,3 @@
-
 import { NextRequest, NextResponse } from "next/server"
 
 export function middleware(request: NextRequest) {
@@ -8,7 +7,7 @@ export function middleware(request: NextRequest) {
   const protectedRoutes = ['/admin', '/cliente', '/checkout']
 
   // Verificar se é uma rota protegida
-  const isProtectedRoute = protectedRoutes.some(route => 
+  const isProtectedRoute = protectedRoutes.some(route =>
     pathname.startsWith(route)
   )
 
@@ -30,6 +29,37 @@ export function middleware(request: NextRequest) {
     }
 
     return NextResponse.redirect(loginUrl)
+  }
+
+  // Admin route protection
+  if (pathname.startsWith('/admin')) {
+    if (!authToken) {
+      const url = new URL('/auth', request.url)
+      url.searchParams.set('returnUrl', pathname)
+      url.searchParams.set('type', 'admin')
+      return NextResponse.redirect(url)
+    }
+
+    try {
+      const decodedToken = await adminAuth.verifyIdToken(authToken)
+
+      // Check if user is admin in Firestore
+      const userDoc = await adminDb.collection('users').doc(decodedToken.uid).get()
+      const userData = userDoc.data()
+
+      if (!userData?.isAdmin) {
+        console.log('User is not admin:', userData)
+        return NextResponse.redirect(new URL('/', request.url))
+      }
+
+      console.log('Admin access granted for user:', decodedToken.uid)
+    } catch (error) {
+      console.error('Admin verification error:', error)
+      const url = new URL('/auth', request.url)
+      url.searchParams.set('returnUrl', pathname)
+      url.searchParams.set('type', 'admin')
+      return NextResponse.redirect(url)
+    }
   }
 
   // Se tem token válido, deixar passar - a verificação de admin será feita no componente

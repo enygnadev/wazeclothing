@@ -15,6 +15,7 @@ interface CartContextType {
   clearCart: () => void
   total: number
   itemCount: number
+  getTotalItems: () => number
   isOpen: boolean
   setIsOpen: (open: boolean) => void
 }
@@ -27,6 +28,7 @@ const CartContext = createContext<CartContextType>({
   clearCart: () => {},
   total: 0,
   itemCount: 0,
+  getTotalItems: () => 0,
   isOpen: false,
   setIsOpen: () => {},
 })
@@ -104,6 +106,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     syncToFirebase()
   }, [items, user])
 
+  const getTotalItems = () => itemCount
+
   return (
     <CartContext.Provider
       value={{
@@ -114,6 +118,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         clearCart,
         total,
         itemCount,
+        getTotalItems,
         isOpen,
         setIsOpen,
       }}

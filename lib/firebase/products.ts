@@ -178,3 +178,39 @@ export async function getSizes(): Promise<string[]> {
 export async function createProduct(product: Omit<Product, "id">): Promise<string | null> {
   return addProduct(product)
 }
+
+// Categories functions
+export async function getCategories(): Promise<string[]> {
+  try {
+    const categoriesRef = collection(db, "categories")
+    const snapshot = await getDocs(categoriesRef)
+    
+    if (snapshot.empty) {
+      // Return default categories if none exist
+      return ["camisetas", "calças", "vestidos", "acessórios"]
+    }
+    
+    return snapshot.docs.map(doc => doc.data().name)
+  } catch (error) {
+    console.error("Error fetching categories:", error)
+    return ["camisetas", "calças", "vestidos", "acessórios"]
+  }
+}
+
+// Sizes functions
+export async function getSizes(): Promise<string[]> {
+  try {
+    const sizesRef = collection(db, "sizes")
+    const snapshot = await getDocs(sizesRef)
+    
+    if (snapshot.empty) {
+      // Return default sizes if none exist
+      return ["PP", "P", "M", "G", "GG", "XG"]
+    }
+    
+    return snapshot.docs.map(doc => doc.data().name)
+  } catch (error) {
+    console.error("Error fetching sizes:", error)
+    return ["PP", "P", "M", "G", "GG", "XG"]
+  }
+}
