@@ -123,16 +123,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setInitialized(true) // Sempre marcar como inicializado após auth state change
       })
 
-      setAuthUnsubscribe(() => unsubscribe)
+      setAuthUnsubscribe(() => wrappedUnsubscribe)
       
-      // Se não há mudança de estado em 3 segundos, marcar como inicializado
-      setTimeout(() => {
-        if (!initialized) {
-          console.log("⏰ Timeout: marcando auth como inicializado")
-          setInitialized(true)
-          setLoading(false)
-        }
-      }, 3000)
+      // Se não há mudança de estado em 2 segundos, marcar como inicializado
+      const timeoutId = setTimeout(() => {
+        console.log("⏰ Timeout: marcando auth como inicializado")
+        setInitialized(true)
+        setLoading(false)
+      }, 2000)
+      
+      // Limpar timeout se auth state change acontecer
+      const originalUnsubscribe = unsubscribe
+      const wrappedUnsubscribe = () => {
+        clearTimeout(timeoutId)
+        originalUnsubscribe()
+      }
       
     } catch (error) {
       console.error("❌ Error initializing auth:", error)

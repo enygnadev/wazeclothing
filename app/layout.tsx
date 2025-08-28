@@ -1,8 +1,6 @@
 import { Inter } from 'next/font/google'
 import './globals.css'
-import { ThemeProvider } from '@/components/providers/theme-provider'
-import { AuthProvider } from '@/components/providers/auth-provider'
-import { CartProvider } from '@/components/providers/cart-provider'
+import { Providers } from '@/components/providers/providers'
 import { Toaster } from '@/components/ui/toaster'
 import type { Metadata, Viewport } from 'next'
 
@@ -40,19 +38,10 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <body className={inter.className}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <AuthProvider>
-            <CartProvider>
-              {children}
-              <Toaster />
-            </CartProvider>
-          </AuthProvider>
-        </ThemeProvider>
+        <Providers>
+          {children}
+          <Toaster />
+        </Providers>
       </body>
     </html>
   )
