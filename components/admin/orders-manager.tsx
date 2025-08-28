@@ -9,12 +9,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Eye, Package, Truck, CheckCircle, XCircle } from "lucide-react"
 import { getOrders, updateOrderStatus } from "@/lib/firebase/orders"
+import { OrderDetailsModal } from "./order-details-modal"
 import type { Order } from "@/lib/types"
 
 export function OrdersManager() {
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedStatus, setSelectedStatus] = useState("all")
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   useEffect(() => {
     loadOrders()
@@ -38,6 +41,16 @@ export function OrdersManager() {
     } catch (error) {
       console.error("Erro ao atualizar status:", error)
     }
+  }
+
+  const handleViewDetails = (order: Order) => {
+    setSelectedOrder(order)
+    setIsModalOpen(true)
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+    setSelectedOrder(null)
   }
 
   const getStatusBadge = (status: string) => {
@@ -129,7 +142,11 @@ export function OrdersManager() {
                     </SelectContent>
                   </Select>
                   
-                  <Button variant="outline" size="sm">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handleViewDetails(order)}
+                  >
                     <Eye className="w-4 h-4 mr-2" />
                     Ver Detalhes
                   </Button>
@@ -145,6 +162,13 @@ export function OrdersManager() {
           <p className="text-muted-foreground">Nenhum pedido encontrado.</p>
         </div>
       )}
+
+      <OrderDetailsModal
+        order={selectedOrder}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onStatusChange={handleStatusChange}
+      />
     </div>
   )
 }
