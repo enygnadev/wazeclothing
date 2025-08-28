@@ -28,14 +28,92 @@ export async function getProducts(): Promise<Product[]> {
       updatedAt: doc.data().updatedAt?.toDate() || new Date(),
     })) as Product[]
   } catch (error) {
-    // Silenciar erros de permissão para usuários não logados
+    // Para usuários não logados, retornar produtos de exemplo
     if (error.code === 'permission-denied') {
-      console.warn("Acesso público aos produtos não autorizado")
-      return []
+      console.warn("Usando produtos de exemplo para usuário não logado")
+      return getSampleProducts()
     }
     console.error("Erro ao buscar produtos:", error)
     throw error
   }
+}
+
+// Produtos de exemplo para usuários não logados
+function getSampleProducts(): Product[] {
+  return [
+    {
+      id: "sample-1",
+      title: "Nike Air Force 1",
+      description: "Tênis Nike Air Force 1 clássico, confortável e estiloso.",
+      price: 299.90,
+      image: "https://source.unsplash.com/400x400/?nike,sneakers",
+      category: "nike",
+      size: "42",
+      featured: true,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    },
+    {
+      id: "sample-2", 
+      title: "Adidas Ultraboost",
+      description: "Tênis Adidas Ultraboost para corrida e uso casual.",
+      price: 399.90,
+      image: "https://source.unsplash.com/400x400/?adidas,shoes",
+      category: "adidas",
+      size: "40",
+      featured: true,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    },
+    {
+      id: "sample-3",
+      title: "Jordan Retro 1",
+      description: "Tênis Jordan Retro 1 edição limitada.",
+      price: 899.90,
+      image: "https://source.unsplash.com/400x400/?jordan,basketball",
+      category: "jordan",
+      size: "41",
+      featured: true,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    },
+    {
+      id: "sample-4",
+      title: "Lacoste Graduate",
+      description: "Tênis Lacoste Graduate em couro premium.",
+      price: 459.90,
+      image: "https://source.unsplash.com/400x400/?lacoste,shoes",
+      category: "lacoste",
+      size: "43",
+      featured: false,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    },
+    {
+      id: "sample-5",
+      title: "Puma Suede Classic",
+      description: "Tênis Puma Suede Classic atemporal.",
+      price: 259.90,
+      image: "https://source.unsplash.com/400x400/?puma,sneakers",
+      category: "puma",
+      size: "39",
+      featured: false,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    },
+    {
+      id: "sample-6",
+      title: "Nike Dunk Low",
+      description: "Tênis Nike Dunk Low retrô.",
+      price: 549.90,
+      image: "https://source.unsplash.com/400x400/?nike,dunk",
+      category: "nike",
+      size: "44",
+      featured: false,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }
+  ]
 }
 
 export async function getProductById(id: string): Promise<Product | null> {

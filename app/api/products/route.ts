@@ -1,4 +1,3 @@
-
 import { NextRequest, NextResponse } from "next/server"
 import { getProducts, getProductsByCategory } from "@/lib/firebase/products"
 
@@ -6,7 +5,7 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const category = searchParams.get('category')
-    
+
     // Verificar se o Firebase está configurado
     try {
       let products
@@ -15,11 +14,11 @@ export async function GET(request: NextRequest) {
       } else {
         products = await getProducts()
       }
-      
+
       return NextResponse.json(products)
     } catch (firebaseError) {
       console.error("Firebase error:", firebaseError)
-      
+
       // Retornar produtos mock em caso de erro do Firebase
       const mockProducts = [
         {
@@ -34,7 +33,7 @@ export async function GET(request: NextRequest) {
           createdAt: new Date()
         }
       ]
-      
+
       return NextResponse.json(mockProducts)
     }
   } catch (error) {
@@ -49,7 +48,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const product = await request.json()
-    
+
     // Aqui você pode adicionar validação
     if (!product.name || !product.price) {
       return NextResponse.json(
@@ -57,7 +56,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
-    
+
     // Por enquanto, retorna sucesso
     // Em produção, você adicionaria o produto ao Firestore
     return NextResponse.json({ success: true, id: Date.now().toString() })

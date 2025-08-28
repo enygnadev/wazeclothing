@@ -107,18 +107,9 @@ export function ProductGrid() {
     )
   }
 
+  // Não mostrar erro para usuários não logados - apenas retornar grid vazio
   if (error) {
-    return (
-      <div className="text-center py-12">
-        <div className="text-red-500 mb-4">⚠️ {error}</div>
-        <button
-          onClick={() => window.location.reload()}
-          className="px-4 py-2 bg-black-500 text-white rounded hover:bg-black-600"
-        >
-          Tentar Novamente
-        </button>
-      </div>
-    )
+    console.warn("Erro silenciado para usuário não logado:", error)
   }
 
   return (
