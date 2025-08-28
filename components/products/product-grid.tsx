@@ -18,41 +18,30 @@ export function ProductGrid() {
   useEffect(() => {
     async function fetchProducts() {
       try {
+        setLoading(true)
         setError(null)
-        const response = await fetch("/api/products")
 
+        const response = await fetch("/api/products")
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`)
         }
-
         const data = await response.json()
 
-        if (data.error) {
-          throw new Error(data.error)
-        }
-
-        setProducts(data)
-        setFilteredProducts(data)
-      } catch (error) {
-        console.error("Error fetching products:", error)
-        setError("Erro ao carregar produtos. Verifique a conexão com o Firebase.")
-        
-        // Usar dados mock como fallback
-        const mockProducts = [
-          {
-            id: "1",
-            title: "Camiseta Básica",
-            description: "Camiseta básica de algodão",
-            price: 49.90,
-            image: "https://source.unsplash.com/400x400?clothes",
-            category: "camisetas",
-            size: "M",
-            featured: true,
-            createdAt: new Date()
+        if (data.success) {
+          setProducts(data.data || [])
+        } else {
+          // Não mostrar erro de permissão para usuários não logados
+          if (data.error && !data.error.includes("permission")) {
+            setError(data.error)
           }
-        ]
-        setProducts(mockProducts)
-        setFilteredProducts(mockProducts)
+        }
+      } catch (error) {
+        console.error("Erro ao buscar produtos:", error)
+        // Não mostrar erro de permissão para usuários não logados
+        const errorMessage = error.message
+        if (!errorMessage.includes("permission") && !errorMessage.includes("401")) {
+          setError("Erro ao carregar produtos. Tente novamente.")
+        }
       } finally {
         setLoading(false)
       }

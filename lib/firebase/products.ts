@@ -1,4 +1,3 @@
-
 import { 
   collection, 
   addDoc, 
@@ -20,7 +19,7 @@ export async function getProducts(): Promise<Product[]> {
     const db = getDb()
     const productsRef = collection(db, "products")
     const productsQuery = query(productsRef, orderBy("createdAt", "desc"))
-    
+
     const snapshot = await getDocs(productsQuery)
     return snapshot.docs.map(doc => ({
       id: doc.id,
@@ -29,8 +28,13 @@ export async function getProducts(): Promise<Product[]> {
       updatedAt: doc.data().updatedAt?.toDate() || new Date(),
     })) as Product[]
   } catch (error) {
+    // Silenciar erros de permissão para usuários não logados
+    if (error.code === 'permission-denied') {
+      console.warn("Acesso público aos produtos não autorizado")
+      return []
+    }
     console.error("Erro ao buscar produtos:", error)
-    return []
+    throw error
   }
 }
 
@@ -39,11 +43,11 @@ export async function getProductById(id: string): Promise<Product | null> {
     const db = getDb()
     const productRef = doc(db, "products", id)
     const snapshot = await getDoc(productRef)
-    
+
     if (!snapshot.exists()) {
       return null
     }
-    
+
     return {
       id: snapshot.id,
       ...snapshot.data(),
@@ -65,7 +69,7 @@ export async function getProductsByCategory(category: string): Promise<Product[]
       where("category", "==", category),
       orderBy("createdAt", "desc")
     )
-    
+
     const snapshot = await getDocs(categoryQuery)
     return snapshot.docs.map(doc => ({
       id: doc.id,
@@ -88,7 +92,7 @@ export async function getFeaturedProducts(): Promise<Product[]> {
       where("featured", "==", true),
       orderBy("createdAt", "desc")
     )
-    
+
     const snapshot = await getDocs(featuredQuery)
     return snapshot.docs.map(doc => ({
       id: doc.id,
@@ -106,13 +110,13 @@ export async function addProduct(product: Omit<Product, "id">): Promise<string |
   try {
     const db = getDb()
     const productsRef = collection(db, "products")
-    
+
     const productData = {
       ...product,
       createdAt: Timestamp.now(),
       updatedAt: Timestamp.now(),
     }
-    
+
     const docRef = await addDoc(productsRef, productData)
     return docRef.id
   } catch (error) {
@@ -125,12 +129,12 @@ export async function updateProduct(id: string, updates: Partial<Product>): Prom
   try {
     const db = getDb()
     const productRef = doc(db, "products", id)
-    
+
     const updateData = {
       ...updates,
       updatedAt: Timestamp.now(),
     }
-    
+
     await updateDoc(productRef, updateData)
     return true
   } catch (error) {
@@ -143,7 +147,7 @@ export async function deleteProduct(id: string): Promise<boolean> {
   try {
     const db = getDb()
     const productRef = doc(db, "products", id)
-    
+
     await deleteDoc(productRef)
     return true
   } catch (error) {
@@ -158,12 +162,12 @@ export async function getCategories(): Promise<string[]> {
     const db = getDb()
     const categoriesRef = collection(db, "categories")
     const snapshot = await getDocs(categoriesRef)
-    
+
     if (snapshot.empty) {
       // Return default categories if none exist
       return ["nike", "adidas", "lacoste", "jordan", "puma"]
     }
-    
+
     return snapshot.docs.map(doc => doc.data().name)
   } catch (error) {
     console.error("Erro ao buscar categorias:", error)
@@ -176,14 +180,18 @@ export async function getSizes(): Promise<string[]> {
     const db = getDb()
     const sizesRef = collection(db, "sizes")
     const snapshot = await getDocs(sizesRef)
-    
+
     if (snapshot.empty) {
-      // Return default sizes if none exist
       return ["PP", "P", "M", "G", "GG", "XG"]
     }
-    
+
     return snapshot.docs.map(doc => doc.data().name)
   } catch (error) {
+    // Silenciar erros de permissão para usuários não logados  
+    if (error.code === 'permission-denied') {
+      console.warn("Usando tamanhos padrão - acesso não autorizado")
+      return ["PP", "P", "M", "G", "GG", "XG"]
+    }
     console.error("Erro ao buscar tamanhos:", error)
     return ["PP", "P", "M", "G", "GG", "XG"]
   }
@@ -192,5 +200,3 @@ export async function getSizes(): Promise<string[]> {
 export async function createProduct(product: Omit<Product, "id">): Promise<string | null> {
   return addProduct(product)
 }
-
-
