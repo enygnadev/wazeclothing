@@ -1,45 +1,28 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getProducts, getProductsByCategory } from "@/lib/firebase/products"
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    const { searchParams } = new URL(request.url)
-    const category = searchParams.get('category')
+    console.log("🔍 API: Buscando produtos...")
 
-    // Verificar se o Firebase está configurado
-    try {
-      let products
-      if (category && category !== 'all') {
-        products = await getProductsByCategory(category)
-      } else {
-        products = await getProducts()
-      }
+    const products = await getProducts()
 
-      return NextResponse.json(products)
-    } catch (firebaseError) {
-      console.error("Firebase error:", firebaseError)
+    console.log("📦 API: Produtos encontrados:", products.length)
 
-      // Retornar produtos mock em caso de erro do Firebase
-      const mockProducts = [
-        {
-          id: "1",
-          title: "Produto Exemplo",
-          description: "Descrição do produto exemplo",
-          price: 99.90,
-          image: "https://source.unsplash.com/400x400?clothes",
-          category: "camisetas",
-          size: "M",
-          featured: true,
-          createdAt: new Date()
-        }
-      ]
-
-      return NextResponse.json(mockProducts)
-    }
+    return NextResponse.json({
+      success: true,
+      data: products,
+      count: products.length
+    })
   } catch (error) {
-    console.error("Error in products API:", error)
+    console.error("❌ API: Erro ao buscar produtos:", error)
+
     return NextResponse.json(
-      { error: "Erro ao carregar produtos" },
+      { 
+        success: false, 
+        error: error.message || "Erro interno do servidor",
+        details: error
+      },
       { status: 500 }
     )
   }

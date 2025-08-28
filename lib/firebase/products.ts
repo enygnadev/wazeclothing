@@ -16,20 +16,65 @@ import type { Product } from "@/lib/types"
 
 export async function getProducts(): Promise<Product[]> {
   try {
+    console.log("🔥 Firebase: Conectando ao Firestore...")
     const db = getDb()
+    
+    console.log("📋 Firebase: Acessando coleção 'products'...")
     const productsRef = collection(db, "products")
+    
+    console.log("🔍 Firebase: Criando query...")
     const productsQuery = query(productsRef, orderBy("createdAt", "desc"))
 
+    console.log("📡 Firebase: Executando query...")
     const snapshot = await getDocs(productsQuery)
-    return snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-      createdAt: doc.data().createdAt?.toDate() || new Date(),
-      updatedAt: doc.data().updatedAt?.toDate() || new Date(),
-    })) as Product[]
+    
+    console.log("📊 Firebase: Documentos encontrados:", snapshot.size)
+    
+    if (snapshot.empty) {
+      console.log("⚠️ Firebase: Nenhum produto encontrado na coleção")
+      return []
+    }
+
+    const products = snapshot.docs.map(doc => {
+      const data = doc.data()
+      console.log("📄 Firebase: Produto encontrado:", doc.id, data.title || "Sem título")
+      return {
+        id: doc.id,
+        ...data,
+        createdAt: data.createdAt?.toDate() || new Date(),
+        updatedAt: data.updatedAt?.toDate() || new Date(),
+      }
+    }) as Product[]
+    
+    console.log("✅ Firebase: Total de produtos processados:", products.length)
+    return products
   } catch (error) {
-    console.error("Erro ao buscar produtos:", error)
-    // Se não há produtos no Firebase, retornar array vazio
+    console.error("❌ Firebase: Erro ao buscar produtos:", error)
+    console.error("🔍 Firebase: Tipo do erro:", error.code)
+    console.error("📝 Firebase: Mensagem:", error.message)
+    
+    // Se há erro de permissão, tentar buscar sem orderBy
+    if (error.code === 'permission-denied' || error.message?.includes('permission')) {
+      try {
+        console.log("🔄 Firebase: Tentando busca simples sem orderBy...")
+        const db = getDb()
+        const productsRef = collection(db, "products")
+        const snapshot = await getDocs(productsRef)
+        
+        console.log("📊 Firebase: Documentos encontrados (sem orderBy):", snapshot.size)
+        
+        return snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+          createdAt: doc.data().createdAt?.toDate() || new Date(),
+          updatedAt: doc.data().updatedAt?.toDate() || new Date(),
+        })) as Product[]
+      } catch (retryError) {
+        console.error("❌ Firebase: Erro na segunda tentativa:", retryError)
+        return []
+      }
+    }
+    
     return []
   }
 }

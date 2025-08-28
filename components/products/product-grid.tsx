@@ -21,26 +21,40 @@ export function ProductGrid() {
         setLoading(true)
         setError(null)
 
-        const response = await fetch("/api/products")
+        console.log("🔍 Buscando produtos...")
+        const response = await fetch("/api/products", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+        
+        console.log("📡 Resposta da API:", response.status)
+        
         if (!response.ok) {
+          console.error("❌ Erro na resposta:", response.status, response.statusText)
           throw new Error(`HTTP error! status: ${response.status}`)
         }
+        
         const data = await response.json()
+        console.log("📦 Dados recebidos:", data)
 
-        if (data.success) {
-          setProducts(data.data || [])
+        if (data.success && Array.isArray(data.data)) {
+          console.log("✅ Produtos carregados:", data.data.length)
+          setProducts(data.data)
         } else {
-          // Não mostrar erro de permissão para usuários não logados
+          console.log("⚠️ Nenhum produto encontrado ou erro:", data.error)
+          setProducts([])
           if (data.error && !data.error.includes("permission")) {
             setError(data.error)
           }
         }
       } catch (error) {
-        console.error("Erro ao buscar produtos:", error)
-        // Não mostrar erro de permissão para usuários não logados
-        const errorMessage = error.message
+        console.error("❌ Erro ao buscar produtos:", error)
+        setProducts([])
+        const errorMessage = error.message || error.toString()
         if (!errorMessage.includes("permission") && !errorMessage.includes("401")) {
-          setError("Erro ao carregar produtos. Tente novamente.")
+          setError("Erro ao carregar produtos. Verifique se há produtos no Firebase.")
         }
       } finally {
         setLoading(false)
