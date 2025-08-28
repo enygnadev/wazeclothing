@@ -1,178 +1,289 @@
+
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Função para verificar se o usuário é admin
+    // ========================================
+    // FUNÇÕES AUXILIARES
+    // ========================================
+    
+    // Verifica se o usuário é administrador
     function isAdmin() {
       return request.auth != null && 
         exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('isAdmin', false) == true;
     }
     
-    // Função para verificar se é o próprio usuário
+    // Verifica se é o próprio usuário
     function isOwner(userId) {
       return request.auth != null && request.auth.uid == userId;
     }
     
-    // Função para verificar autenticação
+    // Verifica se o usuário está autenticado
     function isAuthenticated() {
       return request.auth != null;
     }
     
-    // Função para validar dados obrigatórios
+    // Valida campos obrigatórios
     function hasRequiredFields(fields) {
       return request.resource.data.keys().hasAll(fields);
     }
     
-    // Produtos - COMPLETAMENTE PÚBLICO para leitura, escrita apenas admin
+    // Valida email do usuário
+    function isValidEmail(email) {
+      return email is string && email.matches('.*@.*\\..*');
+    }
+    
+    // Valida dados de produto
+    function isValidProduct() {
+      return request.resource.data.title is string &&
+             request.resource.data.title.size() > 0 &&
+             request.resource.data.price is number &&
+             request.resource.data.price > 0 &&
+             request.resource.data.category is string &&
+             request.resource.data.category.size() > 0;
+    }
+    
+    // ========================================
+    // PRODUTOS - PÚBLICO PARA LEITURA
+    // ========================================
     match /products/{productId} {
-      allow read: if true; // Acesso público total - qualquer pessoa pode ver
+      // Leitura completamente pública - qualquer pessoa pode ver produtos
+      allow read: if true;
+      
+      // Criação apenas para admins com validação
       allow create: if isAdmin() && 
-        hasRequiredFields(['title', 'price']) &&
-        request.resource.data.price is number &&
-        request.resource.data.price > 0 &&
-        request.resource.data.title is string &&
-        request.resource.data.title.size() > 0;
-      allow update: if isAdmin();
+        isValidProduct() &&
+        hasRequiredFields(['title', 'price', 'category', 'image']) &&
+        request.resource.data.featured is bool &&
+        request.resource.data.isSmart is bool;
+      
+      // Atualização apenas para admins
+      allow update: if isAdmin() && isValidProduct();
+      
+      // Exclusão apenas para admins
       allow delete: if isAdmin();
     }
     
-    // Categorias - COMPLETAMENTE PÚBLICO para leitura, escrita admin
+    // ========================================
+    // CATEGORIAS - PÚBLICO PARA LEITURA
+    // ========================================
     match /categories/{categoryId} {
-      allow read: if true; // Acesso público total
-      allow create, update, delete: if isAdmin();
+      // Leitura completamente pública
+      allow read: if true;
+      
+      // Escrita apenas para admins
+      allow create: if isAdmin() && 
+        hasRequiredFields(['name']) &&
+        request.resource.data.name is string &&
+        request.resource.data.name.size() > 0;
+      
+      allow update, delete: if isAdmin();
     }
     
-    // Tamanhos - COMPLETAMENTE PÚBLICO para leitura, escrita admin
+    // ========================================
+    // TAMANHOS - PÚBLICO PARA LEITURA
+    // ========================================
     match /sizes/{sizeId} {
-      allow read: if true; // Acesso público total
-      allow create, update, delete: if isAdmin();
+      // Leitura completamente pública
+      allow read: if true;
+      
+      // Escrita apenas para admins
+      allow create: if isAdmin() && 
+        hasRequiredFields(['name', 'value']) &&
+        request.resource.data.name is string &&
+        request.resource.data.value is string;
+      
+      allow update, delete: if isAdmin();
     }
     
-    // Usuários - ler/escrever apenas próprios dados ou admin
+    // ========================================
+    // CONFIGURAÇÕES DA LOJA - PÚBLICO PARA LEITURA
+    // ========================================
+    match /settings/{document} {
+      // Leitura pública para configurações da loja
+      allow read: if true;
+      
+      // Escrita apenas para admins
+      allow write: if isAdmin();
+    }
+    
+    // ========================================
+    // USUÁRIOS - CONTROLE DE ACESSO RESTRITO
+    // ========================================
     match /users/{userId} {
+      // Ler apenas próprios dados ou admin
       allow read: if isOwner(userId) || isAdmin();
+      
+      // Criar perfil apenas para si mesmo com validação
       allow create: if isOwner(userId) && 
         hasRequiredFields(['email', 'name']) &&
-        request.resource.data.email == request.auth.token.email;
-      allow update: if (isOwner(userId) || isAdmin()) &&
-        // Usuário não pode alterar próprio status de admin
-        (isAdmin() || !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isAdmin']));
-      allow delete: if isAdmin();
-      
-      // LGPD - Consentimento obrigatório para criar perfil
-      allow create: if isOwner(userId) && 
+        isValidEmail(request.resource.data.email) &&
+        request.resource.data.email == request.auth.token.email &&
+        request.resource.data.name is string &&
+        request.resource.data.name.size() > 0 &&
+        // LGPD - Consentimento obrigatório
         request.resource.data.consentDate is timestamp &&
         request.resource.data.consentVersion is string;
+      
+      // Atualizar próprios dados ou admin gerenciar
+      allow update: if (isOwner(userId) || isAdmin()) &&
+        // Usuário comum não pode alterar próprio status de admin
+        (isAdmin() || !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isAdmin'])) &&
+        // Validação de campos obrigatórios
+        (!request.resource.data.keys().hasAny(['email']) || isValidEmail(request.resource.data.email));
+      
+      // Exclusão apenas para admin
+      allow delete: if isAdmin();
     }
     
-    // Pedidos - ler próprios pedidos ou admin gerenciar todos
+    // ========================================
+    // PEDIDOS - USUÁRIOS AUTENTICADOS
+    // ========================================
     match /orders/{orderId} {
+      // Ler próprios pedidos ou admin ver todos
       allow read: if isAuthenticated() && 
         (isOwner(resource.data.userId) || isAdmin());
+      
+      // Criar pedido apenas para usuários autenticados
       allow create: if isAuthenticated() && 
         request.auth.uid == request.resource.data.userId &&
         hasRequiredFields(['items', 'total', 'status']) &&
         request.resource.data.total is number &&
         request.resource.data.total > 0 &&
         request.resource.data.items is list &&
-        request.resource.data.items.size() > 0;
+        request.resource.data.items.size() > 0 &&
+        request.resource.data.status in ['pending', 'processing', 'paid'] &&
+        // Validação de informações do cliente se fornecidas
+        (!request.resource.data.keys().hasAny(['customerInfo']) || 
+         (request.resource.data.customerInfo.name is string &&
+          request.resource.data.customerInfo.email is string));
+      
+      // Atualizar pedido: admin pode tudo, usuário só pode cancelar
       allow update: if isAdmin() || 
         (isOwner(resource.data.userId) && 
          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']) && 
-         request.resource.data.status in ['cancelled']);
-      allow delete: if isAdmin();
+         request.resource.data.status == 'cancelled' &&
+         resource.data.status in ['pending', 'processing']);
       
+      // Exclusão apenas para admin
+      allow delete: if isAdmin();
     }
     
-    // Carrinho - apenas próprio usuário
+    // ========================================
+    // CARRINHO DE COMPRAS - PRIVADO
+    // ========================================
     match /carts/{userId} {
+      // Apenas o próprio usuário pode acessar seu carrinho
       allow read, write: if isOwner(userId);
-      allow create: if isOwner(userId) && request.resource.data.items is list;
-    }
-    
-    // Configurações da loja - leitura pública, escrita admin
-    match /settings/{document} {
-      allow read: if true;
-      allow write: if isAdmin();
-    }
-    
-    // Logs de auditoria LGPD - apenas admin
-    match /audit_logs/{logId} {
-      allow read, write: if isAdmin();
-      allow create: if isAuthenticated(); // Para logs automáticos
-    }
-    
-    // Dados sensíveis (LGPD) - apenas próprio usuário
-    match /user_sensitive_data/{userId} {
-      allow read, write: if isOwner(userId);
-      allow delete: if isOwner(userId); // Direito ao esquecimento LGPD
-    }
-    
-    // Consentimentos LGPD - próprio usuário ou admin
-    match /consents/{userId} {
-      allow read: if isOwner(userId) || isAdmin();
-      allow write: if isOwner(userId);
+      
+      // Criar carrinho com validação
       allow create: if isOwner(userId) && 
-        hasRequiredFields(['consentDate', 'version', 'accepted']) &&
-        request.resource.data.accepted is bool;
+        request.resource.data.items is list;
     }
     
-    // Solicitações de exclusão de dados (LGPD)
-    match /data_deletion_requests/{requestId} {
-      allow read: if isAuthenticated() && 
-        (isOwner(resource.data.userId) || isAdmin());
-      allow create: if isAuthenticated() && 
-        request.auth.uid == request.resource.data.userId;
-      allow update: if isAdmin(); // Admin processa as solicitações
+    // ========================================
+    // ENDEREÇOS DE ENTREGA - PRIVADO
+    // ========================================
+    match /user_addresses/{userId} {
+      match /addresses/{addressId} {
+        allow read, write: if isOwner(userId);
+        
+        allow create: if isOwner(userId) && 
+          hasRequiredFields(['street', 'city', 'state', 'zipCode']) &&
+          request.resource.data.street is string &&
+          request.resource.data.city is string &&
+          request.resource.data.state is string &&
+          request.resource.data.zipCode is string;
+      }
     }
     
-    // Newsletters - controle de inscrição
-    match /newsletters/{email} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated() && 
-        request.resource.data.email == request.auth.token.email;
-      allow delete: if isAuthenticated() && 
-        resource.data.email == request.auth.token.email; // Unsubscribe
-      allow update: if isAdmin();
-    }
-    
-    // Avaliações de produtos - usuários autenticados podem criar
+    // ========================================
+    // AVALIAÇÕES DE PRODUTOS - PÚBLICO PARA LEITURA
+    // ========================================
     match /reviews/{reviewId} {
+      // Leitura pública das avaliações
       allow read: if true;
+      
+      // Criar avaliação apenas usuários autenticados
       allow create: if isAuthenticated() && 
         request.auth.uid == request.resource.data.userId &&
         hasRequiredFields(['productId', 'rating', 'comment']) &&
         request.resource.data.rating is number &&
         request.resource.data.rating >= 1 &&
-        request.resource.data.rating <= 5;
+        request.resource.data.rating <= 5 &&
+        request.resource.data.comment is string;
+      
+      // Atualizar/excluir apenas própria avaliação ou admin
       allow update, delete: if isOwner(resource.data.userId) || isAdmin();
     }
     
-    // Endereços de entrega - apenas próprio usuário
-    match /user_addresses/{userId} {
-      match /addresses/{addressId} {
-        allow read, write: if isOwner(userId);
-        allow create: if isOwner(userId) && 
-          hasRequiredFields(['street', 'city', 'state', 'zipCode']);
-      }
-    }
-    
-    // Histórico de compras para recomendações (dados anonimizados)
-    match /purchase_history/{userId} {
-      allow read, write: if isOwner(userId);
-      // Admin pode ler apenas dados anonimizados para analytics
-      allow read: if isAdmin() && 
-        resource.data.keys().hasOnly(['productCategories', 'timestamp', 'totalAmount']);
-    }
-    
-    // Sessões de usuário (para controle de acesso)
-    match /user_sessions/{sessionId} {
-      allow read, write: if isAuthenticated() && 
-        resource.data.userId == request.auth.uid;
+    // ========================================
+    // NEWSLETTER - CONTROLE DE INSCRIÇÃO
+    // ========================================
+    match /newsletters/{email} {
+      // Admin pode ler todas as inscrições
+      allow read: if isAdmin();
+      
+      // Usuários podem se inscrever
       allow create: if isAuthenticated() && 
-        request.resource.data.userId == request.auth.uid;
+        isValidEmail(request.resource.data.email) &&
+        request.resource.data.email == request.auth.token.email;
+      
+      // Usuário pode cancelar própria inscrição
       allow delete: if isAuthenticated() && 
-        resource.data.userId == request.auth.uid;
+        resource.data.email == request.auth.token.email;
+      
+      // Admin pode atualizar
+      allow update: if isAdmin();
+    }
+    
+    // ========================================
+    // CONFORMIDADE LGPD
+    // ========================================
+    
+    // Consentimentos LGPD
+    match /consents/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow write: if isOwner(userId);
+      allow create: if isOwner(userId) && 
+        hasRequiredFields(['consentDate', 'version', 'accepted']) &&
+        request.resource.data.accepted is bool &&
+        request.resource.data.consentDate is timestamp &&
+        request.resource.data.version is string;
+    }
+    
+    // Configurações de privacidade
+    match /privacy_settings/{userId} {
+      allow read, write: if isOwner(userId);
+      allow read: if isAdmin(); // Para compliance
+    }
+    
+    // Solicitações de exclusão de dados
+    match /data_deletion_requests/{requestId} {
+      allow read: if isAuthenticated() && 
+        (isOwner(resource.data.userId) || isAdmin());
+      allow create: if isAuthenticated() && 
+        request.auth.uid == request.resource.data.userId &&
+        hasRequiredFields(['reason', 'requestDate']) &&
+        request.resource.data.requestDate is timestamp;
+      allow update: if isAdmin(); // Admin processa as solicitações
+    }
+    
+    // Dados sensíveis (direito ao esquecimento)
+    match /user_sensitive_data/{userId} {
+      allow read, write: if isOwner(userId);
+      allow delete: if isOwner(userId); // Direito ao esquecimento
+    }
+    
+    // ========================================
+    // LOGS E AUDITORIA
+    // ========================================
+    
+    // Logs de auditoria LGPD
+    match /audit_logs/{logId} {
+      allow read: if isAdmin();
+      allow create: if isAuthenticated(); // Para logs automáticos
+      allow write: if isAdmin();
     }
     
     // Logs de segurança
@@ -181,10 +292,46 @@ service cloud.firestore {
       allow create: if true; // Para logs automáticos do sistema
     }
     
-    // Configurações de privacidade do usuário (LGPD)
-    match /privacy_settings/{userId} {
+    // ========================================
+    // DADOS ANALÍTICOS E HISTÓRICO
+    // ========================================
+    
+    // Histórico de compras (dados anonimizados para analytics)
+    match /purchase_history/{userId} {
       allow read, write: if isOwner(userId);
-      allow read: if isAdmin(); // Admin pode visualizar para compliance
+      // Admin pode ler apenas dados anonimizados
+      allow read: if isAdmin() && 
+        resource.data.keys().hasOnly(['productCategories', 'timestamp', 'totalAmount']);
+    }
+    
+    // Sessões de usuário (controle de acesso)
+    match /user_sessions/{sessionId} {
+      allow read, write: if isAuthenticated() && 
+        resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() && 
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.createdAt is timestamp;
+      allow delete: if isAuthenticated() && 
+        resource.data.userId == request.auth.uid;
+    }
+    
+    // ========================================
+    // RECURSOS ADMINISTRATIVOS
+    // ========================================
+    
+    // Estatísticas da loja (apenas admin)
+    match /store_analytics/{document} {
+      allow read, write: if isAdmin();
+    }
+    
+    // Configurações do sistema (apenas admin)
+    match /system_config/{document} {
+      allow read, write: if isAdmin();
+    }
+    
+    // Backup de dados (apenas admin)
+    match /backups/{backupId} {
+      allow read, write: if isAdmin();
     }
   }
 }
