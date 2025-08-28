@@ -6,6 +6,7 @@ import { AuthForm } from "@/components/auth/auth-form"
 import { useAuth } from "@/components/providers/auth-provider"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Loader2 } from "lucide-react"
+import Header from "@/components/Header" // Assumindo que o Header está em "@/components/Header"
 
 function AuthPageContent() {
   const searchParams = useSearchParams()
@@ -52,23 +53,26 @@ function AuthPageContent() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl">
-            {type === 'admin' ? 'Acesso Administrativo' : 'Waze Clothing'}
-          </CardTitle>
-          <CardDescription>
-            {type === 'admin'
-              ? 'Faça login para acessar o painel administrativo'
-              : 'Entre na sua conta ou crie uma nova'
-            }
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <AuthForm mode="login" />
-        </CardContent>
-      </Card>
+    <div className="min-h-screen bg-background">
+      <Header />
+      <main className="container mx-auto px-4 py-8 pt-24 flex items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl">
+              {type === 'admin' ? 'Acesso Administrativo' : 'Waze Clothing'}
+            </CardTitle>
+            <CardDescription>
+              {type === 'admin'
+                ? 'Faça login para acessar o painel administrativo'
+                : 'Entre na sua conta ou crie uma nova'
+              }
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <AuthForm mode="login" />
+          </CardContent>
+        </Card>
+      </main>
     </div>
   )
 }

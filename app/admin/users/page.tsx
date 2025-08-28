@@ -8,7 +8,7 @@ export default function AdminUsersPage() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <div className="flex">
+      <div className="flex pt-16">
         <AdminSidebar />
         <main className="flex-1 p-6">
           <Suspense fallback={<div>Carregando usuários...</div>}>

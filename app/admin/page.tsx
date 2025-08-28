@@ -1,4 +1,3 @@
-
 "use client"
 
 import { Suspense, useEffect, useState } from "react"
@@ -25,7 +24,7 @@ export default function AdminPage() {
         userProfile,
         loading
       })
-      
+
       if (!initialized) {
         console.log("🔄 Inicializando auth...")
         try {
@@ -35,7 +34,7 @@ export default function AdminPage() {
         }
         return
       }
-      
+
       const currentState = {
         user: !!user,
         userEmail: user?.email,
@@ -45,10 +44,10 @@ export default function AdminPage() {
         initialized,
         timestamp: new Date().toISOString()
       }
-      
+
       console.log("🔍 Debug Auth State:", currentState)
       setDebugInfo(currentState)
-      
+
       // Parar verificação quando estiver pronto
       if (initialized && !loading) {
         setVerifying(false)
@@ -114,7 +113,7 @@ export default function AdminPage() {
               Fazer Login como Admin
             </Button>
           </div>
-          
+
           {/* Debug info apenas em desenvolvimento */}
           {process.env.NODE_ENV === 'development' && (
             <div className="mt-4 text-xs text-muted-foreground bg-muted p-2 rounded">
@@ -145,7 +144,7 @@ export default function AdminPage() {
               Logado como: <strong>{user.email}</strong> (Admin)
             </p>
           </div>
-          
+
           <Suspense fallback={
             <div className="flex items-center justify-center p-8">
               <Loader2 className="h-6 w-6 animate-spin mr-2" />
