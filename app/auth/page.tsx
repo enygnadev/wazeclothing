@@ -39,9 +39,8 @@ function AuthPageContent() {
     )
   }
 
-  // Se tem usuário, redirecionar imediatamente
+  // Se tem usuário, mostrar tela de redirecionamento
   if (user && !loading) {
-    router.push(returnUrl)
     return (
       <div className="min-h-screen flex items-center justify-center bg-background p-4">
         <div className="text-center">
