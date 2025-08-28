@@ -58,22 +58,56 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const product = await request.json()
+    console.log("📥 API: Dados recebidos para criar produto:", product)
 
-    // Aqui você pode adicionar validação
-    if (!product.name || !product.price) {
+    // Validação com os campos corretos que vêm do formulário
+    if (!product.title || !product.price) {
+      console.error("❌ API: Validação falhou - título ou preço ausente")
       return NextResponse.json(
-        { error: "Nome e preço são obrigatórios" },
+        { error: "Título e preço são obrigatórios" },
         { status: 400 }
       )
     }
 
-    // Por enquanto, retorna sucesso
-    // Em produção, você adicionaria o produto ao Firestore
-    return NextResponse.json({ success: true, id: Date.now().toString() })
+    // Importar a função de criação de produto
+    const { createProduct } = await import("@/lib/firebase/products")
+    
+    // Criar o produto no Firestore
+    const productData = {
+      title: product.title,
+      description: product.description || "",
+      price: product.price,
+      image: product.image || "",
+      category: product.category || "",
+      features: product.features || [],
+      featured: product.featured || false,
+      size: product.size || "",
+      isSmart: product.isSmart || false,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }
+
+    console.log("💾 API: Criando produto:", productData)
+    const productId = await createProduct(productData)
+
+    if (productId) {
+      console.log("✅ API: Produto criado com ID:", productId)
+      return NextResponse.json({ 
+        success: true, 
+        id: productId,
+        message: "Produto criado com sucesso!"
+      })
+    } else {
+      console.error("❌ API: Falha ao criar produto no Firestore")
+      return NextResponse.json(
+        { error: "Erro ao salvar produto no banco de dados" },
+        { status: 500 }
+      )
+    }
   } catch (error) {
-    console.error("Error creating product:", error)
+    console.error("❌ API: Erro ao criar produto:", error)
     return NextResponse.json(
-      { error: "Erro ao criar produto" },
+      { error: "Erro interno do servidor" },
       { status: 500 }
     )
   }

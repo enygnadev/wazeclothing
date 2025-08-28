@@ -1,9 +1,9 @@
-import { 
-  collection, 
-  addDoc, 
-  getDocs, 
-  doc, 
-  updateDoc, 
+import {
+  collection,
+  addDoc,
+  getDocs,
+  doc,
+  updateDoc,
   deleteDoc,
   query,
   where,
@@ -18,18 +18,18 @@ export async function getProducts(): Promise<Product[]> {
   try {
     console.log("🔥 Firebase: Conectando ao Firestore...")
     const db = getDb()
-    
+
     console.log("📋 Firebase: Acessando coleção 'products'...")
     const productsRef = collection(db, "products")
-    
+
     console.log("🔍 Firebase: Criando query...")
     const productsQuery = query(productsRef, orderBy("createdAt", "desc"))
 
     console.log("📡 Firebase: Executando query...")
     const snapshot = await getDocs(productsQuery)
-    
+
     console.log("📊 Firebase: Documentos encontrados:", snapshot.size)
-    
+
     if (snapshot.empty) {
       console.log("⚠️ Firebase: Nenhum produto encontrado na coleção")
       return []
@@ -45,14 +45,14 @@ export async function getProducts(): Promise<Product[]> {
         updatedAt: data.updatedAt?.toDate() || new Date(),
       }
     }) as Product[]
-    
+
     console.log("✅ Firebase: Total de produtos processados:", products.length)
     return products
   } catch (error) {
     console.error("❌ Firebase: Erro ao buscar produtos:", error)
     console.error("🔍 Firebase: Tipo do erro:", error.code)
     console.error("📝 Firebase: Mensagem:", error.message)
-    
+
     // Se há erro de permissão, tentar buscar sem orderBy
     if (error.code === 'permission-denied' || error.message?.includes('permission')) {
       try {
@@ -60,9 +60,9 @@ export async function getProducts(): Promise<Product[]> {
         const db = getDb()
         const productsRef = collection(db, "products")
         const snapshot = await getDocs(productsRef)
-        
+
         console.log("📊 Firebase: Documentos encontrados (sem orderBy):", snapshot.size)
-        
+
         return snapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data(),
@@ -74,7 +74,7 @@ export async function getProducts(): Promise<Product[]> {
         return []
       }
     }
-    
+
     return []
   }
 }
@@ -108,7 +108,7 @@ export async function getProductsByCategory(category: string): Promise<Product[]
     const db = getDb()
     const productsRef = collection(db, "products")
     const categoryQuery = query(
-      productsRef, 
+      productsRef,
       where("category", "==", category),
       orderBy("createdAt", "desc")
     )
@@ -131,7 +131,7 @@ export async function getFeaturedProducts(): Promise<Product[]> {
     const db = getDb()
     const productsRef = collection(db, "products")
     const featuredQuery = query(
-      productsRef, 
+      productsRef,
       where("featured", "==", true),
       orderBy("createdAt", "desc")
     )
@@ -190,11 +190,10 @@ export async function deleteProduct(id: string): Promise<boolean> {
   try {
     const db = getDb()
     const productRef = doc(db, "products", id)
-
     await deleteDoc(productRef)
     return true
   } catch (error) {
-    console.error("Erro ao deletar produto:", error)
+    console.error("Erro ao excluir produto:", error)
     return false
   }
 }
@@ -264,5 +263,24 @@ export async function createSize(name: string): Promise<boolean> {
 }
 
 export async function getProduct(id: string): Promise<Product | null> {
-  return getProductById(id)
+  try {
+    const db = getDb()
+    const productRef = doc(db, "products", id)
+    const productSnap = await getDoc(productRef)
+
+    if (productSnap.exists()) {
+      const data = productSnap.data()
+      return {
+        id: productSnap.id,
+        ...data,
+        createdAt: data.createdAt?.toDate() || new Date(),
+        updatedAt: data.updatedAt?.toDate() || new Date(),
+      } as Product
+    }
+
+    return null
+  } catch (error) {
+    console.error("Erro ao buscar produto:", error)
+    return null
+  }
 }
