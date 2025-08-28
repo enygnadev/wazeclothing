@@ -1,0 +1,42 @@
+~/workspace$ npm run build
+
+> Waze-Clothing-ecommerce@1.0.0 build
+> next build
+
+   ▲ Next.js 15.2.4
+   - Environments: .env.local
+
+   Creating an optimized production build ...
+ ⚠ Compiled with warnings
+
+./app/api/chat/route.ts
+Attempted import error: 'streamText' is not exported from 'ai' (imported as 'streamText').
+
+Import trace for requested module:
+./app/api/chat/route.ts
+
+ ✓ Compiled successfully
+   Skipping validation of types
+   Skipping linting
+   Collecting page data  ...✅ Configuração Firebase carregada com sucesso
+✅ Configuração Firebase carregada com sucesso
+✅ Configuração Firebase carregada com sucesso
+ ✓ Collecting page data    
+✅ Configuração Firebase carregada com sucesso
+Error occurred prerendering page "/admin/orders". Read more: https://nextjs.org/docs/messages/prerender-error
+Error: Event handlers cannot be passed to Client Component props.
+  {className: ..., ref: undefined, onClick: function onClick, children: ...}
+                                            ^^^^^^^^^^^^^^^^
+If you need interactivity, consider converting part of this to a Client Component.
+    at e$ (/home/runner/workspace/node_modules/.pnpm/next@15.2.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:17:23404)
+    at Object.toJSON (/home/runner/workspace/node_modules/.pnpm/next@15.2.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:17:14854)
+    at stringify (<anonymous>)
+    at eF (/home/runner/workspace/node_modules/.pnpm/next@15.2.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:17:26079)
+    at eq (/home/runner/workspace/node_modules/.pnpm/next@15.2.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:17:26391)
+    at ez (/home/runner/workspace/node_modules/.pnpm/next@15.2.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:17:26887)
+    at AsyncLocalStorage.run (node:async_hooks:346:14)
+    at /home/runner/workspace/node_modules/.pnpm/next@15.2.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:17:27678
+    at node:internal/process/task_queues:140:7
+    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)
+Export encountered an error on /admin/orders/page: /admin/orders, exiting the build.
+ ⨯ Next.js build worker exited with code: 1 and signal: null
