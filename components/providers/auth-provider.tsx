@@ -102,9 +102,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const db = getDb()
     await setDoc(doc(db, "users", result.user.uid), {
       email: result.user.email,
-      displayName: result.user.displayName || "",
-      isAdmin: false,
+      name: result.user.displayName || email.split('@')[0],
+      displayName: result.user.displayName || email.split('@')[0],
+      isAdmin: email === 'admin@waze.com' || email === 'admin@admin.com', // Fazer primeiro usuário admin
       createdAt: new Date(),
+      updatedAt: new Date(),
+      consentDate: new Date(),
+      consentVersion: "1.0"
     })
   }
 
@@ -127,9 +131,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!userDoc.exists()) {
       await setDoc(doc(db, "users", result.user.uid), {
         email: result.user.email,
-        displayName: result.user.displayName || "",
-        isAdmin: false,
+        name: result.user.displayName || result.user.email?.split('@')[0] || "",
+        displayName: result.user.displayName || result.user.email?.split('@')[0] || "",
+        isAdmin: result.user.email === 'admin@waze.com' || result.user.email === 'admin@admin.com',
         createdAt: new Date(),
+        updatedAt: new Date(),
+        consentDate: new Date(),
+        consentVersion: "1.0"
       })
     }
   }

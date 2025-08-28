@@ -1,4 +1,3 @@
-
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
@@ -40,7 +39,7 @@ export function middleware(request: NextRequest) {
   // Proteção para rotas admin
   if (pathname.startsWith('/admin')) {
     const hasAdminAccess = request.cookies.get('admin-session')?.value === 'true'
-    
+
     if (!hasAdminAccess) {
       url.pathname = '/auth'
       url.searchParams.set('returnUrl', pathname)
@@ -52,7 +51,7 @@ export function middleware(request: NextRequest) {
   // Proteção para área cliente
   if (pathname.startsWith('/cliente')) {
     const hasUserSession = request.cookies.get('user-session')?.value === 'true'
-    
+
     if (!hasUserSession) {
       url.pathname = '/auth'
       url.searchParams.set('returnUrl', pathname)
@@ -67,7 +66,7 @@ export function middleware(request: NextRequest) {
   response.headers.set('X-XSS-Protection', '1; mode=block')
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
   response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
-  
+
   return response
 }
 
