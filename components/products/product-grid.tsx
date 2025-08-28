@@ -16,24 +16,37 @@ export function ProductGrid() {
   const [selectedPrice, setSelectedPrice] = useState("")
 
   useEffect(() => {
-    async function fetchProducts() {
+    async function fetchProducts(retryCount = 0) {
       try {
         setLoading(true)
         setError(null)
 
-        console.log("🔍 Buscando produtos...")
+        console.log("🔍 Buscando produtos... (tentativa:", retryCount + 1, ")")
+        
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 10000) // 10s timeout
+        
         const response = await fetch("/api/products", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
           },
+          signal: controller.signal,
         })
         
-        console.log("📡 Resposta da API:", response.status)
+        clearTimeout(timeoutId)
+        console.log("📡 Resposta da API:", response.status, response.statusText)
         
         if (!response.ok) {
+          // Se for erro 502 e primeira tentativa, tentar novamente
+          if (response.status === 502 && retryCount < 2) {
+            console.log("🔄 Erro 502, tentando novamente em 2s...")
+            setTimeout(() => fetchProducts(retryCount + 1), 2000)
+            return
+          }
+          
           console.error("❌ Erro na resposta:", response.status, response.statusText)
-          throw new Error(`HTTP error! status: ${response.status}`)
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`)
         }
         
         const data = await response.json()
@@ -52,9 +65,20 @@ export function ProductGrid() {
       } catch (error) {
         console.error("❌ Erro ao buscar produtos:", error)
         setProducts([])
-        const errorMessage = error.message || error.toString()
-        if (!errorMessage.includes("permission") && !errorMessage.includes("401")) {
-          setError("Erro ao carregar produtos. Verifique se há produtos no Firebase.")
+        
+        if (error.name === 'AbortError') {
+          setError("Tempo limite excedido. Tente recarregar a página.")
+        } else if (error.message.includes("502")) {
+          setError("Servidor temporariamente indisponível. Tentando reconectar...")
+          if (retryCount < 2) {
+            setTimeout(() => fetchProducts(retryCount + 1), 3000)
+            return
+          }
+        } else {
+          const errorMessage = error.message || error.toString()
+          if (!errorMessage.includes("permission") && !errorMessage.includes("401")) {
+            setError("Erro ao carregar produtos. Verifique a conexão.")
+          }
         }
       } finally {
         setLoading(false)

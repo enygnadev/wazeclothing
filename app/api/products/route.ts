@@ -3,25 +3,52 @@ import { getProducts, getProductsByCategory } from "@/lib/firebase/products"
 
 export async function GET() {
   try {
-    console.log("🔍 API: Buscando produtos...")
+    console.log("🔍 API: Iniciando busca de produtos...")
+    
+    // Verificar se Firebase está configurado
+    if (!process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID) {
+      console.error("❌ API: Firebase não configurado")
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: "Firebase não configurado",
+          data: []
+        },
+        { status: 500 }
+      )
+    }
 
+    console.log("🔥 API: Firebase configurado, buscando produtos...")
     const products = await getProducts()
 
     console.log("📦 API: Produtos encontrados:", products.length)
 
-    return NextResponse.json({
-      success: true,
-      data: products,
-      count: products.length
-    })
+    return NextResponse.json(
+      {
+        success: true,
+        data: products || [],
+        count: products?.length || 0
+      },
+      { 
+        status: 200,
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        }
+      }
+    )
   } catch (error) {
     console.error("❌ API: Erro ao buscar produtos:", error)
+    console.error("❌ API: Stack trace:", error.stack)
 
     return NextResponse.json(
       { 
         success: false, 
-        error: error.message || "Erro interno do servidor",
-        details: error
+        error: error?.message || "Erro interno do servidor",
+        data: [],
+        count: 0,
+        details: process.env.NODE_ENV === 'development' ? error : undefined
       },
       { status: 500 }
     )
