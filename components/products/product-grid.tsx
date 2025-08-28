@@ -107,11 +107,6 @@ export function ProductGrid() {
     )
   }
 
-  // Não mostrar erro para usuários não logados - apenas retornar grid vazio
-  if (error) {
-    console.warn("Erro silenciado para usuário não logado:", error)
-  }
-
   return (
     <div className="space-y-6">
       <ProductCategories

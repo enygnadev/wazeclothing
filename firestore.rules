@@ -24,28 +24,28 @@ service cloud.firestore {
       return request.resource.data.keys().hasAll(fields);
     }
     
-    // Produtos - leitura pública, escrita apenas admin
+    // Produtos - COMPLETAMENTE PÚBLICO para leitura, escrita apenas admin
     match /products/{productId} {
-      allow read: if true; // Permitir leitura pública
+      allow read: if true; // Acesso público total
       allow create: if isAdmin() && 
-        hasRequiredFields(['name', 'price']) &&
+        hasRequiredFields(['title', 'price']) &&
         request.resource.data.price is number &&
         request.resource.data.price > 0 &&
-        request.resource.data.name is string &&
-        request.resource.data.name.size() > 0;
+        request.resource.data.title is string &&
+        request.resource.data.title.size() > 0;
       allow update: if isAdmin();
       allow delete: if isAdmin();
     }
     
-    // Categorias - leitura pública, escrita admin
+    // Categorias - COMPLETAMENTE PÚBLICO para leitura, escrita admin
     match /categories/{categoryId} {
-      allow read: if true; // Permitir leitura pública
+      allow read: if true; // Acesso público total
       allow create, update, delete: if isAdmin();
     }
     
-    // Tamanhos - leitura pública, escrita admin
+    // Tamanhos - COMPLETAMENTE PÚBLICO para leitura, escrita admin
     match /sizes/{sizeId} {
-      allow read: if true; // Permitir leitura pública
+      allow read: if true; // Acesso público total
       allow create, update, delete: if isAdmin();
     }
     
