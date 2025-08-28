@@ -134,3 +134,71 @@ export async function getProductsByCategory(category: string): Promise<Product[]
     return []
   }
 }
+
+export async function getCategories(): Promise<string[]> {
+  try {
+    const db = getDb()
+    const q = query(collection(db, PRODUCTS_COLLECTION))
+    const querySnapshot = await getDocs(q)
+    
+    const categories = new Set<string>()
+    querySnapshot.docs.forEach(doc => {
+      const data = doc.data()
+      if (data.category) {
+        categories.add(data.category)
+      }
+    })
+    
+    return Array.from(categories).sort()
+  } catch (error) {
+    console.error("Error getting categories:", error)
+    return []
+  }
+}
+
+export async function getSizes(): Promise<string[]> {
+  try {
+    const db = getDb()
+    const q = query(collection(db, PRODUCTS_COLLECTION))
+    const querySnapshot = await getDocs(q)
+    
+    const sizes = new Set<string>()
+    querySnapshot.docs.forEach(doc => {
+      const data = doc.data()
+      if (data.size) {
+        sizes.add(data.size)
+      }
+    })
+    
+    return Array.from(sizes).sort()
+  } catch (error) {
+    console.error("Error getting sizes:", error)
+    return []
+  }
+}
+
+export async function createCategory(categoryName: string): Promise<boolean> {
+  try {
+    // Categories are created implicitly when products are added
+    // This function exists for compatibility but doesn't need to do anything
+    return true
+  } catch (error) {
+    console.error("Error creating category:", error)
+    return false
+  }
+}
+
+export async function createSize(sizeName: string): Promise<boolean> {
+  try {
+    // Sizes are created implicitly when products are added
+    // This function exists for compatibility but doesn't need to do anything
+    return true
+  } catch (error) {
+    console.error("Error creating size:", error)
+    return false
+  }
+}
+
+export async function createProduct(product: Omit<Product, "id">): Promise<string | null> {
+  return addProduct(product)
+}
