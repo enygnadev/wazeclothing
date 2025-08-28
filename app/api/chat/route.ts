@@ -37,6 +37,4 @@ Seja sempre estiloso, direto, prestativo e focado em moda masculina urbana e con
     console.error("Error in chat API:", error)
     return NextResponse.json({ error: "Failed to process chat message" }, { status: 500 })
   }
-}s: 500 })
-  }
 }
