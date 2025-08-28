@@ -27,24 +27,20 @@ function AuthPageContent() {
     }
   }, [user, loading, initialized, mounted, returnUrl, router])
 
-  // Mostrar loading apenas quando necessário
-  const isLoading = !mounted || !initialized || (loading && !user)
-  const shouldRedirect = user && initialized && !loading
-
-  if (isLoading) {
+  // Aguardar apenas até a inicialização completar
+  if (!mounted || !initialized) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background p-4">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-          <p>
-            {!initialized ? "Inicializando autenticação..." : "Carregando..."}
-          </p>
+          <p>Inicializando autenticação...</p>
         </div>
       </div>
     )
   }
 
-  if (shouldRedirect) {
+  // Se tem usuário, redirecionar imediatamente
+  if (user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background p-4">
         <div className="text-center">

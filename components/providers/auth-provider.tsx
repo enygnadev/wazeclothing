@@ -119,13 +119,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
 
         setLoading(false)
+        
+        // Marcar como inicializado apenas após o primeiro auth state
+        if (!initialized) {
+          setInitialized(true)
+        }
       }, (error) => {
         console.error("❌ Erro no onAuthStateChanged:", error)
         setLoading(false)
+        setInitialized(true) // Marcar como inicializado mesmo com erro
       })
 
       setAuthUnsubscribe(() => unsubscribe)
-      setInitialized(true)
     } catch (error) {
       console.error("Error initializing auth:", error)
       setLoading(false)

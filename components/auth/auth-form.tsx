@@ -46,15 +46,28 @@ export function AuthForm({ mode }: AuthFormProps) {
     }
   }, [user, initialized, loading, router])
 
-  // Loading apenas se não inicializado OU se tem usuário e está carregando profile
-  if (!mounted || !initialized || (user && loading)) {
+  // Aguardar apenas inicialização
+  if (!mounted || !initialized) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="text-center space-y-2">
           <Loader2 className="h-8 w-8 animate-spin mx-auto" />
           <p className="text-sm text-muted-foreground">
-            {!initialized ? "Inicializando autenticação..." : 
-             user ? "Redirecionando..." : "Carregando..."}
+            Inicializando autenticação...
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  // Se tem usuário, não mostrar form
+  if (user) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-center space-y-2">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto" />
+          <p className="text-sm text-muted-foreground">
+            Redirecionando...
           </p>
         </div>
       </div>
