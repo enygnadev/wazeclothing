@@ -42,7 +42,7 @@ const setAuthCookie = async (user: User | null) => {
         const cookieString = `auth-token=${token}; path=/; max-age=${maxAge}${isSecure ? '; secure' : ''}; samesite=strict`
         document.cookie = cookieString
         console.log("🍪 Token atualizado no cookie (1 hora)")
-        
+
         // Agendar refresh do token em 50 minutos
         setTimeout(async () => {
           if (user && !user.isAnonymous) {
@@ -53,7 +53,7 @@ const setAuthCookie = async (user: User | null) => {
             }
           }
         }, 50 * 60 * 1000) // 50 minutos
-        
+
       } catch (error) {
         console.error("❌ Erro ao obter token:", error)
         // Limpar cookie inválido
@@ -85,7 +85,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const app = (await import("@/lib/firebase/config")).default
 
       const auth = getAuth(app)
-      
+
       // Configurar persistência local
       try {
         await setPersistence(auth, browserLocalPersistence)
@@ -96,13 +96,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       const unsubscribe = onAuthStateChanged(auth, async (user) => {
         console.log("🔄 Auth state changed:", { user: !!user, email: user?.email })
-        
+
         setUser(user)
-        
+
         if (user) {
           // Atualizar cookie apenas se realmente logado
           await setAuthCookie(user)
-          
+
           try {
             const profile = await getUserProfile(user.uid)
             setUserProfile(profile)

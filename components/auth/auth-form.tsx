@@ -36,29 +36,26 @@ export function AuthForm({ mode }: AuthFormProps) {
     }
   }, [mounted, initialized, initializeAuth])
 
-  // Se já está logado, redirecionar
+  // Se já está logado, redirecionar (apenas uma vez)
   useEffect(() => {
-    if (user && initialized) {
+    if (user && initialized && !loading) {
       const urlParams = new URLSearchParams(window.location.search)
       const returnUrl = urlParams.get('returnUrl') || '/'
+      console.log("🔄 Redirecionando usuário logado para:", returnUrl)
       router.push(returnUrl)
     }
-  }, [user, initialized, router])
+  }, [user, initialized, loading, router])
 
-  if (!mounted) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    )
-  }
-
-  if (!initialized) {
+  // Loading apenas se não inicializado OU se tem usuário e está carregando profile
+  if (!mounted || !initialized || (user && loading)) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="text-center space-y-2">
           <Loader2 className="h-8 w-8 animate-spin mx-auto" />
-          <p className="text-sm text-muted-foreground">Inicializando autenticação...</p>
+          <p className="text-sm text-muted-foreground">
+            {!initialized ? "Inicializando autenticação..." : 
+             user ? "Redirecionando..." : "Carregando..."}
+          </p>
         </div>
       </div>
     )

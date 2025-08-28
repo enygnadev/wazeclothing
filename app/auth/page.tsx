@@ -22,23 +22,29 @@ function AuthPageContent() {
 
   useEffect(() => {
     if (mounted && initialized && !loading && user) {
-      // Se já está logado, redirecionar
+      console.log("🔄 Auth page: redirecionando usuário logado")
       router.push(returnUrl)
     }
   }, [user, loading, initialized, mounted, returnUrl, router])
 
-  if (!mounted || loading || !initialized) {
+  // Mostrar loading apenas quando necessário
+  const isLoading = !mounted || !initialized || (loading && !user)
+  const shouldRedirect = user && initialized && !loading
+
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background p-4">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-          <p>Carregando...</p>
+          <p>
+            {!initialized ? "Inicializando autenticação..." : "Carregando..."}
+          </p>
         </div>
       </div>
     )
   }
 
-  if (user) {
+  if (shouldRedirect) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background p-4">
         <div className="text-center">
