@@ -66,7 +66,7 @@ export function ProductCategories({
   return (
     <div className="mb-6 space-y-6">
       <div className="text-center space-y-1">
-        <h3 className="font-luxury text-2xl md:text-3xl font-bold text-gradient-luxury">
+        <h3 className="font-luxury text-2xl md:text-3xl font-bold text-bw-solid">
           Roupas Masculinas Urbanas
         </h3>
         <p className="font-elegant text-muted-foreground text-sm">
