@@ -70,7 +70,7 @@ export function Header() {
             <div>
               <h1 className="font-luxury text-lg font-bold text-zinc">Waze</h1>
               <p className="font-elegant text-xs text-muted-foreground -mt-1 hidden sm:block">
-                Lighting
+                Clothing
               </p>
             </div>
           </Link>
