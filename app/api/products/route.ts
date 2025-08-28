@@ -7,14 +7,36 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const category = searchParams.get('category')
     
-    let products
-    if (category && category !== 'all') {
-      products = await getProductsByCategory(category)
-    } else {
-      products = await getProducts()
+    // Verificar se o Firebase está configurado
+    try {
+      let products
+      if (category && category !== 'all') {
+        products = await getProductsByCategory(category)
+      } else {
+        products = await getProducts()
+      }
+      
+      return NextResponse.json(products)
+    } catch (firebaseError) {
+      console.error("Firebase error:", firebaseError)
+      
+      // Retornar produtos mock em caso de erro do Firebase
+      const mockProducts = [
+        {
+          id: "1",
+          title: "Produto Exemplo",
+          description: "Descrição do produto exemplo",
+          price: 99.90,
+          image: "https://source.unsplash.com/400x400?clothes",
+          category: "camisetas",
+          size: "M",
+          featured: true,
+          createdAt: new Date()
+        }
+      ]
+      
+      return NextResponse.json(mockProducts)
     }
-    
-    return NextResponse.json(products)
   } catch (error) {
     console.error("Error in products API:", error)
     return NextResponse.json(

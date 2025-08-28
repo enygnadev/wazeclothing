@@ -8,13 +8,13 @@ import { getAnalytics, isSupported } from "firebase/analytics"
 
 // Firebase configuration
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "AIzaSyAi097jLQftvdSvLkUqnP3l_qD3tHRefjg",
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "wazeclothing.firebaseapp.com",
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "wazeclothing",
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || "gs://enygma-9a3c4.appspot.com",
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "222417382187",
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "1:222417382187:web:0b574f48c95d351c72336e",
-  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || "G-37QLR4P8CP",
+  apiKey: "AIzaSyAi097jLQftvdSvLkUqnP3l_qD3tHRefjg",
+  authDomain: "wazeclothing.firebaseapp.com",
+  projectId: "wazeclothing",
+  storageBucket: "wazeclothing.appspot.com",
+  messagingSenderId: "222417382187",
+  appId: "1:222417382187:web:0b574f48c95d351c72336e",
+  measurementId: "G-37QLR4P8CP",
 }
 
 // Check required environment variables

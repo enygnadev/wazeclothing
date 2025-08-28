@@ -35,7 +35,24 @@ export function ProductGrid() {
         setFilteredProducts(data)
       } catch (error) {
         console.error("Error fetching products:", error)
-        setError("Erro ao carregar produtos. Tente novamente.")
+        setError("Erro ao carregar produtos. Verifique a conexão com o Firebase.")
+        
+        // Usar dados mock como fallback
+        const mockProducts = [
+          {
+            id: "1",
+            title: "Camiseta Básica",
+            description: "Camiseta básica de algodão",
+            price: 49.90,
+            image: "https://source.unsplash.com/400x400?clothes",
+            category: "camisetas",
+            size: "M",
+            featured: true,
+            createdAt: new Date()
+          }
+        ]
+        setProducts(mockProducts)
+        setFilteredProducts(mockProducts)
       } finally {
         setLoading(false)
       }
