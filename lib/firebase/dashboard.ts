@@ -7,7 +7,12 @@ export interface DashboardStats {
   totalUsers: number
   totalOrders: number
   totalRevenue: number
-  monthlyGrowth: number
+  monthlyChange: {
+    products: number
+    orders: number
+    users: number
+    revenue: number
+  }
 }
 
 export interface MonthlyStats {
@@ -50,15 +55,20 @@ export async function getDashboardStats(): Promise<DashboardStats> {
       }
     })
 
-    // Calculate monthly growth (mock for now)
-    const monthlyGrowth = 12.5
+    // Calculate monthly changes (mock for now)
+    const monthlyChange = {
+      products: 8.2,
+      orders: 12.5,
+      users: 15.3,
+      revenue: 9.7
+    }
 
     return {
       totalProducts,
       totalUsers,
       totalOrders,
       totalRevenue,
-      monthlyGrowth
+      monthlyChange
     }
   } catch (error) {
     console.error("Error getting dashboard stats:", error)
@@ -67,7 +77,12 @@ export async function getDashboardStats(): Promise<DashboardStats> {
       totalUsers: 0,
       totalOrders: 0,
       totalRevenue: 0,
-      monthlyGrowth: 0
+      monthlyChange: {
+        products: 0,
+        orders: 0,
+        users: 0,
+        revenue: 0
+      }
     }
   }
 }
