@@ -62,7 +62,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
   return (
     <Card className="group relative overflow-hidden bg-gradient-to-br from-white to-gray-50/50 dark:from-gray-900 dark:to-gray-800/50 border-0 shadow-md hover:shadow-luxury transition-all duration-300 hover:scale-[1.02] backdrop-blur-sm h-full flex flex-col">
-      <div className="absolute inset-0 bg-gradient-to-r from-black-400/20 via-transparent to-green-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-amber-400/10 via-transparent to-yellow-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg pointer-events-none"></div>
 
       <CardHeader className="p-0 relative">
         <div className="relative aspect-square overflow-hidden rounded-t-lg">
@@ -137,25 +137,28 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
       </CardContent>
 
-      <CardFooter className="p-4 pt-0">
+      <CardFooter className="p-4 pt-0 relative z-10">
         <div className="space-y-2">
           <Button
+            type="button"
             onClick={handleAddToCart}
-            className={`w-full font-elegant font-semibold transition-all duration-300 hover:scale-105 text-sm py-2 ${
+            disabled={false}
+            className={`w-full font-elegant font-semibold transition-all duration-300 hover:scale-105 text-sm py-2 cursor-pointer ${
               user
-                ? "bg-gradient-to-r from-black-400 to-green-500 hover:from-black-500 hover:to-green-600 text-black shadow-md hover:shadow-lg"
+                ? "bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-500 hover:to-yellow-600 text-black shadow-md hover:shadow-lg"
                 : "bg-gradient-to-r from-gray-400 to-gray-500 hover:from-gray-500 hover:to-gray-600 text-white"
             }`}
+            style={{ pointerEvents: 'auto' }}
           >
             {user ? (
               <>
                 <ShoppingCart className="w-3 h-3 mr-2" />
-                Adicionar
+                Adicionar ao Carrinho
               </>
             ) : (
               <>
                 <Lock className="w-3 h-3 mr-2" />
-                Login
+                Fazer Login
               </>
             )}
           </Button>
@@ -174,8 +177,8 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
       </CardFooter>
 
-      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 animate-shimmer"></div>
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-0">
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -skew-x-12 animate-shimmer"></div>
       </div>
     </Card>
   )
