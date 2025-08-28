@@ -1,50 +1,58 @@
+
 import { NextRequest, NextResponse } from "next/server"
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // Skip middleware for static files and API routes (except auth-related)
+  // Skip middleware for static files and API routes
   if (
     pathname.startsWith('/_next') ||
     pathname.startsWith('/static') ||
     pathname.includes('.') ||
-    pathname.startsWith('/api/health') ||
-    pathname.startsWith('/api/products') ||
-    pathname.startsWith('/api/chat')
+    pathname.startsWith('/api') ||
+    pathname.startsWith('/favicon')
   ) {
     return NextResponse.next()
   }
 
   // Public routes that don't require authentication
   const publicRoutes = ['/', '/auth', '/products', '/categories', '/contato']
-  if (publicRoutes.includes(pathname)) {
+  
+  // Check if it's a public route or exact match
+  const isPublicRoute = publicRoutes.some(route => {
+    if (route === '/') return pathname === '/'
+    return pathname.startsWith(route)
+  })
+
+  if (isPublicRoute) {
     return NextResponse.next()
   }
 
-  // Admin routes protection
-  if (pathname.startsWith('/admin')) {
-    const token = request.cookies.get('auth-token')?.value
+  // Protected routes
+  const isAdminRoute = pathname.startsWith('/admin')
+  const isClientRoute = pathname.startsWith('/cliente') || pathname.startsWith('/checkout')
+  
+  // Get token from cookie
+  const token = request.cookies.get('auth-token')?.value
 
-    if (!token) {
-      const url = new URL('/auth', request.url)
-      url.searchParams.set('returnUrl', pathname)
+  // If no token for protected routes, redirect to auth
+  if (!token && (isAdminRoute || isClientRoute)) {
+    const url = new URL('/auth', request.url)
+    url.searchParams.set('returnUrl', pathname)
+    
+    if (isAdminRoute) {
       url.searchParams.set('type', 'admin')
-      return NextResponse.redirect(url)
     }
-
-    return NextResponse.next()
+    
+    return NextResponse.redirect(url)
   }
 
-  // Cliente area protection
-  if (pathname.startsWith('/cliente') || pathname.startsWith('/checkout')) {
-    const token = request.cookies.get('auth-token')?.value
-
-    if (!token) {
-      const url = new URL('/auth', request.url)
-      url.searchParams.set('returnUrl', pathname)
-      return NextResponse.redirect(url)
-    }
-  }
-
+  // For admin routes, additional verification happens on the client side
   return NextResponse.next()
+}
+
+export const config = {
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|manifest.json|.*\\.(png|jpg|jpeg|gif|webp|svg|ico)$).*)',
+  ],
 }

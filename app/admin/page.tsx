@@ -8,11 +8,13 @@ import { Header } from "@/components/layout/header"
 import { useAuth } from "@/components/providers/auth-provider"
 import { Button } from "@/components/ui/button"
 import { Shield, Loader2, AlertTriangle } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 export default function AdminPage() {
   const { user, userProfile, loading, initialized, initializeAuth } = useAuth()
   const [verifying, setVerifying] = useState(true)
   const [debugInfo, setDebugInfo] = useState<any>(null)
+  const router = useRouter()
 
   useEffect(() => {
     const init = async () => {
@@ -21,8 +23,7 @@ export default function AdminPage() {
         user: !!user, 
         userEmail: user?.email,
         userProfile,
-        loading,
-        verifying
+        loading
       })
       
       if (!initialized) {
@@ -35,7 +36,6 @@ export default function AdminPage() {
         return
       }
       
-      // Debug info detalhado
       const currentState = {
         user: !!user,
         userEmail: user?.email,
@@ -43,16 +43,14 @@ export default function AdminPage() {
         isAdmin: userProfile?.isAdmin,
         loading,
         initialized,
-        verifying,
         timestamp: new Date().toISOString()
       }
       
       console.log("🔍 Debug Auth State:", currentState)
       setDebugInfo(currentState)
       
-      // Parar verificação apenas quando estiver inicializado, não carregando e tem dados
+      // Parar verificação quando estiver pronto
       if (initialized && !loading) {
-        console.log("✅ Auth inicializado, parando verificação")
         setVerifying(false)
       }
     }
@@ -60,18 +58,18 @@ export default function AdminPage() {
     init()
   }, [initialized, initializeAuth, user, userProfile, loading])
 
-  // Mostrar loading enquanto está inicializando ou verificando
-  if (loading || verifying || !initialized) {
+  // Se ainda está verificando
+  if (verifying || loading || !initialized) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-          <p className="mb-4">Verificando permissões...</p>
-          {debugInfo && (
-            <div className="text-xs text-muted-foreground bg-muted p-2 rounded">
-              <pre>{JSON.stringify(debugInfo, null, 2)}</pre>
-            </div>
-          )}
+        <div className="text-center space-y-4">
+          <Loader2 className="h-12 w-12 animate-spin mx-auto" />
+          <h1 className="text-xl font-semibold">Verificando acesso administrativo...</h1>
+          <p className="text-muted-foreground">
+            {!initialized ? "Inicializando autenticação..." : 
+             loading ? "Carregando dados do usuário..." : 
+             "Verificando permissões..."}
+          </p>
         </div>
       </div>
     )
@@ -81,22 +79,15 @@ export default function AdminPage() {
   if (!user) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center max-w-md">
-          <Shield className="h-16 w-16 text-red-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold mb-4">Acesso Negado</h1>
-          <p className="text-muted-foreground mb-6">
+        <div className="text-center max-w-md space-y-4">
+          <AlertTriangle className="h-16 w-16 text-amber-500 mx-auto" />
+          <h1 className="text-2xl font-bold">Acesso Negado</h1>
+          <p className="text-muted-foreground">
             Você precisa fazer login para acessar a área administrativa.
           </p>
-          <Button onClick={() => window.location.href = '/auth?returnUrl=/admin&type=admin'}>
-            Fazer Login
+          <Button onClick={() => router.push('/auth?returnUrl=/admin&type=admin')}>
+            Fazer Login como Admin
           </Button>
-          
-          {/* Debug info */}
-          <div className="mt-4 text-xs text-muted-foreground bg-muted p-2 rounded">
-            <p>Estado: Usuário não encontrado</p>
-            <p>Token no cookie: {document?.cookie?.includes('auth-token') ? 'Presente' : 'Ausente'}</p>
-            <pre>{JSON.stringify(debugInfo, null, 2)}</pre>
-          </div>
         </div>
       </div>
     )
@@ -106,32 +97,38 @@ export default function AdminPage() {
   if (!userProfile?.isAdmin) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center max-w-md">
-          <Shield className="h-16 w-16 text-red-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold mb-4">Acesso Negado</h1>
-          <p className="text-muted-foreground mb-6">
+        <div className="text-center max-w-md space-y-4">
+          <Shield className="h-16 w-16 text-red-500 mx-auto" />
+          <h1 className="text-2xl font-bold">Acesso Negado</h1>
+          <p className="text-muted-foreground">
             Você não tem permissão para acessar a área administrativa.
           </p>
-          <p className="text-sm text-muted-foreground mb-4">
+          <p className="text-sm text-muted-foreground">
             Usuário: {user.email}
           </p>
-          <Button onClick={() => window.location.href = '/'}>
-            Voltar ao Site
-          </Button>
-          
-          {/* Debug info */}
-          <div className="mt-4 text-xs text-muted-foreground bg-muted p-2 rounded">
-            <p>Estado: Usuário não é admin</p>
-            <p>isAdmin: {String(userProfile?.isAdmin)}</p>
-            <p>userProfile: {JSON.stringify(userProfile, null, 2)}</p>
-            <p>Token no cookie: {typeof document !== 'undefined' && document?.cookie?.includes('auth-token') ? 'Presente' : 'Ausente'}</p>
-            <pre>{JSON.stringify(debugInfo, null, 2)}</pre>
+          <div className="space-y-2">
+            <Button onClick={() => router.push('/')}>
+              Voltar ao Site
+            </Button>
+            <Button variant="outline" onClick={() => router.push('/auth?returnUrl=/admin&type=admin')}>
+              Fazer Login como Admin
+            </Button>
           </div>
+          
+          {/* Debug info apenas em desenvolvimento */}
+          {process.env.NODE_ENV === 'development' && (
+            <div className="mt-4 text-xs text-muted-foreground bg-muted p-2 rounded">
+              <p>Estado: Usuário não é admin</p>
+              <p>isAdmin: {String(userProfile?.isAdmin || false)}</p>
+              <pre className="text-left">{JSON.stringify(debugInfo, null, 2)}</pre>
+            </div>
+          )}
         </div>
       </div>
     )
   }
 
+  // Se é admin, mostrar dashboard
   return (
     <div className="min-h-screen bg-background">
       <Header />

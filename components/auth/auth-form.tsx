@@ -1,3 +1,4 @@
+
 "use client"
 
 import type React from "react"
@@ -23,27 +24,36 @@ export function AuthForm({ mode }: AuthFormProps) {
 
   const { toast } = useToast()
   const router = useRouter()
-  const { signIn, signUp, signInWithGoogle, initializeAuth, initialized } = useAuth()
+  const { signIn, signUp, signInWithGoogle, user, initialized, initializeAuth } = useAuth()
 
-  // Marca que o componente foi montado (para evitar SSR erros)
   useEffect(() => {
     setMounted(true)
   }, [])
 
   useEffect(() => {
     if (mounted && !initialized) {
-      initializeAuth().catch((error) => {
-        console.error("❌ Falha na inicialização da autenticação:", error)
-        toast({
-          title: "Erro de inicialização",
-          description: "Recarregue a página e tente novamente.",
-          variant: "destructive",
-        })
-      })
+      initializeAuth().catch(console.error)
     }
-  }, [mounted, initialized, initializeAuth, toast])
+  }, [mounted, initialized, initializeAuth])
 
-  if (!mounted || !initialized) {
+  // Se já está logado, redirecionar
+  useEffect(() => {
+    if (user && initialized) {
+      const urlParams = new URLSearchParams(window.location.search)
+      const returnUrl = urlParams.get('returnUrl') || '/'
+      router.push(returnUrl)
+    }
+  }, [user, initialized, router])
+
+  if (!mounted) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    )
+  }
+
+  if (!initialized) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="text-center space-y-2">
@@ -73,12 +83,10 @@ export function AuthForm({ mode }: AuthFormProps) {
         })
       }
 
-      // Aguardar um pouco para o estado ser atualizado
-      setTimeout(() => {
-        const urlParams = new URLSearchParams(window.location.search)
-        const returnUrl = urlParams.get('returnUrl') || '/'
-        router.push(returnUrl)
-      }, 500)
+      // Redirecionar após sucesso
+      const urlParams = new URLSearchParams(window.location.search)
+      const returnUrl = urlParams.get('returnUrl') || '/'
+      router.push(returnUrl)
 
     } catch (error: any) {
       const errorCode = error?.code || ""
@@ -117,12 +125,9 @@ export function AuthForm({ mode }: AuthFormProps) {
         description: "Bem-vindo à Waze Clothing!",
       })
 
-      // Aguardar um pouco para o estado ser atualizado
-      setTimeout(() => {
-        const urlParams = new URLSearchParams(window.location.search)
-        const returnUrl = urlParams.get('returnUrl') || '/'
-        router.push(returnUrl)
-      }, 500)
+      const urlParams = new URLSearchParams(window.location.search)
+      const returnUrl = urlParams.get('returnUrl') || '/'
+      router.push(returnUrl)
 
     } catch (error: any) {
       const errorCode = error?.code || ""
@@ -132,8 +137,6 @@ export function AuthForm({ mode }: AuthFormProps) {
         errorMessage = "Login cancelado pelo usuário."
       } else if (errorCode.includes("popup-blocked")) {
         errorMessage = "Popup bloqueado. Permita popups para este site."
-      } else if (errorCode.includes("cancelled-popup-request")) {
-        errorMessage = "Solicitação de popup cancelada."
       }
 
       toast({
@@ -180,7 +183,7 @@ export function AuthForm({ mode }: AuthFormProps) {
           {loading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Carregando...
+              Entrando...
             </>
           ) : mode === "login" ? "Entrar" : "Cadastrar"}
         </Button>
