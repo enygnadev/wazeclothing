@@ -13,6 +13,8 @@ export function Cart() {
   const { items, isOpen, setIsOpen, getTotalPrice, clearCart } = useCart()
   const { user } = useAuth()
   
+  // Safety check for items array
+  const safeItems = items || []
   const total = getTotalPrice()
 
   return (
@@ -21,12 +23,12 @@ export function Cart() {
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2">
             <ShoppingBag className="h-5 w-5" />
-            Carrinho ({items.length} {items.length === 1 ? 'item' : 'itens'})
+            Carrinho ({safeItems.length} {safeItems.length === 1 ? 'item' : 'itens'})
           </SheetTitle>
         </SheetHeader>
 
         <div className="flex-1 flex flex-col">
-          {items.length === 0 ? (
+          {safeItems.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center space-y-4">
               <ShoppingBag className="h-16 w-16 text-muted-foreground" />
               <div>
@@ -43,7 +45,7 @@ export function Cart() {
             <>
               <div className="flex-1 overflow-y-auto">
                 <div className="space-y-1">
-                  {items.map((item) => (
+                  {safeItems.map((item) => (
                     <CartItem key={item.id} item={item} />
                   ))}
                 </div>

@@ -111,6 +111,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     isOpen: false
   })
 
+  // Ensure items is always an array
+  const safeState = {
+    ...state,
+    items: state.items || []
+  }
+
   // Load cart from localStorage on mount
   useEffect(() => {
     const savedCart = localStorage.getItem('cart')
@@ -126,8 +132,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   // Save cart to localStorage when it changes
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(state.items))
-  }, [state.items])
+    localStorage.setItem('cart', JSON.stringify(safeState.items))
+  }, [safeState.items])
 
   const addItem = (product: Product, quantity = 1) => {
     dispatch({ type: 'ADD_ITEM', payload: { product, quantity } })
@@ -158,15 +164,15 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }
 
   const getTotalItems = () => {
-    return state.items.reduce((total, item) => total + item.quantity, 0)
+    return safeState.items.reduce((total, item) => total + item.quantity, 0)
   }
 
   const getTotalPrice = () => {
-    return state.items.reduce((total, item) => total + (item.price * item.quantity), 0)
+    return safeState.items.reduce((total, item) => total + (item.price * item.quantity), 0)
   }
 
   const value: CartContextType = {
-    state,
+    state: safeState,
     addItem,
     removeItem,
     updateQuantity,

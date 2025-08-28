@@ -1,0 +1,827 @@
+app/api/chat/route.ts:40:9 - error TS1128: Declaration or statement expected.
+
+40 }s: 500 })
+           ~
+
+app/api/chat/route.ts:40:10 - error TS1128: Declaration or statement expected.
+
+40 }s: 500 })
+            ~
+
+app/api/chat/route.ts:41:3 - error TS1128: Declaration or statement expected.
+
+41   }
+     ~
+
+app/api/chat/route.ts:42:1 - error TS1128: Declaration or statement expected.
+
+42 }
+   ~
+
+
+Found 4 errors in the same file, starting at: app/api/chat/route.ts:40
+
+~/workspace$ tsc --noEmit
+.next/types/app/api/products/[id]/route.ts:49:7 - error TS2344: Type '{ __tag__: "GET"; __param_position__: "second"; __param_type__: { params: { id: string; }; }; }' does not satisfy the constraint 'ParamCheck<RouteContext>'.
+  The types of '__param_type__.params' are incompatible between these types.
+    Type '{ id: string; }' is missing the following properties from type 'Promise<any>': then, catch, finally, [Symbol.toStringTag]
+
+ 49       {
+          ~
+ 50         __tag__: 'GET'
+    ~~~~~~~~~~~~~~~~~~~~~~
+... 
+ 52         __param_type__: SecondArg<MaybeField<TEntry, 'GET'>>
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 53       },
+    ~~~~~~~
+
+.next/types/app/api/products/[id]/route.ts:205:7 - error TS2344: Type '{ __tag__: "PUT"; __param_position__: "second"; __param_type__: { params: { id: string; }; }; }' does not satisfy the constraint 'ParamCheck<RouteContext>'.
+  The types of '__param_type__.params' are incompatible between these types.
+    Type '{ id: string; }' is missing the following properties from type 'Promise<any>': then, catch, finally, [Symbol.toStringTag]
+
+205       {
+          ~
+206         __tag__: 'PUT'
+    ~~~~~~~~~~~~~~~~~~~~~~
+... 
+208         __param_type__: SecondArg<MaybeField<TEntry, 'PUT'>>
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+209       },
+    ~~~~~~~
+
+.next/types/app/api/products/[id]/route.ts:244:7 - error TS2344: Type '{ __tag__: "DELETE"; __param_position__: "second"; __param_type__: { params: { id: string; }; }; }' does not satisfy the constraint 'ParamCheck<RouteContext>'.
+  The types of '__param_type__.params' are incompatible between these types.
+    Type '{ id: string; }' is missing the following properties from type 'Promise<any>': then, catch, finally, [Symbol.toStringTag]
+
+244       {
+          ~
+245         __tag__: 'DELETE'
+    ~~~~~~~~~~~~~~~~~~~~~~~~~
+... 
+247         __param_type__: SecondArg<MaybeField<TEntry, 'DELETE'>>
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+248       },
+    ~~~~~~~
+
+app/api/chat/route.ts:34:33 - error TS2345: Argument of type 'Stream<ChatCompletionChunk> & { _request_id?: string | null | undefined; }' is not assignable to parameter of type 'Response | AsyncIterableOpenAIStreamReturnTypes'.
+  Type 'Stream<ChatCompletionChunk> & { _request_id?: string | null | undefined; }' is not assignable to type 'AsyncIterable<AzureChatCompletions>'.
+    The types returned by '[Symbol.asyncIterator]().next(...)' are incompatible between these types.
+      Type 'Promise<IteratorResult<ChatCompletionChunk, any>>' is not assignable to type 'Promise<IteratorResult<AzureChatCompletions, any>>'.
+        Type 'IteratorResult<ChatCompletionChunk, any>' is not assignable to type 'IteratorResult<AzureChatCompletions, any>'.
+          Type 'IteratorYieldResult<ChatCompletionChunk>' is not assignable to type 'IteratorResult<AzureChatCompletions, any>'.
+            Type 'IteratorYieldResult<ChatCompletionChunk>' is not assignable to type 'IteratorYieldResult<AzureChatCompletions>'.
+              Property 'promptFilterResults' is missing in type 'ChatCompletionChunk' but required in type 'AzureChatCompletions'.
+
+34     const stream = OpenAIStream(response)
+                                   ~~~~~~~~
+
+  node_modules/ai/dist/index.d.ts:362:5
+    362     promptFilterResults: any[];
+            ~~~~~~~~~~~~~~~~~~~
+    'promptFilterResults' is declared here.
+
+app/api/health/route.ts:21:16 - error TS18046: 'error' is of type 'unknown'.
+
+21         error: error.message
+                  ~~~~~
+
+app/api/products/[id]/route.ts:24:7 - error TS2353: Object literal may only specify known properties, and 'name' does not exist in type 'Partial<Product>'.
+
+24       name: data.name, // Changed from title to name
+         ~~~~
+
+app/api/products/route.ts:43:42 - error TS18046: 'error' is of type 'unknown'.
+
+43     console.error("❌ API: Stack trace:", error.stack)
+                                            ~~~~~
+
+app/api/products/route.ts:48:23 - error TS2339: Property 'message' does not exist on type '{}'.
+
+48         error: error?.message || "Erro interno do servidor",
+                         ~~~~~~~
+
+components/admin/order-details-modal.tsx:111:51 - error TS2339: Property 'paymentMethod' does not exist on type 'Order'.
+
+111                   <p>{getPaymentMethodLabel(order.paymentMethod)}</p>
+                                                      ~~~~~~~~~~~~~
+
+components/admin/order-details-modal.tsx:174:57 - error TS2339: Property 'title' does not exist on type 'CartItem'.
+
+174                       <h4 className="font-medium">{item.title}</h4>
+                                                            ~~~~~
+
+components/admin/order-details-modal.tsx:179:50 - error TS2339: Property 'price' does not exist on type 'CartItem'.
+
+179                         Preço unitário: R$ {item.price.toFixed(2)}
+                                                     ~~~~~
+
+components/admin/order-details-modal.tsx:183:60 - error TS2339: Property 'price' does not exist on type 'CartItem'.
+
+183                       <p className="font-medium">R$ {(item.price * item.quantity).toFixed(2)}</p>
+                                                               ~~~~~
+
+components/admin/order-details-modal.tsx:203:51 - error TS2339: Property 'shippingFee' does not exist on type 'Order'.
+
+203                   <span>R$ {(order.total - (order.shippingFee || 0)).toFixed(2)}</span>
+                                                      ~~~~~~~~~~~
+
+components/admin/order-details-modal.tsx:205:24 - error TS2339: Property 'shippingFee' does not exist on type 'Order'.
+
+205                 {order.shippingFee && order.shippingFee > 0 && (
+                           ~~~~~~~~~~~
+
+components/admin/order-details-modal.tsx:205:45 - error TS2339: Property 'shippingFee' does not exist on type 'Order'.
+
+205                 {order.shippingFee && order.shippingFee > 0 && (
+                                                ~~~~~~~~~~~
+
+components/admin/order-details-modal.tsx:208:37 - error TS2339: Property 'shippingFee' does not exist on type 'Order'.
+
+208                     <span>R$ {order.shippingFee.toFixed(2)}</span>
+                                        ~~~~~~~~~~~
+
+components/admin/orders-manager.tsx:115:35 - error TS2339: Property 'title' does not exist on type 'CartItem'.
+
+115                       <span>{item.title} x {item.quantity}</span>
+                                      ~~~~~
+
+components/admin/orders-manager.tsx:116:39 - error TS2339: Property 'price' does not exist on type 'CartItem'.
+
+116                       <span>R$ {(item.price * item.quantity).toFixed(2)}</span>
+                                          ~~~~~
+
+components/admin/product-manager.tsx:159:7 - error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+
+159       description: product.description,
+          ~~~~~~~~~~~
+
+components/admin/product-manager.tsx:163:25 - error TS2551: Property 'features' does not exist on type 'Product'. Did you mean 'featured'?
+
+163       features: product.features ?? [],
+                            ~~~~~~~~
+
+  lib/types.ts:8:3
+    8   featured: boolean
+        ~~~~~~~~
+    'featured' is declared here.
+
+components/admin/product-manager.tsx:165:21 - error TS2551: Property 'size' does not exist on type 'Product'. Did you mean 'sizes'?
+
+165       size: product.size ?? "",
+                        ~~~~
+
+  lib/types.ts:10:3
+    10   sizes?: string[]
+         ~~~~~
+    'sizes' is declared here.
+
+components/admin/product-manager.tsx:309:96 - error TS2551: Property 'size' does not exist on type 'Product'. Did you mean 'sizes'?
+
+309                 <p className="text-sm text-muted-foreground">Tamanho: {resolveSizeName(product.size)}</p>
+                                                                                                   ~~~~
+
+  lib/types.ts:10:3
+    10   sizes?: string[]
+         ~~~~~
+    'sizes' is declared here.
+
+components/admin/users-manager.tsx:10:26 - error TS2300: Duplicate identifier 'User'.
+
+10 import { Search, Shield, User, Mail, Calendar } from "lucide-react"
+                            ~~~~
+
+components/admin/users-manager.tsx:12:15 - error TS2300: Duplicate identifier 'User'.
+
+12 import type { User } from "@/lib/types"
+                 ~~~~
+
+components/admin/users-manager.tsx:15:38 - error TS2749: 'User' refers to a value, but is being used as a type here. Did you mean 'typeof User'?
+
+15   const [users, setUsers] = useState<User[]>([])
+                                        ~~~~
+
+components/auth/auth-form.tsx:117:32 - error TS2339: Property 'code' does not exist on type '{}'.
+
+117       const errorCode = error?.code || ""
+                                   ~~~~
+
+components/auth/auth-form.tsx:158:32 - error TS2339: Property 'code' does not exist on type '{}'.
+
+158       const errorCode = error?.code || ""
+                                   ~~~~
+
+components/cart/cart-item.tsx:21:21 - error TS2551: Property 'product' does not exist on type 'CartItem'. Did you mean 'productId'?
+
+21           src={item.product.image || "/placeholder.svg?height=64&width=64"}
+                       ~~~~~~~
+
+  lib/types.ts:24:3
+    24   productId: string
+         ~~~~~~~~~
+    'productId' is declared here.
+
+components/cart/cart-item.tsx:22:21 - error TS2551: Property 'product' does not exist on type 'CartItem'. Did you mean 'productId'?
+
+22           alt={item.product.title}
+                       ~~~~~~~
+
+  lib/types.ts:24:3
+    24   productId: string
+         ~~~~~~~~~
+    'productId' is declared here.
+
+components/cart/cart-item.tsx:29:64 - error TS2551: Property 'product' does not exist on type 'CartItem'. Did you mean 'productId'?
+
+29         <h4 className="text-sm font-medium line-clamp-2">{item.product.title}</h4>
+                                                                  ~~~~~~~
+
+  lib/types.ts:24:3
+    24   productId: string
+         ~~~~~~~~~
+    'productId' is declared here.
+
+components/cart/cart-item.tsx:30:63 - error TS2551: Property 'product' does not exist on type 'CartItem'. Did you mean 'productId'?
+
+30         <p className="text-sm text-muted-foreground">R$ {item.product.price.toFixed(2)}</p>
+                                                                 ~~~~~~~
+
+  lib/types.ts:24:3
+    24   productId: string
+         ~~~~~~~~~
+    'productId' is declared here.
+
+components/cart/checkout.tsx:115:40 - error TS2551: Property 'product' does not exist on type 'CartItem'. Did you mean 'productId'?
+
+115       message += `${index + 1}. ${item.product.title}\n`
+                                           ~~~~~~~
+
+  lib/types.ts:24:3
+    24   productId: string
+         ~~~~~~~~~
+    'productId' is declared here.
+
+components/cart/checkout.tsx:117:48 - error TS2551: Property 'product' does not exist on type 'CartItem'. Did you mean 'productId'?
+
+117       message += `   Valor unitário: R$ ${item.product.price.toFixed(2)}\n`
+                                                   ~~~~~~~
+
+  lib/types.ts:24:3
+    24   productId: string
+         ~~~~~~~~~
+    'productId' is declared here.
+
+components/cart/checkout.tsx:118:43 - error TS2551: Property 'product' does not exist on type 'CartItem'. Did you mean 'productId'?
+
+118       message += `   Subtotal: R$ ${(item.product.price * item.quantity).toFixed(2)}\n\n`
+                                              ~~~~~~~
+
+  lib/types.ts:24:3
+    24   productId: string
+         ~~~~~~~~~
+    'productId' is declared here.
+
+components/cart/checkout.tsx:156:21 - error TS2551: Property 'product' does not exist on type 'CartItem'. Did you mean 'productId'?
+
+156         title: item.product.title,
+                        ~~~~~~~
+
+  lib/types.ts:24:3
+    24   productId: string
+         ~~~~~~~~~
+    'productId' is declared here.
+
+components/cart/checkout.tsx:157:21 - error TS2551: Property 'product' does not exist on type 'CartItem'. Did you mean 'productId'?
+
+157         price: item.product.price,
+                        ~~~~~~~
+
+  lib/types.ts:24:3
+    24   productId: string
+         ~~~~~~~~~
+    'productId' is declared here.
+
+components/cart/checkout.tsx:159:21 - error TS2551: Property 'product' does not exist on type 'CartItem'. Did you mean 'productId'?
+
+159         image: item.product.image
+                        ~~~~~~~
+
+  lib/types.ts:24:3
+    24   productId: string
+         ~~~~~~~~~
+    'productId' is declared here.
+
+components/cart/checkout.tsx:181:25 - error TS2345: Argument of type '{ userId: string; items: { id: string; title: any; price: any; quantity: number; image: any; }[]; total: number; shippingFee: number; status: "pending"; customerInfo: { name: string; email: string; phone: string; address: string; cep: string; numero: string; complemento: string; }; paymentMethod: "pix" | "whatsapp";...' is not assignable to parameter of type 'Omit<Order, "id">'.
+  Types of property 'items' are incompatible.
+    Type '{ id: string; title: any; price: any; quantity: number; image: any; }[]' is not assignable to type 'CartItem[]'.
+      Property 'productId' is missing in type '{ id: string; title: any; price: any; quantity: number; image: any; }' but required in type 'CartItem'.
+
+181       await createOrder(order)
+                            ~~~~~
+
+  lib/types.ts:24:3
+    24   productId: string
+         ~~~~~~~~~
+    'productId' is declared here.
+
+components/cart/checkout.tsx:359:54 - error TS2551: Property 'product' does not exist on type 'CartItem'. Did you mean 'productId'?
+
+359                     <p className="font-medium">{item.product.title}</p>
+                                                         ~~~~~~~
+
+  lib/types.ts:24:3
+    24   productId: string
+         ~~~~~~~~~
+    'productId' is declared here.
+
+components/cart/checkout.tsx:365:31 - error TS2551: Property 'product' does not exist on type 'CartItem'. Did you mean 'productId'?
+
+365                     R$ {(item.product.price * item.quantity).toFixed(2)}
+                                  ~~~~~~~
+
+  lib/types.ts:24:3
+    24   productId: string
+         ~~~~~~~~~
+    'productId' is declared here.
+
+components/client/customer-dashboard.tsx:145:63 - error TS2339: Property 'title' does not exist on type 'CartItem'.
+
+145                               <span className="text-sm">{item.title} x {item.quantity}</span>
+                                                                  ~~~~~
+
+components/client/customer-dashboard.tsx:146:67 - error TS2339: Property 'price' does not exist on type 'CartItem'.
+
+146                               <span className="text-sm">R$ {(item.price * item.quantity).toFixed(2)}</span>
+                                                                      ~~~~~
+
+components/products/product-card.tsx:110:18 - error TS2551: Property 'features' does not exist on type 'Product'. Did you mean 'featured'?
+
+110         {product.features && product.features.length > 0 && (
+                     ~~~~~~~~
+
+  lib/types.ts:8:3
+    8   featured: boolean
+        ~~~~~~~~
+    'featured' is declared here.
+
+components/products/product-card.tsx:110:38 - error TS2551: Property 'features' does not exist on type 'Product'. Did you mean 'featured'?
+
+110         {product.features && product.features.length > 0 && (
+                                         ~~~~~~~~
+
+  lib/types.ts:8:3
+    8   featured: boolean
+        ~~~~~~~~
+    'featured' is declared here.
+
+components/products/product-card.tsx:112:22 - error TS2551: Property 'features' does not exist on type 'Product'. Did you mean 'featured'?
+
+112             {product.features.slice(0, 2).map((feature) => (
+                         ~~~~~~~~
+
+  lib/types.ts:8:3
+    8   featured: boolean
+        ~~~~~~~~
+    'featured' is declared here.
+
+components/products/product-card.tsx:112:48 - error TS7006: Parameter 'feature' implicitly has an 'any' type.
+
+112             {product.features.slice(0, 2).map((feature) => (
+                                                   ~~~~~~~
+
+components/products/product-card.tsx:121:22 - error TS2551: Property 'features' does not exist on type 'Product'. Did you mean 'featured'?
+
+121             {product.features.length > 2 && (
+                         ~~~~~~~~
+
+  lib/types.ts:8:3
+    8   featured: boolean
+        ~~~~~~~~
+    'featured' is declared here.
+
+components/products/product-card.tsx:126:27 - error TS2551: Property 'features' does not exist on type 'Product'. Did you mean 'featured'?
+
+126                 +{product.features.length - 2}
+                              ~~~~~~~~
+
+  lib/types.ts:8:3
+    8   featured: boolean
+        ~~~~~~~~
+    'featured' is declared here.
+
+components/products/product-grid.tsx:69:13 - error TS18046: 'error' is of type 'unknown'.
+
+69         if (error.name === 'AbortError') {
+               ~~~~~
+
+components/products/product-grid.tsx:71:20 - error TS18046: 'error' is of type 'unknown'.
+
+71         } else if (error.message.includes("502")) {
+                      ~~~~~
+
+components/products/product-grid.tsx:78:32 - error TS18046: 'error' is of type 'unknown'.
+
+78           const errorMessage = error.message || error.toString()
+                                  ~~~~~
+
+components/products/product-grid.tsx:78:49 - error TS18046: 'error' is of type 'unknown'.
+
+78           const errorMessage = error.message || error.toString()
+                                                   ~~~~~
+
+components/products/product-grid.tsx:96:32 - error TS2551: Property 'size' does not exist on type 'Product'. Did you mean 'sizes'?
+
+96       !selectedSize || product.size === selectedSize
+                                  ~~~~
+
+  lib/types.ts:10:3
+    10   sizes?: string[]
+         ~~~~~
+    'sizes' is declared here.
+
+components/providers/cart-provider.tsx:57:15 - error TS2561: Object literal may only specify known properties, but 'product' does not exist in type 'CartItem'. Did you mean to write 'productId'?
+
+57               product,
+                 ~~~~~~~
+
+components/providers/cart-provider.tsx:130:57 - error TS2322: Type 'CartItem | { id: string; product: Product; quantity: number; }' is not assignable to type 'CartItem'.
+  Object literal may only specify known properties, but 'product' does not exist in type 'CartItem'. Did you mean to write 'productId'?
+
+130           newItems = [...currentItems, { id: productId, product, quantity }]
+                                                            ~~~~~~~
+
+components/providers/cart-provider.tsx:130:57 - error TS2561: Object literal may only specify known properties, but 'product' does not exist in type 'CartItem'. Did you mean to write 'productId'?
+
+130           newItems = [...currentItems, { id: productId, product, quantity }]
+                                                            ~~~~~~~
+
+components/providers/cart-provider.tsx:183:56 - error TS2551: Property 'product' does not exist on type 'CartItem'. Did you mean 'productId'?
+
+183     return items.reduce((total, item) => total + (item.product.price * item.quantity), 0)
+                                                           ~~~~~~~
+
+  lib/types.ts:24:3
+    24   productId: string
+         ~~~~~~~~~
+    'productId' is declared here.
+
+lib/firebase/products.ts:38:22 - error TS2352: Conversion of type '{ createdAt: any; updatedAt: any; id: string; }[]' to type 'Product[]' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type '{ createdAt: any; updatedAt: any; id: string; }' is missing the following properties from type 'Product': title, price, image, category, and 2 more.
+
+ 38     const products = snapshot.docs.map(doc => {
+                         ~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 39       const data = doc.data()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+... 
+ 46       }
+    ~~~~~~~
+ 47     }) as Product[]
+    ~~~~~~~~~~~~~~~~~~~
+
+lib/firebase/products.ts:53:49 - error TS18046: 'error' is of type 'unknown'.
+
+53     console.error("🔍 Firebase: Tipo do erro:", error.code)
+                                                   ~~~~~
+
+lib/firebase/products.ts:54:45 - error TS18046: 'error' is of type 'unknown'.
+
+54     console.error("📝 Firebase: Mensagem:", error.message)
+                                               ~~~~~
+
+lib/firebase/products.ts:57:9 - error TS18046: 'error' is of type 'unknown'.
+
+57     if (error.code === 'permission-denied' || error.message?.includes('permission')) {
+           ~~~~~
+
+lib/firebase/products.ts:57:47 - error TS18046: 'error' is of type 'unknown'.
+
+57     if (error.code === 'permission-denied' || error.message?.includes('permission')) {
+                                                 ~~~~~
+
+lib/firebase/products.ts:66:16 - error TS2352: Conversion of type '{ createdAt: any; updatedAt: any; id: string; }[]' to type 'Product[]' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type '{ createdAt: any; updatedAt: any; id: string; }' is missing the following properties from type 'Product': title, price, image, category, and 2 more.
+
+ 66         return snapshot.docs.map(doc => ({
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 67           id: doc.id,
+    ~~~~~~~~~~~~~~~~~~~~~
+... 
+ 70           updatedAt: doc.data().updatedAt?.toDate() || new Date(),
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 71         })) as Product[]
+    ~~~~~~~~~~~~~~~~~~~~~~~~
+
+lib/firebase/products.ts:94:12 - error TS2352: Conversion of type '{ createdAt: any; updatedAt: any; id: string; }' to type 'Product' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type '{ createdAt: any; updatedAt: any; id: string; }' is missing the following properties from type 'Product': title, price, image, category, and 2 more.
+
+ 94     return {
+               ~
+ 95       id: snapshot.id,
+    ~~~~~~~~~~~~~~~~~~~~~~
+... 
+ 98       updatedAt: snapshot.data().updatedAt?.toDate() || new Date(),
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 99     } as Product
+    ~~~~~~~~~~~~~~~~
+
+lib/firebase/products.ts:117:12 - error TS2352: Conversion of type '{ createdAt: any; updatedAt: any; id: string; }[]' to type 'Product[]' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type '{ createdAt: any; updatedAt: any; id: string; }' is missing the following properties from type 'Product': title, price, image, category, and 2 more.
+
+117     return snapshot.docs.map(doc => ({
+               ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+118       id: doc.id,
+    ~~~~~~~~~~~~~~~~~
+... 
+121       updatedAt: doc.data().updatedAt?.toDate() || new Date(),
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+122     })) as Product[]
+    ~~~~~~~~~~~~~~~~~~~~
+
+lib/firebase/products.ts:140:12 - error TS2352: Conversion of type '{ createdAt: any; updatedAt: any; id: string; }[]' to type 'Product[]' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type '{ createdAt: any; updatedAt: any; id: string; }' is missing the following properties from type 'Product': title, price, image, category, and 2 more.
+
+140     return snapshot.docs.map(doc => ({
+               ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+141       id: doc.id,
+    ~~~~~~~~~~~~~~~~~
+... 
+144       updatedAt: doc.data().updatedAt?.toDate() || new Date(),
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+145     })) as Product[]
+    ~~~~~~~~~~~~~~~~~~~~
+
+lib/firebase/products.ts:273:14 - error TS2352: Conversion of type '{ createdAt: any; updatedAt: any; id: string; }' to type 'Product' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type '{ createdAt: any; updatedAt: any; id: string; }' is missing the following properties from type 'Product': title, price, image, category, and 2 more.
+
+273       return {
+                 ~
+274         id: productSnap.id,
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+... 
+277         updatedAt: data.updatedAt?.toDate() || new Date(),
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+278       } as Product
+    ~~~~~~~~~~~~~~~~~~
+
+
+Found 67 errors in 17 files.
+
+Errors  Files
+     3  .next/types/app/api/products/[id]/route.ts:49
+     1  app/api/chat/route.ts:34
+     1  app/api/health/route.ts:21
+     1  app/api/products/[id]/route.ts:24
+     2  app/api/products/route.ts:43
+     8  components/admin/order-details-modal.tsx:111
+     2  components/admin/orders-manager.tsx:115
+     4  components/admin/product-manager.tsx:159
+     3  components/admin/users-manager.tsx:10
+     2  components/auth/auth-form.tsx:117
+     4  components/cart/cart-item.tsx:21
+     9  components/cart/checkout.tsx:115
+     2  components/client/customer-dashboard.tsx:145
+     6  components/products/product-card.tsx:110
+     5  components/products/product-grid.tsx:69
+     4  components/providers/cart-provider.tsx:57
+    10  lib/firebase/products.ts:38
+~/workspace$ ^C
+~/workspace$ ^C
+~/workspace$ tsc --noEmit
+app/api/chat/route.ts:34:33 - error TS2345: Argument of type 'Stream<ChatCompletionChunk> & { _request_id?: string | null | undefined; }' is not assignable to parameter of type 'Response | AsyncIterableOpenAIStreamReturnTypes'.
+  Type 'Stream<ChatCompletionChunk> & { _request_id?: string | null | undefined; }' is not assignable to type 'AsyncIterable<AzureChatCompletions>'.
+    The types returned by '[Symbol.asyncIterator]().next(...)' are incompatible between these types.
+      Type 'Promise<IteratorResult<ChatCompletionChunk, any>>' is not assignable to type 'Promise<IteratorResult<AzureChatCompletions, any>>'.
+        Type 'IteratorResult<ChatCompletionChunk, any>' is not assignable to type 'IteratorResult<AzureChatCompletions, any>'.
+          Type 'IteratorYieldResult<ChatCompletionChunk>' is not assignable to type 'IteratorResult<AzureChatCompletions, any>'.
+            Type 'IteratorYieldResult<ChatCompletionChunk>' is not assignable to type 'IteratorYieldResult<AzureChatCompletions>'.
+              Property 'promptFilterResults' is missing in type 'ChatCompletionChunk' but required in type 'AzureChatCompletions'.
+
+34     const stream = OpenAIStream(response)
+                                   ~~~~~~~~
+
+  node_modules/ai/dist/index.d.ts:362:5
+    362     promptFilterResults: any[];
+            ~~~~~~~~~~~~~~~~~~~
+    'promptFilterResults' is declared here.
+
+components/admin/order-details-modal.tsx:174:57 - error TS2339: Property 'title' does not exist on type 'CartItem'.
+
+174                       <h4 className="font-medium">{item.title}</h4>
+                                                            ~~~~~
+
+components/admin/orders-manager.tsx:115:35 - error TS2339: Property 'title' does not exist on type 'CartItem'.
+
+115                       <span>{item.title} x {item.quantity}</span>
+                                      ~~~~~
+
+components/admin/product-manager.tsx:158:22 - error TS2339: Property 'title' does not exist on type 'Product'.
+
+158       title: product.title,
+                         ~~~~~
+
+components/admin/product-manager.tsx:159:7 - error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+
+159       description: product.description,
+          ~~~~~~~~~~~
+
+components/admin/product-manager.tsx:302:28 - error TS2339: Property 'title' does not exist on type 'Product'.
+
+302                   {product.title}
+                               ~~~~~
+
+components/admin/product-manager.tsx:309:88 - error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+
+309                 <p className="text-sm text-muted-foreground">Tamanho: {resolveSizeName(product.size)}</p>
+                                                                                           ~~~~~~~~~~~~
+
+components/admin/users-manager.tsx:11:20 - error TS2305: Module '"@/lib/firebase/users"' has no exported member 'deleteUser'.
+
+11 import { getUsers, deleteUser, updateUserRole } from "@/lib/firebase/users"
+                      ~~~~~~~~~~
+
+components/admin/users-manager.tsx:49:36 - error TS2345: Argument of type 'string' is not assignable to parameter of type 'boolean'.
+  Type 'string' is not assignable to type 'boolean'.
+
+49       await updateUserRole(userId, newRole as 'admin' | 'customer')
+                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+components/cart/cart-item.tsx:15:11 - error TS2339: Property 'updateItemQuantity' does not exist on type 'CartContextType'.
+
+15   const { updateItemQuantity, removeItem } = useCart()
+             ~~~~~~~~~~~~~~~~~~
+
+components/cart/cart-item.tsx:21:21 - error TS2551: Property 'product' does not exist on type 'CartItem'. Did you mean 'productId'?
+
+21           src={item.product.image || "/placeholder.svg?height=64&width=64"}
+                       ~~~~~~~
+
+  lib/types.ts:20:3
+    20   productId: string
+         ~~~~~~~~~
+    'productId' is declared here.
+
+components/cart/cart-item.tsx:22:21 - error TS2551: Property 'product' does not exist on type 'CartItem'. Did you mean 'productId'?
+
+22           alt={item.product.title}
+                       ~~~~~~~
+
+  lib/types.ts:20:3
+    20   productId: string
+         ~~~~~~~~~
+    'productId' is declared here.
+
+components/cart/cart-item.tsx:29:64 - error TS2551: Property 'product' does not exist on type 'CartItem'. Did you mean 'productId'?
+
+29         <h4 className="text-sm font-medium line-clamp-2">{item.product.title}</h4>
+                                                                  ~~~~~~~
+
+  lib/types.ts:20:3
+    20   productId: string
+         ~~~~~~~~~
+    'productId' is declared here.
+
+components/cart/cart-item.tsx:30:63 - error TS2551: Property 'product' does not exist on type 'CartItem'. Did you mean 'productId'?
+
+30         <p className="text-sm text-muted-foreground">R$ {item.product.price.toFixed(2)}</p>
+                                                                 ~~~~~~~
+
+  lib/types.ts:20:3
+    20   productId: string
+         ~~~~~~~~~
+    'productId' is declared here.
+
+components/cart/cart.tsx:13:11 - error TS2339: Property 'items' does not exist on type 'CartContextType'.
+
+13   const { items, isOpen, setIsOpen, getTotalPrice, clearCart } = useCart()
+             ~~~~~
+
+components/cart/cart.tsx:13:18 - error TS2339: Property 'isOpen' does not exist on type 'CartContextType'.
+
+13   const { items, isOpen, setIsOpen, getTotalPrice, clearCart } = useCart()
+                    ~~~~~~
+
+components/cart/cart.tsx:13:26 - error TS2339: Property 'setIsOpen' does not exist on type 'CartContextType'.
+
+13   const { items, isOpen, setIsOpen, getTotalPrice, clearCart } = useCart()
+                            ~~~~~~~~~
+
+components/cart/cart.tsx:48:35 - error TS7006: Parameter 'item' implicitly has an 'any' type.
+
+48                   {safeItems.map((item) => (
+                                     ~~~~
+
+components/cart/checkout.tsx:31:11 - error TS2339: Property 'items' does not exist on type 'CartContextType'.
+
+31   const { items: cartItems, getTotalPrice, clearCart } = useCart()
+             ~~~~~
+
+components/cart/checkout.tsx:114:24 - error TS7006: Parameter 'item' implicitly has an 'any' type.
+
+114     cartItems.forEach((item, index) => {
+                           ~~~~
+
+components/cart/checkout.tsx:114:30 - error TS7006: Parameter 'index' implicitly has an 'any' type.
+
+114     cartItems.forEach((item, index) => {
+                                 ~~~~~
+
+components/cart/checkout.tsx:154:40 - error TS7006: Parameter 'item' implicitly has an 'any' type.
+
+154       const orderItems = cartItems.map(item => ({
+                                           ~~~~
+
+components/cart/checkout.tsx:181:25 - error TS2345: Argument of type '{ userId: string; items: any; total: number; shippingFee: number; status: "pending"; customerInfo: { name: string; email: string; phone: string; address: string; cep: string; numero: string; complemento: string; }; paymentMethod: "pix" | "whatsapp"; createdAt: Date; }' is not assignable to parameter of type 'Omit<Order, "id">'.
+  Property 'updatedAt' is missing in type '{ userId: string; items: any; total: number; shippingFee: number; status: "pending"; customerInfo: { name: string; email: string; phone: string; address: string; cep: string; numero: string; complemento: string; }; paymentMethod: "pix" | "whatsapp"; createdAt: Date; }' but required in type 'Omit<Order, "id">'.
+
+181       await createOrder(order)
+                            ~~~~~
+
+  lib/types.ts:54:3
+    54   updatedAt: Date
+         ~~~~~~~~~
+    'updatedAt' is declared here.
+
+components/cart/checkout.tsx:356:31 - error TS7006: Parameter 'item' implicitly has an 'any' type.
+
+356               {cartItems.map((item) => (
+                                  ~~~~
+
+components/client/customer-dashboard.tsx:145:63 - error TS2339: Property 'title' does not exist on type 'CartItem'.
+
+145                               <span className="text-sm">{item.title} x {item.quantity}</span>
+                                                                  ~~~~~
+
+components/layout/header.tsx:29:24 - error TS2339: Property 'itemCount' does not exist on type 'CartContextType'.
+
+29       itemCount = cart.itemCount ?? 0
+                          ~~~~~~~~~
+
+components/layout/header.tsx:30:24 - error TS2339: Property 'setIsOpen' does not exist on type 'CartContextType'.
+
+30       setIsOpen = cart.setIsOpen
+                          ~~~~~~~~~
+
+components/products/product-card.tsx:19:20 - error TS2339: Property 'setIsOpen' does not exist on type 'CartContextType'.
+
+19   const { addItem, setIsOpen } = useCart()
+                      ~~~~~~~~~
+
+components/products/product-card.tsx:43:63 - error TS2339: Property 'title' does not exist on type 'Product'.
+
+43       console.log("Adicionando produto ao carrinho:", product.title)
+                                                                 ~~~~~
+
+components/products/product-card.tsx:45:21 - error TS2345: Argument of type 'string' is not assignable to parameter of type 'Product'.
+
+45       await addItem(product.id)
+                       ~~~~~~~~~~
+
+components/products/product-card.tsx:51:33 - error TS2339: Property 'title' does not exist on type 'Product'.
+
+51         description: `${product.title} foi adicionado ao carrinho.`,
+                                   ~~~~~
+
+components/products/product-card.tsx:71:26 - error TS2339: Property 'title' does not exist on type 'Product'.
+
+71             alt={product.title}
+                            ~~~~~
+
+components/products/product-card.tsx:103:22 - error TS2339: Property 'title' does not exist on type 'Product'.
+
+103             {product.title}
+                         ~~~~~
+
+components/products/product-card.tsx:169:75 - error TS2339: Property 'title' does not exist on type 'Product'.
+
+169               const message = `Olá! Tenho interesse no produto *${product.title}* (R$ ${product.price.toFixed(2)}). Você pode me dar mais informações?`
+                                                                              ~~~~~
+
+components/products/product-grid.tsx:78:32 - error TS18046: 'error' is of type 'unknown'.
+
+78           const errorMessage = error.message || error.toString()
+                                  ~~~~~
+
+components/products/product-grid.tsx:78:49 - error TS18046: 'error' is of type 'unknown'.
+
+78           const errorMessage = error.message || error.toString()
+                                                   ~~~~~
+
+
+Found 36 errors in 12 files.
+
+Errors  Files
+     1  app/api/chat/route.ts:34
+     1  components/admin/order-details-modal.tsx:174
+     1  components/admin/orders-manager.tsx:115
+     4  components/admin/product-manager.tsx:158
+     2  components/admin/users-manager.tsx:11
+     5  components/cart/cart-item.tsx:15
+     4  components/cart/cart.tsx:13
+     6  components/cart/checkout.tsx:31
+     1  components/client/customer-dashboard.tsx:145
+     2  components/layout/header.tsx:29
+     7  components/products/product-card.tsx:19
+     2  components/products/product-grid.tsx:78
