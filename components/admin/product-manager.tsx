@@ -64,10 +64,33 @@ export function ProductManager() {
   const fetchProducts = async () => {
     try {
       const response = await fetch("/api/products");
+      
+      if (!response.ok) {
+        console.error("API Error:", response.status, response.statusText);
+        return;
+      }
+      
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        console.error("Response is not JSON:", contentType);
+        const text = await response.text();
+        console.error("Response body:", text);
+        return;
+      }
+      
       const data = await response.json();
-      setProducts(data);
+      
+      if (data.success && Array.isArray(data.data)) {
+        setProducts(data.data);
+      } else if (Array.isArray(data)) {
+        setProducts(data);
+      } else {
+        console.error("Unexpected data format:", data);
+        setProducts([]);
+      }
     } catch (error) {
       console.error("Error fetching products:", error);
+      setProducts([]);
     }
   };
 
