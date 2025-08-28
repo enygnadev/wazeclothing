@@ -95,8 +95,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.warn("⚠️ Falha ao configurar persistência:", persistError)
       }
 
+      // Se não há mudança de estado em 2 segundos, marcar como inicializado
+      const timeoutId = setTimeout(() => {
+        console.log("⏰ Timeout: marcando auth como inicializado")
+        setInitialized(true)
+        setLoading(false)
+      }, 2000)
+
       const unsubscribe = onAuthStateChanged(auth, async (user) => {
         console.log("🔄 Auth state changed:", { user: !!user, email: user?.email })
+        
+        // Limpar timeout quando auth state muda
+        clearTimeout(timeoutId)
 
         setUser(user)
 
@@ -123,21 +133,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setInitialized(true) // Sempre marcar como inicializado após auth state change
       })
 
-      setAuthUnsubscribe(() => wrappedUnsubscribe)
-      
-      // Se não há mudança de estado em 2 segundos, marcar como inicializado
-      const timeoutId = setTimeout(() => {
-        console.log("⏰ Timeout: marcando auth como inicializado")
-        setInitialized(true)
-        setLoading(false)
-      }, 2000)
-      
-      // Limpar timeout se auth state change acontecer
-      const originalUnsubscribe = unsubscribe
-      const wrappedUnsubscribe = () => {
-        clearTimeout(timeoutId)
-        originalUnsubscribe()
-      }
+      setAuthUnsubscribe(() => unsubscribe)
       
     } catch (error) {
       console.error("❌ Error initializing auth:", error)
