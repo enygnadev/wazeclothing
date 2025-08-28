@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState } from "react"
@@ -20,6 +19,12 @@ interface CheckoutData {
   phone: string
   address: string
   paymentMethod: "pix" | "whatsapp"
+  cep: string
+  numero: string
+  complemento: string
+  bairrocomprador: string
+  municipiocomprador: string
+  enderecocomprador: string
 }
 
 export function Checkout() {
@@ -31,8 +36,52 @@ export function Checkout() {
     email: user?.email || "",
     phone: "",
     address: "",
-    paymentMethod: "whatsapp"
+    paymentMethod: "whatsapp",
+    cep: "",
+    numero: "",
+    complemento: "",
+    bairrocomprador: "",
+    municipiocomprador: "",
+    enderecocomprador: "",
   })
+
+  const fetchAddressFromCEP = async (cep: string) => {
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+      const data = await response.json();
+      if (!data.erro) {
+        setCheckoutData(prev => ({
+          ...prev,
+          enderecocomprador: data.logradouro,
+          municipiocomprador: data.localidade,
+          bairrocomprador: data.bairro,
+          complemento: data.uf, // Assuming UF can be used as a temporary complement if no specific complement is found
+          address: `${data.logradouro}, ${data.bairro}, ${data.localidade} - ${data.uf}` // Auto-fill main address field
+        }));
+      } else {
+        console.error('CEP não encontrado');
+        setCheckoutData(prev => ({
+          ...prev,
+          enderecocomprador: "",
+          municipiocomprador: "",
+          bairrocomprador: "",
+          complemento: "",
+          address: "" // Clear address if CEP is not found
+        }));
+      }
+    } catch (error) {
+      console.error('Erro ao buscar CEP:', error);
+      setCheckoutData(prev => ({
+        ...prev,
+        enderecocomprador: "",
+        municipiocomprador: "",
+        bairrocomprador: "",
+        complemento: "",
+        address: "" // Clear address on error
+      }));
+    }
+  };
+
 
   const shippingFee = 15.90
   const freeShippingMinValue = 199.90
@@ -42,6 +91,9 @@ export function Checkout() {
 
   const handleInputChange = (field: keyof CheckoutData, value: string) => {
     setCheckoutData(prev => ({ ...prev, [field]: value }))
+    if (field === "cep" && value.length === 8) { // Assuming CEP has 8 digits
+        fetchAddressFromCEP(value);
+    }
   }
 
   const generateWhatsAppMessage = () => {
@@ -49,8 +101,15 @@ export function Checkout() {
     message += `👤 *Cliente:* ${checkoutData.name}\n`
     message += `📧 *E-mail:* ${checkoutData.email}\n`
     message += `📱 *Telefone:* ${checkoutData.phone}\n`
-    message += `📍 *Endereço:* ${checkoutData.address}\n\n`
-    
+    message += `📍 *Endereço:* ${checkoutData.address}, Nº ${checkoutData.numero}, Complemento: ${checkoutData.complemento || 'N/A'}\n`
+
+    message += `\n*Endereço Detalhado (via CEP):*\n`
+    message += `Logradouro: ${checkoutData.enderecocomprador}\n`
+    message += `Bairro: ${checkoutData.bairrocomprador}\n`
+    message += `Cidade: ${checkoutData.municipiocomprador}\n`
+    message += `Estado: ${checkoutData.complemento}\n\n`
+
+
     message += `🛒 *ITENS DO PEDIDO:*\n`
     cartItems.forEach((item, index) => {
       message += `${index + 1}. ${item.product.title}\n`
@@ -58,12 +117,12 @@ export function Checkout() {
       message += `   Valor unitário: R$ ${item.product.price.toFixed(2)}\n`
       message += `   Subtotal: R$ ${(item.product.price * item.quantity).toFixed(2)}\n\n`
     })
-    
+
     message += `💰 *RESUMO DO PAGAMENTO:*\n`
     message += `Subtotal: R$ ${subtotal.toFixed(2)}\n`
     message += `Frete: ${finalShippingFee === 0 ? 'GRÁTIS' : `R$ ${finalShippingFee.toFixed(2)}`}\n`
     message += `*TOTAL: R$ ${total.toFixed(2)}*\n\n`
-    
+
     message += `💳 *Forma de pagamento:* ${checkoutData.paymentMethod === 'pix' ? 'PIX' : 'WhatsApp'}\n\n`
     message += `✅ Pedido enviado através do site oficial da Waze Clothing`
 
@@ -74,9 +133,9 @@ export function Checkout() {
     const message = generateWhatsAppMessage()
     const whatsappNumber = "5511999999999" // Número do WhatsApp da loja
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${message}`
-    
+
     window.open(whatsappUrl, '_blank')
-    
+
     // Criar pedido no Firebase para controle interno
     createOrderInFirebase("whatsapp")
   }
@@ -111,6 +170,9 @@ export function Checkout() {
           email: checkoutData.email,
           phone: checkoutData.phone,
           address: checkoutData.address,
+          cep: checkoutData.cep,
+          numero: checkoutData.numero,
+          complemento: checkoutData.complemento,
         },
         paymentMethod,
         createdAt: new Date()
@@ -118,7 +180,7 @@ export function Checkout() {
 
       await createOrder(order)
       await clearCart()
-      
+
       if (paymentMethod === "pix") {
         // Redirecionar para página de confirmação PIX
         window.location.href = "/pedido-confirmado"
@@ -174,7 +236,7 @@ export function Checkout() {
                 />
               </div>
             </div>
-            
+
             <div>
               <Label htmlFor="email">E-mail</Label>
               <Input
@@ -185,9 +247,44 @@ export function Checkout() {
                 required
               />
             </div>
-            
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="cep">CEP</Label>
+                <Input
+                  id="cep"
+                  value={checkoutData.cep}
+                  onChange={(e) => handleInputChange("cep", e.target.value)}
+                  placeholder="Apenas números"
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="numero">Número</Label>
+                <Input
+                  id="numero"
+                  value={checkoutData.numero}
+                  onChange={(e) => handleInputChange("numero", e.target.value)}
+                  placeholder="Nº da casa"
+                  required
+                />
+              </div>
+            </div>
+
             <div>
-              <Label htmlFor="address">Endereço Completo</Label>
+              <Label htmlFor="complemento">Complemento</Label>
+              <Input
+                id="complemento"
+                value={checkoutData.complemento}
+                onChange={(e) => handleInputChange("complemento", e.target.value)}
+                placeholder="Apto, Bloco, etc."
+                required
+              />
+            </div>
+
+
+            <div>
+              <Label htmlFor="address">Endereço Completo (Rua, Bairro, Cidade, UF)</Label>
               <Textarea
                 id="address"
                 value={checkoutData.address}
@@ -218,7 +315,7 @@ export function Checkout() {
               <p className="text-sm text-muted-foreground ml-6">
                 Envie seu pedido diretamente para nosso WhatsApp e finalize a compra
               </p>
-              
+
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="pix" id="pix" />
                 <Label htmlFor="pix" className="flex items-center gap-2">
@@ -270,9 +367,9 @@ export function Checkout() {
                   </p>
                 </div>
               ))}
-              
+
               <Separator />
-              
+
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span>Subtotal:</span>
@@ -302,7 +399,7 @@ export function Checkout() {
           {checkoutData.paymentMethod === "whatsapp" ? (
             <Button
               onClick={handleWhatsAppCheckout}
-              disabled={loading || !checkoutData.name || !checkoutData.phone || !checkoutData.address}
+              disabled={loading || !checkoutData.name || !checkoutData.phone || !checkoutData.address || !checkoutData.cep || !checkoutData.numero}
               className="w-full bg-green-600 hover:bg-green-700"
             >
               <MessageCircle className="w-4 h-4 mr-2" />
@@ -311,14 +408,14 @@ export function Checkout() {
           ) : (
             <Button
               onClick={handlePixCheckout}
-              disabled={loading || !checkoutData.name || !checkoutData.phone || !checkoutData.address}
+              disabled={loading || !checkoutData.name || !checkoutData.phone || !checkoutData.address || !checkoutData.cep || !checkoutData.numero}
               className="w-full"
             >
               <CreditCard className="w-4 h-4 mr-2" />
               {loading ? "Processando..." : "Finalizar com PIX"}
             </Button>
           )}
-          
+
           <p className="text-xs text-muted-foreground text-center">
             Ao finalizar a compra, você concorda com nossos Termos de Uso e Política de Privacidade
           </p>
