@@ -216,7 +216,12 @@ export function ProductManager() {
                   {categories.map((cat, i) => {
                     const Icon = resolveIcon(cat);
                     return (
-                      <Button key={i} variant={formData.category === cat ? "default" : "outline"} onClick={() => setFormData({ ...formData, category: cat })}>
+                      <Button 
+                        key={i} 
+                        type="button"
+                        variant={formData.category === cat ? "default" : "outline"} 
+                        onClick={() => setFormData({ ...formData, category: cat })}
+                      >
                         <Icon className="w-4 h-4 mr-1" />{cat}
                       </Button>
                     );
@@ -243,7 +248,14 @@ export function ProductManager() {
                 <Label>Tamanho</Label>
                 <div className="flex gap-2 flex-wrap">
                   {sizes.map((s, i) => (
-                    <Button key={i} variant={formData.size === s ? "default" : "outline"} onClick={() => setFormData({ ...formData, size: s })}>{s}</Button>
+                    <Button 
+                      key={i} 
+                      type="button"
+                      variant={formData.size === s ? "default" : "outline"} 
+                      onClick={() => setFormData({ ...formData, size: s })}
+                    >
+                      {s}
+                    </Button>
                   ))}
                   <Popover>
                     <PopoverTrigger asChild>
