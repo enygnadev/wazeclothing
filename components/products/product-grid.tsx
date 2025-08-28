@@ -52,7 +52,10 @@ export function ProductGrid() {
         const data = await response.json()
         console.log("📦 Dados recebidos:", data)
 
-        if (data.success && Array.isArray(data.data)) {
+        if (Array.isArray(data)) {
+          console.log("✅ Produtos carregados:", data.length)
+          setProducts(data)
+        } else if (data.success && Array.isArray(data.data)) {
           console.log("✅ Produtos carregados:", data.data.length)
           setProducts(data.data)
         } else {
