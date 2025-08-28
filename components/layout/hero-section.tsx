@@ -100,16 +100,7 @@ export function HeroSection() {
               </Button>
             </Link>
 
-            <Link href="/admin">
-              <Button
-                variant="outline"
-                size="lg"
-                className="w-full sm:w-auto group border-2 border-amber-400/50 text-amber-600 hover:bg-amber-400/10 font-elegant font-semibold px-8 py-3 text-amber-600 rounded-full backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-amber-400"
-              >
-                <Crown className="w-4 h-4 mr-2" />
-                Admin (Teste)
-              </Button>
-            </Link>
+           
           </div>
 
           {/* Marcas animadas */}
