@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useEffect, useState } from "react"
@@ -78,18 +79,13 @@ export function Header() {
     >
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
-      
+          {/* Logo */}
           <Link href="/" className="group flex items-center space-x-2">
             <div className="relative">
-
-  <div className="absolute inset-0 bg-gradient-to-r from-black to-white rounded-lg blur-sm opacity-30 group-hover:opacity-50 transition-opacity"></div>
-
- 
-  <div className="relative p-1.5 bg-gradient-to-br from-black to-white rounded-lg">
-    <Sparkles className="h-4 w-4 text-bw-solid" />
-  </div>
-</div>
-
+              <div className="absolute inset-0 bg-gradient-to-r from-black to-white rounded-lg blur-sm opacity-30 group-hover:opacity-50 transition-opacity"></div>
+              <div className="relative p-1.5 bg-gradient-to-br from-black to-white rounded-lg">
+                <Sparkles className="h-4 w-4 text-white" />
+              </div>
             </div>
             <div>
               <h1 className="font-luxury text-lg font-bold text-zinc">Waze</h1>
