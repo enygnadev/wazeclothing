@@ -272,24 +272,23 @@ export function Checkout() {
             </div>
 
             <div>
-              <Label htmlFor="complemento">Complemento</Label>
-              <Input
-                id="complemento"
-                value={checkoutData.complemento}
-                onChange={(e) => handleInputChange("complemento", e.target.value)}
-                placeholder="Apto, Bloco, etc."
-                required
-              />
-            </div>
-
-
-            <div>
               <Label htmlFor="address">Endereço Completo (Rua, Bairro, Cidade, UF)</Label>
               <Textarea
                 id="address"
                 value={checkoutData.address}
                 onChange={(e) => handleInputChange("address", e.target.value)}
                 placeholder="Rua, número, complemento, bairro, cidade, CEP"
+                required
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="complemento">Complemento</Label>
+              <Input
+                id="complemento"
+                value={checkoutData.complemento}
+                onChange={(e) => handleInputChange("complemento", e.target.value)}
+                placeholder="Apto, Bloco, etc."
                 required
               />
             </div>
