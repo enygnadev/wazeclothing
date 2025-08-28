@@ -1,10 +1,16 @@
 "use client"
 
-import React from "react"
-import { createContext, useContext, useState } from "react"
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useRef,
+  useCallback,
+  useEffect,
+} from "react"
 import type { User } from "firebase/auth"
+import { Timestamp } from "firebase/firestore"
 import { getUserProfile } from "@/lib/firebase/users"
-import { Timestamp } from "firebase/firestore" // Import Timestamp
 
 interface AuthContextType {
   user: User | null
@@ -30,39 +36,25 @@ const AuthContext = createContext<AuthContextType>({
   initializeAuth: async () => {},
 })
 
-// Helper function to set auth cookie
+/** Cookie opcional para compat/middleware (não obrigatório para funcionar) */
 const setAuthCookie = async (user: User | null) => {
-  if (typeof window !== 'undefined') {
+  if (typeof window === "undefined") return
+  try {
     if (user) {
-      try {
-        const token = await user.getIdToken(true) // Force refresh
-        // Cookie com 1 hora de validade, mas com refresh automático
-        const maxAge = 60 * 60 // 1 hora em segundos
-        const isSecure = window.location.protocol === 'https:'
-        const cookieString = `auth-token=${token}; path=/; max-age=${maxAge}${isSecure ? '; secure' : ''}; samesite=strict`
-        document.cookie = cookieString
-        console.log("🍪 Token atualizado no cookie (1 hora)")
-
-        // Agendar refresh do token em 50 minutos
-        setTimeout(async () => {
-          if (user && !user.isAnonymous) {
-            try {
-              await setAuthCookie(user)
-            } catch (error) {
-              console.error("❌ Erro no refresh automático:", error)
-            }
-          }
-        }, 50 * 60 * 1000) // 50 minutos
-
-      } catch (error) {
-        console.error("❌ Erro ao obter token:", error)
-        // Limpar cookie inválido
-        document.cookie = `auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;`
-      }
+      const token = await user.getIdToken(true) // force refresh
+      const maxAge = 60 * 60 // 1h
+      const isSecure = window.location.protocol === "https:"
+      document.cookie = `auth-token=${token}; path=/; max-age=${maxAge}${
+        isSecure ? "; secure" : ""
+      }; samesite=strict`
     } else {
-      document.cookie = `auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;`
-      console.log("🍪 Cookie removido")
+      document.cookie =
+        "auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;"
     }
+  } catch (e) {
+    console.error("❌ Erro ao obter token:", e)
+    document.cookie =
+      "auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;"
   }
 }
 
@@ -71,23 +63,67 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [userProfile, setUserProfile] = useState<any | null>(null)
   const [loading, setLoading] = useState(false)
   const [initialized, setInitialized] = useState(false)
-  const [authUnsubscribe, setAuthUnsubscribe] = useState<(() => void) | null>(null)
 
-  const initializeAuth = async () => {
-    if (initialized || typeof window === "undefined") return
+  // 🔒 refs para evitar re-render loops
+  const unsubscribeRef = useRef<(() => void) | null>(null)
+  const initStartedRef = useRef(false)
+  const mountedRef = useRef(false)
+  const refreshTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  useEffect(() => {
+    mountedRef.current = true
+    return () => {
+      mountedRef.current = false
+      if (unsubscribeRef.current) {
+        try {
+          unsubscribeRef.current()
+        } catch {}
+        unsubscribeRef.current = null
+      }
+      if (refreshTimeoutRef.current) {
+        clearTimeout(refreshTimeoutRef.current)
+        refreshTimeoutRef.current = null
+      }
+    }
+  }, [])
+
+  const scheduleTokenRefresh = useCallback((u: User | null) => {
+    if (refreshTimeoutRef.current) {
+      clearTimeout(refreshTimeoutRef.current)
+      refreshTimeoutRef.current = null
+    }
+    if (!u) return
+    refreshTimeoutRef.current = setTimeout(async () => {
+      try {
+        if (!mountedRef.current) return
+        await setAuthCookie(u)
+        // re-agenda o próximo refresh
+        scheduleTokenRefresh(u)
+      } catch (e) {
+        console.error("❌ Erro no refresh automático do token:", e)
+      }
+    }, 50 * 60 * 1000) // 50 min
+  }, [])
+
+  const initializeAuth = useCallback(async () => {
+    if (initialized || initStartedRef.current || typeof window === "undefined")
+      return
+    initStartedRef.current = true
     setLoading(true)
     console.log("🔄 Inicializando autenticação...")
 
     try {
-      // Dynamic imports to avoid SSR issues
-      const { getAuth } = await import("firebase/auth")
-      const { onAuthStateChanged, setPersistence, browserLocalPersistence } = await import("firebase/auth")
-      const app = (await import("@/lib/firebase/config")).default
+      const [
+        { getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence },
+        // ⬇️ importa NOMEADO { app } (sem .default)
+        { app },
+      ] = await Promise.all([
+        import("firebase/auth"),
+        import("@/lib/firebase/config"),
+      ])
 
       const auth = getAuth(app)
 
-      // Configurar persistência local
       try {
         await setPersistence(auth, browserLocalPersistence)
         console.log("🔒 Persistência local configurada")
@@ -95,136 +131,156 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.warn("⚠️ Falha ao configurar persistência:", persistError)
       }
 
-      // Se não há mudança de estado em 2 segundos, marcar como inicializado
-      const timeoutId = setTimeout(() => {
+      // Fallback: evita spinner infinito se nada disparar
+      const initTimeout = setTimeout(() => {
+        if (!mountedRef.current) return
         console.log("⏰ Timeout: marcando auth como inicializado")
         setInitialized(true)
         setLoading(false)
       }, 2000)
 
-      const unsubscribe = onAuthStateChanged(auth, async (user) => {
-        console.log("🔄 Auth state changed:", { user: !!user, email: user?.email })
-        
-        // Limpar timeout quando auth state muda
-        clearTimeout(timeoutId)
+      const unsubscribe = onAuthStateChanged(auth, async (u) => {
+        clearTimeout(initTimeout)
+        if (!mountedRef.current) return
 
-        setUser(user)
+        console.log("🔄 Auth state changed:", { user: !!u, email: u?.email })
+        setUser(u)
 
-        if (user) {
-          // Atualizar cookie apenas se realmente logado
-          await setAuthCookie(user)
+        if (u) {
+          await setAuthCookie(u)
+          scheduleTokenRefresh(u)
 
           try {
-            const profile = await getUserProfile(user.uid)
+            const profile = await getUserProfile(u.uid).catch(() => null)
             setUserProfile(profile)
             console.log("👤 Profile carregado:", { isAdmin: profile?.isAdmin })
-          } catch (error) {
-            console.error("Error fetching user profile:", error)
+          } catch (err) {
+            console.error("❌ Erro ao buscar user profile:", err)
             setUserProfile(null)
           }
         } else {
-          // Limpar tudo se não há usuário
           setUserProfile(null)
           await setAuthCookie(null)
+          scheduleTokenRefresh(null)
           console.log("👤 Usuário deslogado - dados limpos")
         }
 
         setLoading(false)
-        setInitialized(true) // Sempre marcar como inicializado após auth state change
+        setInitialized(true)
       })
 
-      setAuthUnsubscribe(() => unsubscribe)
-      
+      // ✅ guarda unsubscribe em ref (sem setState)
+      unsubscribeRef.current = unsubscribe
     } catch (error) {
       console.error("❌ Error initializing auth:", error)
+      if (!mountedRef.current) return
       setLoading(false)
-      setInitialized(true) // Mesmo com erro, marcar como inicializado
+      setInitialized(true)
     }
-  }
+  }, [initialized, scheduleTokenRefresh])
 
-  const signIn = async (email: string, password: string) => {
-    if (!initialized) await initializeAuth()
+  const signIn = useCallback(
+    async (email: string, password: string) => {
+      if (!initialized) await initializeAuth()
+      const [{ signInWithEmailAndPassword, getAuth }, { app }] =
+        await Promise.all([
+          import("firebase/auth"),
+          import("@/lib/firebase/config"),
+        ])
+      const auth = getAuth(app)
+      const result = await signInWithEmailAndPassword(auth, email, password)
+      await setAuthCookie(result.user)
+      scheduleTokenRefresh(result.user)
+    },
+    [initialized, initializeAuth, scheduleTokenRefresh]
+  )
 
-    const { signInWithEmailAndPassword } = await import("firebase/auth")
-    const { getAuth } = await import("firebase/auth")
-    const app = (await import("@/lib/firebase/config")).default
+  const signUp = useCallback(
+    async (email: string, password: string) => {
+      if (!initialized) await initializeAuth()
 
-    const auth = getAuth(app)
-    const result = await signInWithEmailAndPassword(auth, email, password)
-    await setAuthCookie(result.user)
-  }
+      const [
+        { createUserWithEmailAndPassword, getAuth },
+        { doc, setDoc },
+        { getDb },
+        { app },
+      ] = await Promise.all([
+        import("firebase/auth"),
+        import("firebase/firestore"),
+        import("@/lib/firebase/firestore"),
+        import("@/lib/firebase/config"),
+      ])
 
-  const signUp = async (email: string, password: string) => {
-    if (!initialized) await initializeAuth()
+      const auth = getAuth(app)
+      const result = await createUserWithEmailAndPassword(auth, email, password)
 
-    const { createUserWithEmailAndPassword } = await import("firebase/auth")
-    const { getAuth } = await import("firebase/auth")
-    const { doc, setDoc } = await import("firebase/firestore")
-    const { getDb } = await import("@/lib/firebase/firestore")
-    const app = (await import("@/lib/firebase/config")).default
+      const db = getDb()
+      const userData = {
+        email: result.user.email,
+        name: result.user.displayName || email.split("@")[0],
+        displayName: result.user.displayName || email.split("@")[0],
+        isAdmin:
+          email === "admin@waze.com" ||
+          email === "admin@admin.com" ||
+          email === "guga1trance@gmail.com",
+        createdAt: Timestamp.now(),
+        updatedAt: Timestamp.now(),
+        consentDate: Timestamp.now(),
+        consentVersion: "1.0",
+      }
 
-    const auth = getAuth(app)
-    const result = await createUserWithEmailAndPassword(auth, email, password)
+      await setDoc(doc(db, "users", result.user.uid), userData, { merge: true })
+      await setAuthCookie(result.user)
+      scheduleTokenRefresh(result.user)
+      setUserProfile(userData)
+    },
+    [initialized, initializeAuth, scheduleTokenRefresh]
+  )
 
-    // Create user profile in Firestore
-    const db = getDb()
-    const userData = {
-      email: result.user.email,
-      name: result.user.displayName || email.split('@')[0],
-      displayName: result.user.displayName || email.split('@')[0],
-      isAdmin: email === 'admin@waze.com' || email === 'admin@admin.com' || email === 'guga1trance@gmail.com',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      consentDate: new Date(),
-      consentVersion: "1.0"
-    }
+  const signInWithGoogle = useCallback(
+    async () => {
+      if (!initialized) await initializeAuth()
 
-    await setDoc(doc(db, "users", result.user.uid), userData)
-    await setAuthCookie(result.user)
+      const [
+        { signInWithPopup, GoogleAuthProvider, getAuth },
+        { doc, setDoc, getDoc },
+        { getDb },
+        { app },
+      ] = await Promise.all([
+        import("firebase/auth"),
+        import("firebase/firestore"),
+        import("@/lib/firebase/firestore"),
+        import("@/lib/firebase/config"),
+      ])
 
-    // Atualizar o profile localmente
-    setUserProfile(userData)
-  }
+      const auth = getAuth(app)
+      const provider = new GoogleAuthProvider()
+      const result = await signInWithPopup(auth, provider)
 
-  const signInWithGoogle = async () => {
-    if (!initialized) await initializeAuth()
-
-    const { signInWithPopup, GoogleAuthProvider } = await import("firebase/auth")
-    const { getAuth } = await import("firebase/auth")
-    const { doc, setDoc, getDoc } = await import("firebase/firestore")
-    const { getDb } = await import("@/lib/firebase/firestore")
-    const app = (await import("@/lib/firebase/config")).default
-
-    const auth = getAuth(app)
-    const googleProvider = new GoogleAuthProvider()
-    const result = await signInWithPopup(auth, googleProvider)
-
-    // Check if user profile exists, if not create it
-    const db = getDb()
-    const userDoc = await getDoc(doc(db, 'users', result.user.uid))
-      if (userDoc.exists()) {
-        const userData = userDoc.data()
+      const db = getDb()
+      const snap = await getDoc(doc(db, "users", result.user.uid))
+      if (snap.exists()) {
+        const data = snap.data()
         const profile = {
           id: result.user.uid,
           email: result.user.email!,
-          name: userData.name || result.user.displayName || '',
-          isAdmin: userData.isAdmin === true, // Explicit boolean check
-          createdAt: userData.createdAt?.toDate() || new Date(),
+          name: data.name || result.user.displayName || "",
+          isAdmin: data.isAdmin === true,
+          createdAt: data.createdAt?.toDate?.() ?? new Date(),
         }
         setUserProfile(profile)
-        console.log('User profile loaded:', profile)
+        console.log("User profile loaded:", profile)
       } else {
-        // Create user profile if it doesn't exist
         const newProfile = {
           email: result.user.email!,
-          name: result.user.displayName || result.user.email?.split('@')[0],
+          name:
+            result.user.displayName || result.user.email?.split("@")[0] || "",
           isAdmin: false,
           createdAt: Timestamp.now(),
           consentDate: Timestamp.now(),
-          consentVersion: "1.0"
+          consentVersion: "1.0",
         }
-
-        await setDoc(doc(db, 'users', result.user.uid), newProfile)
+        await setDoc(doc(db, "users", result.user.uid), newProfile)
         const profile = {
           id: result.user.uid,
           email: result.user.email!,
@@ -233,36 +289,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           createdAt: newProfile.createdAt.toDate(),
         }
         setUserProfile(profile)
-        console.log('New user profile created:', profile)
+        console.log("New user profile created:", profile)
       }
 
-    await setAuthCookie(result.user)
-  }
+      await setAuthCookie(result.user)
+      scheduleTokenRefresh(result.user)
+    },
+    [initialized, initializeAuth, scheduleTokenRefresh]
+  )
 
-  const signOut = async () => {
-    if (!initialized) return
-
-    const { signOut: firebaseSignOut } = await import("firebase/auth")
-    const { getAuth } = await import("firebase/auth")
-    const app = (await import("@/lib/firebase/config")).default
-
-    const auth = getAuth(app)
-    await firebaseSignOut(auth)
-    await setAuthCookie(null)
-
-    // Limpar estado local
-    setUser(null)
-    setUserProfile(null)
-  }
-
-  // Cleanup on unmount
-  React.useEffect(() => {
-    return () => {
-      if (authUnsubscribe) {
-        authUnsubscribe()
-      }
-    }
-  }, [authUnsubscribe])
+  const signOut = useCallback(
+    async () => {
+      if (!initialized) return
+      const [{ signOut: firebaseSignOut, getAuth }, { app }] = await Promise.all(
+        [import("firebase/auth"), import("@/lib/firebase/config")]
+      )
+      const auth = getAuth(app)
+      await firebaseSignOut(auth)
+      await setAuthCookie(null)
+      scheduleTokenRefresh(null)
+      setUser(null)
+      setUserProfile(null)
+    },
+    [initialized, scheduleTokenRefresh]
+  )
 
   return (
     <AuthContext.Provider
