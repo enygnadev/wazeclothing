@@ -1,4 +1,3 @@
-
 "use client"
 
 import Image from "next/image"
@@ -12,41 +11,41 @@ interface CartItemProps {
 }
 
 export function CartItem({ item }: CartItemProps) {
-  const { updateItemQuantity, removeItem } = useCart()
+  const { updateQuantity, removeItem } = useCart()
 
   return (
-    <div className="flex items-center space-x-4 py-4">
-      <div className="relative h-16 w-16 rounded-md overflow-hidden">
+    <div className="flex items-center space-x-3 py-3">
+      <div className="relative h-16 w-16 flex-shrink-0">
         <Image
-          src={item.product.image || "/placeholder.svg?height=64&width=64"}
-          alt={item.product.title}
+          src={item.image || "/placeholder.svg?height=64&width=64"}
+          alt={item.title || item.name}
           fill
-          className="object-cover"
+          className="rounded-md object-cover"
         />
       </div>
 
       <div className="flex-1 min-w-0">
-        <h4 className="text-sm font-medium line-clamp-2">{item.product.title}</h4>
-        <p className="text-sm text-muted-foreground">R$ {item.product.price.toFixed(2)}</p>
+        <h4 className="text-sm font-medium line-clamp-2">{item.title || item.name}</h4>
+        <p className="text-sm text-muted-foreground">R$ {item.price.toFixed(2)}</p>
       </div>
 
       <div className="flex items-center space-x-2">
         <Button
           variant="outline"
           size="icon"
-          className="h-8 w-8"
-          onClick={() => updateItemQuantity(item.id, item.quantity - 1)}
+          className="h-7 w-7"
+          onClick={() => updateQuantity(item.id, item.quantity - 1)}
         >
           <Minus className="h-3 w-3" />
         </Button>
 
-        <span className="w-8 text-center text-sm font-medium">{item.quantity}</span>
+        <span className="w-8 text-center text-sm">{item.quantity}</span>
 
         <Button
           variant="outline"
           size="icon"
-          className="h-8 w-8"
-          onClick={() => updateItemQuantity(item.id, item.quantity + 1)}
+          className="h-7 w-7"
+          onClick={() => updateQuantity(item.id, item.quantity + 1)}
         >
           <Plus className="h-3 w-3" />
         </Button>

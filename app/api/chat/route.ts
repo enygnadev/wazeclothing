@@ -34,7 +34,9 @@ Seja sempre estiloso, direto, prestativo e focado em moda masculina urbana e con
     const stream = OpenAIStream(response)
     return new StreamingTextResponse(stream)
   } catch (error) {
-    console.error("Error in chat API:", error)
-    return NextResponse.json({ error: "Failed to process chat message" }, { status: 500 })
+      console.error('Erro na API de chat:', error)
+      return NextResponse.json(
+        { error: 'Erro interno do servidor' },
+        { status: 500 })
   }
 }

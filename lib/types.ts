@@ -1,15 +1,15 @@
-
 export interface Product {
   id: string
-  name: string // Changed from title to name
-  description?: string
+  title: string
+  name?: string
+  description: string
   price: number
   image: string
   category: string
   featured: boolean
+  features?: string[]
+  size?: string
   sizes?: string[]
-  features?: string[] // Added features back
-  size?: string // Keep both size and sizes for compatibility
   isSmart?: boolean
   createdAt: Date
   updatedAt: Date
@@ -18,9 +18,10 @@ export interface Product {
 export interface CartItem {
   id: string
   productId: string
-  name: string // Product name
-  price: number // Product price
-  image: string // Product image
+  name: string
+  title?: string
+  price: number
+  image: string
   quantity: number
 }
 

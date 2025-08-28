@@ -24,7 +24,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     const data = await request.json()
 
     await updateProduct(id, {
-      name: data.name,
+      title: data.title || data.name,
       description: data.description,
       price: parseFloat(data.price),
       image: data.image,

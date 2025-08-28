@@ -42,7 +42,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
       console.log("Adicionando produto ao carrinho:", product.title)
       
-      await addItem(product.id)
+      addItem(product, 1)
 
       setIsOpen(true)
 

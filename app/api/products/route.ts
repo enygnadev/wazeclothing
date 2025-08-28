@@ -39,14 +39,16 @@ export async function GET(request: NextRequest) {
     console.error("❌ API: Erro ao buscar produtos:", error)
 
     const errorMessage = error instanceof Error ? error.message : 'Erro interno do servidor'
-    const stack = error instanceof Error ? error.stack : undefined
+    const errorStack = error instanceof Error ? error.stack : undefined
 
-    console.error("❌ API: Stack trace:", stack)
+    console.error("❌ API: Stack trace:", errorStack)
+    console.error("❌ API: Erro completo:", error)
 
     return NextResponse.json(
       {
+        success: false,
         error: errorMessage,
-        message: "Falha ao carregar produtos"
+        details: "Verifique os logs para mais informações"
       },
       { status: 500 }
     )
