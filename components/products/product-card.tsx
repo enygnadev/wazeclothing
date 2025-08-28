@@ -39,12 +39,7 @@ export function ProductCard({ product }: ProductCardProps) {
       return
     }
 
-    addItem({
-      id: product.id,
-      title: product.title,
-      price: product.price,
-      image: product.image,
-    })
+    await addItem(product.id)
 
     setIsOpen(true)
 

@@ -107,10 +107,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const addItem = async (productId: string, quantity = 1) => {
     try {
+      setIsLoading(true)
       const product = await getProductById(productId)
       if (!product) {
-        throw new Error("Produto não encontrado")
+        console.error("Produto não encontrado:", productId)
+        return
       }
+
+      console.log("Adicionando produto ao carrinho:", product.title)
 
       setItems(currentItems => {
         const existingItem = currentItems.find(item => item.id === productId)
@@ -122,8 +126,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
               ? { ...item, quantity: item.quantity + quantity }
               : item
           )
+          console.log("Produto já existe, aumentando quantidade")
         } else {
           newItems = [...currentItems, { id: productId, product, quantity }]
+          console.log("Novo produto adicionado ao carrinho")
         }
         
         saveCart(newItems)
@@ -131,6 +137,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       })
     } catch (error) {
       console.error("Erro ao adicionar item:", error)
+    } finally {
+      setIsLoading(false)
     }
   }
 
