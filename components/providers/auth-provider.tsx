@@ -36,8 +36,10 @@ const setAuthCookie = async (user: User | null) => {
     if (user) {
       try {
         const token = await user.getIdToken(true) // Force refresh
-        document.cookie = `auth-token=${token}; path=/; max-age=86400; secure; samesite=strict`
-        console.log("🍪 Token atualizado no cookie")
+        // Cookie com 7 dias de validade para ser mais estável
+        const maxAge = 7 * 24 * 60 * 60 // 7 dias em segundos
+        document.cookie = `auth-token=${token}; path=/; max-age=${maxAge}; secure; samesite=strict`
+        console.log("🍪 Token atualizado no cookie (válido por 7 dias)")
       } catch (error) {
         console.error("❌ Erro ao obter token:", error)
         // Limpar cookie inválido

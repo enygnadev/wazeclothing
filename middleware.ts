@@ -31,23 +31,17 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl)
   }
 
-  // Para rotas admin, verificar se tem token válido
+  // Para rotas admin - verificação mais simples
   if (pathname.startsWith('/admin')) {
-    // Se não tem token, redirecionar para login
-    if (!authToken) {
-      const url = new URL('/auth', request.url)
-      url.searchParams.set('returnUrl', pathname)
-      url.searchParams.set('type', 'admin')
-      return NextResponse.redirect(url)
-    }
-    
-    // Se tem token válido (não vazio, não undefined), permitir acesso
-    // A verificação de admin será feita no componente
-    if (authToken && authToken !== 'undefined' && authToken !== 'null') {
+    // Se tem algum token, deixar o componente decidir
+    // Isso evita loops de redirecionamento
+    if (authToken && authToken !== 'undefined' && authToken !== 'null' && authToken.length > 10) {
+      console.log("🔐 Admin token found, allowing access to:", pathname)
       return NextResponse.next()
     }
     
-    // Se token inválido, redirecionar
+    // Só redirecionar se realmente não tem token
+    console.log("🚫 No valid admin token, redirecting from:", pathname)
     const url = new URL('/auth', request.url)
     url.searchParams.set('returnUrl', pathname)
     url.searchParams.set('type', 'admin')

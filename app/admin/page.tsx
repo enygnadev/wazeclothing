@@ -24,6 +24,18 @@ export default function AdminPage() {
         return
       }
       
+      // Se chegou aqui e não tem usuário após inicializado, pode ter problema
+      if (initialized && !loading && !user) {
+        console.log("❌ Auth inicializado mas sem usuário - possível token expirado")
+        // Dar uma chance para o auth recuperar
+        setTimeout(() => {
+          if (!user) {
+            console.log("🔄 Forçando reinicialização do auth...")
+            initializeAuth()
+          }
+        }, 2000)
+      }
+      
       // Debug info
       console.log("🔍 Debug Auth State:", {
         user: !!user,
