@@ -1,60 +1,24 @@
-
 import { NextRequest, NextResponse } from "next/server"
 
-export async function middleware(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // Skip middleware for static files and API routes
+  // Ignora arquivos estáticos e qualquer requisição de arquivo
   if (
-    pathname.startsWith('/_next') ||
-    pathname.startsWith('/static') ||
-    pathname.includes('.') ||
-    pathname.startsWith('/api') ||
-    pathname.startsWith('/favicon')
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/static") ||
+    pathname.startsWith("/api") ||
+    pathname.startsWith("/favicon") ||
+    pathname.includes(".")
   ) {
     return NextResponse.next()
   }
 
-  // Public routes that don't require authentication
-  const publicRoutes = ['/', '/auth', '/products', '/categories', '/contato']
-  
-  // Check if it's a public route or exact match
-  const isPublicRoute = publicRoutes.some(route => {
-    if (route === '/') return pathname === '/'
-    return pathname.startsWith(route)
-  })
-
-  if (isPublicRoute) {
-    return NextResponse.next()
-  }
-
-  // Protected routes
-  const isAdminRoute = pathname.startsWith('/admin')
-  const isClientRoute = pathname.startsWith('/cliente') || pathname.startsWith('/checkout')
-  
-  // Get token from cookie
-  const token = request.cookies.get('auth-token')?.value
-
-  // If no token for protected routes, redirect to auth
-  if (!token && (isAdminRoute || isClientRoute)) {
-    const url = new URL('/auth', request.url)
-    url.searchParams.set('returnUrl', pathname)
-    
-    if (isAdminRoute) {
-      url.searchParams.set('type', 'admin')
-    }
-    
-    return NextResponse.redirect(url)
-  }
-
-  // For admin routes, additional verification happens on the client side
+  // Não fazer autenticação no Edge. O /admin, /cliente e /checkout
+  // serão verificados no cliente (React) usando useAuth + claims + users/{uid}.isAdmin.
   return NextResponse.next()
 }
 
 export const config = {
-  matcher: [
-    '/admin/:path*',
-    '/cliente/:path*',
-    '/checkout/:path*',
-  ],
+  matcher: ["/admin/:path*", "/cliente/:path*", "/checkout/:path*"],
 }
