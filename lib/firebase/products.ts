@@ -155,51 +155,25 @@ export async function deleteProduct(id: string): Promise<boolean> {
 // Funções para categorias e tamanhos
 export async function getCategories(): Promise<string[]> {
   try {
-    const products = await getProducts()
-    const categories = [...new Set(products.map(product => product.category).filter(Boolean))]
-    return categories.length > 0 ? categories : ["camisetas", "calças", "vestidos", "acessórios"]
-  } catch (error) {
-    console.error("Erro ao buscar categorias:", error)
-    return ["camisetas", "calças", "vestidos", "acessórios"]
-  }
-}
-
-export async function getSizes(): Promise<string[]> {
-  try {
-    const products = await getProducts()
-    const sizes = [...new Set(products.map(product => product.size).filter(Boolean))]
-    return sizes.length > 0 ? sizes : ["PP", "P", "M", "G", "GG"]
-  } catch (error) {
-    console.error("Erro ao buscar tamanhos:", error)
-    return ["PP", "P", "M", "G", "GG"]
-  }
-}
-
-export async function createProduct(product: Omit<Product, "id">): Promise<string | null> {
-  return addProduct(product)
-}
-
-// Categories functions
-export async function getCategories(): Promise<string[]> {
-  try {
+    const db = getDb()
     const categoriesRef = collection(db, "categories")
     const snapshot = await getDocs(categoriesRef)
     
     if (snapshot.empty) {
       // Return default categories if none exist
-      return ["camisetas", "calças", "vestidos", "acessórios"]
+      return ["nike", "adidas", "lacoste", "jordan", "puma"]
     }
     
     return snapshot.docs.map(doc => doc.data().name)
   } catch (error) {
-    console.error("Error fetching categories:", error)
-    return ["camisetas", "calças", "vestidos", "acessórios"]
+    console.error("Erro ao buscar categorias:", error)
+    return ["nike", "adidas", "lacoste", "jordan", "puma"]
   }
 }
 
-// Sizes functions
 export async function getSizes(): Promise<string[]> {
   try {
+    const db = getDb()
     const sizesRef = collection(db, "sizes")
     const snapshot = await getDocs(sizesRef)
     
@@ -210,7 +184,13 @@ export async function getSizes(): Promise<string[]> {
     
     return snapshot.docs.map(doc => doc.data().name)
   } catch (error) {
-    console.error("Error fetching sizes:", error)
+    console.error("Erro ao buscar tamanhos:", error)
     return ["PP", "P", "M", "G", "GG", "XG"]
   }
 }
+
+export async function createProduct(product: Omit<Product, "id">): Promise<string | null> {
+  return addProduct(product)
+}
+
+
