@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect } from "react"
@@ -112,7 +111,7 @@ export function Header() {
                     </Button>
                   </Link>
                 )}
-                
+
                 <Link href="/cliente">
                   <Button variant="outline" size="sm">
                     <User className="h-4 w-4 mr-2" />
@@ -145,7 +144,7 @@ export function Header() {
                   <div className="lg:hidden mb-4">
                     <SearchBar />
                   </div>
-                  
+
                   <Link 
                     href="/" 
                     className="text-lg font-medium hover:text-primary transition-colors"
