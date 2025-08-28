@@ -81,10 +81,15 @@ export function Header() {
           {/* Logo - Compact */}
           <Link href="/" className="group flex items-center space-x-2">
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-green-500 rounded-lg blur-sm opacity-30 group-hover:opacity-50 transition-opacity"></div>
-              <div className="relative p-1.5 bg-gradient-to-br from-black to-white rounded-lg">
-                <Sparkles className="h-4 w-4 text-white" />
-              </div>
+  {/* camada de brilho */}
+  <div className="absolute inset-0 bg-gradient-to-r from-black to-white rounded-lg blur-sm opacity-30 group-hover:opacity-50 transition-opacity"></div>
+
+  {/* fundo + conteúdo */}
+  <div className="relative p-1.5 bg-gradient-to-br from-black to-white rounded-lg">
+    <Sparkles className="h-4 w-4 text-bw-solid" />
+  </div>
+</div>
+
             </div>
             <div>
               <h1 className="font-luxury text-lg font-bold text-zinc">Waze</h1>
