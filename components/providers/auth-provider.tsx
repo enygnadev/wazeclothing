@@ -77,6 +77,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (initialized || typeof window === "undefined") return
 
     setLoading(true)
+    console.log("🔄 Inicializando autenticação...")
 
     try {
       // Dynamic imports to avoid SSR issues
@@ -119,20 +120,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
 
         setLoading(false)
-        
-        // Marcar como inicializado apenas após o primeiro auth state
-        if (!initialized) {
-          setInitialized(true)
-        }
-      }, (error) => {
-        console.error("❌ Erro no onAuthStateChanged:", error)
-        setLoading(false)
-        setInitialized(true) // Marcar como inicializado mesmo com erro
+        setInitialized(true) // Sempre marcar como inicializado após auth state change
       })
 
       setAuthUnsubscribe(() => unsubscribe)
+      
+      // Se não há mudança de estado em 3 segundos, marcar como inicializado
+      setTimeout(() => {
+        if (!initialized) {
+          console.log("⏰ Timeout: marcando auth como inicializado")
+          setInitialized(true)
+          setLoading(false)
+        }
+      }, 3000)
+      
     } catch (error) {
-      console.error("Error initializing auth:", error)
+      console.error("❌ Error initializing auth:", error)
       setLoading(false)
       setInitialized(true) // Mesmo com erro, marcar como inicializado
     }

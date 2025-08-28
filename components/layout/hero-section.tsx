@@ -10,7 +10,7 @@ const images = ["/banner.gif", "/CLjx.gif"];
 export function HeroSection() {
   return (
     <section className="relative min-h-[80vh] md:min-h-screen flex items-center justify-center overflow-hidden bg-black text-white">
-      
+
       {/* 🔁 Background com efeito de entrada */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         <motion.img
@@ -99,7 +99,7 @@ export function HeroSection() {
                 Entrar
               </Button>
             </Link>
-            
+
             <Link href="/admin">
               <Button
                 variant="outline"
