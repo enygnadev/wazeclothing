@@ -1,4 +1,3 @@
-
 "use client"
 
 import { Suspense, useEffect, useState } from "react"
@@ -7,6 +6,21 @@ import { AuthForm } from "@/components/auth/auth-form"
 import { useAuth } from "@/components/providers/auth-provider"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Loader2 } from "lucide-react"
+import { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Login - Waze Clothing",
+  description: "Faça login na sua conta Waze Clothing",
+}
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#000000" },
+  ],
+}
 
 function AuthPageContent() {
   const searchParams = useSearchParams()
@@ -58,7 +72,7 @@ function AuthPageContent() {
             {type === 'admin' ? 'Acesso Administrativo' : 'Waze Clothing'}
           </CardTitle>
           <CardDescription>
-            {type === 'admin' 
+            {type === 'admin'
               ? 'Faça login para acessar o painel administrativo'
               : 'Entre na sua conta ou crie uma nova'
             }

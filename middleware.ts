@@ -44,7 +44,12 @@ export function middleware(request: NextRequest) {
   // Para rotas admin - verificação do token
   if (pathname.startsWith('/admin')) {
     // Token existe e parece válido, deixar componente fazer verificação mais detalhada
-    console.log("🔐 Token válido encontrado, permitindo acesso a:", pathname)
+    console.log("🔐 Admin route access:", { 
+      pathname, 
+      hasToken: !!authToken, 
+      tokenLength: authToken?.length || 0,
+      tokenPreview: authToken ? authToken.substring(0, 20) + '...' : 'none'
+    })
     return NextResponse.next()
   }
 

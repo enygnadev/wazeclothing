@@ -94,6 +94,7 @@ export default function AdminPage() {
           {/* Debug info */}
           <div className="mt-4 text-xs text-muted-foreground bg-muted p-2 rounded">
             <p>Estado: Usuário não encontrado</p>
+            <p>Token no cookie: {document?.cookie?.includes('auth-token') ? 'Presente' : 'Ausente'}</p>
             <pre>{JSON.stringify(debugInfo, null, 2)}</pre>
           </div>
         </div>
@@ -122,6 +123,8 @@ export default function AdminPage() {
           <div className="mt-4 text-xs text-muted-foreground bg-muted p-2 rounded">
             <p>Estado: Usuário não é admin</p>
             <p>isAdmin: {String(userProfile?.isAdmin)}</p>
+            <p>userProfile: {JSON.stringify(userProfile, null, 2)}</p>
+            <p>Token no cookie: {typeof document !== 'undefined' && document?.cookie?.includes('auth-token') ? 'Presente' : 'Ausente'}</p>
             <pre>{JSON.stringify(debugInfo, null, 2)}</pre>
           </div>
         </div>
