@@ -238,3 +238,31 @@ export async function getSizes(): Promise<string[]> {
 export async function createProduct(product: Omit<Product, "id">): Promise<string | null> {
   return addProduct(product)
 }
+
+export async function createCategory(name: string): Promise<boolean> {
+  try {
+    const db = getDb()
+    const categoriesRef = collection(db, "categories")
+    await addDoc(categoriesRef, { name })
+    return true
+  } catch (error) {
+    console.error("Erro ao criar categoria:", error)
+    return false
+  }
+}
+
+export async function createSize(name: string): Promise<boolean> {
+  try {
+    const db = getDb()
+    const sizesRef = collection(db, "sizes")
+    await addDoc(sizesRef, { name })
+    return true
+  } catch (error) {
+    console.error("Erro ao criar tamanho:", error)
+    return false
+  }
+}
+
+export async function getProduct(id: string): Promise<Product | null> {
+  return getProductById(id)
+}
