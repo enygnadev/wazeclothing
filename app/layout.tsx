@@ -1,40 +1,50 @@
-import type React from "react"
-import type { Metadata } from "next"
-import { Playfair_Display, Inter, Poppins } from "next/font/google"
-import "./globals.css"
-import { AuthProvider } from "@/components/providers/auth-provider"
-import { CartProvider } from "@/components/providers/cart-provider"
-import { Toaster } from "@/components/ui/toaster"
-import { ThemeProvider } from "@/components/providers/theme-provider"
-import { CartDrawer } from "@/components/cart/cart-drawer"
 
-const playfair = Playfair_Display({
-  subsets: ["latin"],
-  variable: "--font-playfair",
-  display: "swap",
-})
+import { Inter } from 'next/font/google'
+import './globals.css'
+import { ThemeProvider } from '@/components/providers/theme-provider'
+import { AuthProvider } from '@/components/providers/auth-provider'
+import { CartProvider } from '@/components/providers/cart-provider'
+import { Toaster } from '@/components/ui/toaster'
+import type { Metadata, Viewport } from 'next'
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap",
-})
-
-const poppins = Poppins({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-poppins",
-  display: "swap",
-})
+const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: "Waze Clothing - Roupas",
-  description:
-    "Experiência premium em roupas.",
-  manifest: "/manifest.json",
-  themeColor: "#D4AF37",
-  viewport: "width=device-width, initial-scale=1, maximum-scale=1",
-    generator: 'v0.dev'
+  title: 'Waze Clothing - Moda Exclusiva',
+  description: 'Descubra a última moda em roupas exclusivas na Waze Clothing. Qualidade premium, estilo único.',
+  keywords: ['moda', 'roupas', 'fashion', 'clothing', 'estilo'],
+  authors: [{ name: 'Waze Clothing' }],
+  creator: 'Waze Clothing',
+  publisher: 'Waze Clothing',
+  robots: {
+    index: true,
+    follow: true,
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'pt_BR',
+    url: 'https://wazeclothing.com',
+    title: 'Waze Clothing - Moda Exclusiva',
+    description: 'Descubra a última moda em roupas exclusivas na Waze Clothing.',
+    siteName: 'Waze Clothing',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Waze Clothing - Moda Exclusiva',
+    description: 'Descubra a última moda em roupas exclusivas na Waze Clothing.',
+    creator: '@wazeclothing',
+  },
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#000000' }
+  ],
 }
 
 export default function RootLayout({
@@ -43,17 +53,17 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html
-      lang="pt-BR"
-      suppressHydrationWarning
-      className={`${playfair.variable} ${inter.variable} ${poppins.variable}`}
-    >
-      <body className={`${inter.className} antialiased`}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+    <html lang="pt-BR" suppressHydrationWarning>
+      <body className={inter.className}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
           <AuthProvider>
             <CartProvider>
               {children}
-              <CartDrawer />
               <Toaster />
             </CartProvider>
           </AuthProvider>

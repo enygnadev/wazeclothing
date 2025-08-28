@@ -1,11 +1,11 @@
+
 "use client"
 
 import { Suspense, useEffect, useState } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { AuthForm } from "@/components/auth/auth-form"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useAuth } from "@/components/providers/auth-provider"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Loader2 } from "lucide-react"
 
 function AuthPageContent() {
@@ -55,28 +55,17 @@ function AuthPageContent() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">
-            {type === 'admin' ? 'Acesso Administrativo' : 'Bem-vindo à Waze Clothing'}
+            {type === 'admin' ? 'Acesso Administrativo' : 'Waze Clothing'}
           </CardTitle>
           <CardDescription>
             {type === 'admin' 
-              ? 'Entre com sua conta de administrador' 
-              : 'Entre na sua conta ou crie uma nova para começar a comprar'
+              ? 'Faça login para acessar o painel administrativo'
+              : 'Entre na sua conta ou crie uma nova'
             }
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="login" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">Entrar</TabsTrigger>
-              <TabsTrigger value="register">Cadastrar</TabsTrigger>
-            </TabsList>
-            <TabsContent value="login">
-              <AuthForm mode="login" />
-            </TabsContent>
-            <TabsContent value="register">
-              <AuthForm mode="register" />
-            </TabsContent>
-          </Tabs>
+          <AuthForm returnUrl={returnUrl} type={type} />
         </CardContent>
       </Card>
     </div>
