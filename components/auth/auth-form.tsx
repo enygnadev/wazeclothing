@@ -72,7 +72,16 @@ export function AuthForm({ mode }: AuthFormProps) {
           description: "Bem-vindo à Waze Clothing!",
         })
       }
-      router.push("/")
+      
+      // Aguardar um pouco para o estado ser atualizado
+      setTimeout(() => {
+        const urlParams = new URLSearchParams(window.location.search)
+        const returnUrl = urlParams.get('returnUrl') || '/'
+        
+        // Força recarregar a página para garantir que o estado seja atualizado
+        window.location.href = returnUrl
+      }, 1000)
+      
     } catch (error: any) {
       const errorCode = error?.code || ""
       let errorMessage = "Ocorreu um erro. Tente novamente."
@@ -109,7 +118,16 @@ export function AuthForm({ mode }: AuthFormProps) {
         title: "Login com Google bem-sucedido!",
         description: "Bem-vindo à Waze Clothing!",
       })
-      router.push("/")
+      
+      // Aguardar um pouco para o estado ser atualizado
+      setTimeout(() => {
+        const urlParams = new URLSearchParams(window.location.search)
+        const returnUrl = urlParams.get('returnUrl') || '/'
+        
+        // Força recarregar a página para garantir que o estado seja atualizado
+        window.location.href = returnUrl
+      }, 1000)
+      
     } catch (error: any) {
       const errorCode = error?.code || ""
       let errorMessage = "Erro ao fazer login com Google."

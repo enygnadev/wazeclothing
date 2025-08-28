@@ -24,7 +24,12 @@ export function middleware(request: NextRequest) {
   
   // Se não tem token válido, redirecionar para login
   if (!authToken || invalidTokens.includes(authToken) || authToken.length < 10) {
-    console.log("🚫 Token inválido ou ausente:", { authToken: authToken?.substring(0, 10) + '...' })
+    console.log("🚫 Token inválido ou ausente:", { 
+      authToken: authToken ? authToken.substring(0, 10) + '...' : 'null',
+      pathname,
+      hasToken: !!authToken,
+      tokenLength: authToken?.length || 0
+    })
     
     const loginUrl = new URL('/auth', request.url)
     loginUrl.searchParams.set('returnUrl', pathname)

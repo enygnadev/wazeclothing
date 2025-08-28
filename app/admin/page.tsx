@@ -16,41 +16,44 @@ export default function AdminPage() {
 
   useEffect(() => {
     const init = async () => {
-      console.log("🔄 Admin page init...", { initialized, user: !!user, userProfile })
+      console.log("🔄 Admin page init...", { 
+        initialized, 
+        user: !!user, 
+        userEmail: user?.email,
+        userProfile,
+        loading,
+        verifying
+      })
       
       if (!initialized) {
         console.log("🔄 Inicializando auth...")
-        await initializeAuth()
+        try {
+          await initializeAuth()
+        } catch (error) {
+          console.error("❌ Erro na inicialização:", error)
+        }
         return
       }
       
-      // Debug info
+      // Debug info detalhado
       const currentState = {
         user: !!user,
         userEmail: user?.email,
         userProfile,
         isAdmin: userProfile?.isAdmin,
         loading,
-        initialized
+        initialized,
+        verifying,
+        timestamp: new Date().toISOString()
       }
       
       console.log("🔍 Debug Auth State:", currentState)
       setDebugInfo(currentState)
       
-      // Parar verificação apenas quando estiver inicializado e não carregando
+      // Parar verificação apenas quando estiver inicializado, não carregando e tem dados
       if (initialized && !loading) {
+        console.log("✅ Auth inicializado, parando verificação")
         setVerifying(false)
-        
-        // Se não há usuário após inicializado, dar um tempo e tentar recarregar
-        if (!user) {
-          console.log("⚠️ Usuário não encontrado após inicialização")
-          setTimeout(() => {
-            if (!user && initialized) {
-              console.log("🔄 Redirecionando para login...")
-              window.location.href = '/auth?returnUrl=/admin&type=admin'
-            }
-          }, 3000)
-        }
       }
     }
 
