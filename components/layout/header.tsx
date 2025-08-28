@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useEffect, useState } from "react"
@@ -95,7 +94,7 @@ export function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
-            <Link 
+            <Link
               href="/"
               className="font-elegant text-sm font-medium hover:text-black-500 transition-colors relative group"
             >
@@ -109,7 +108,26 @@ export function Header() {
               Produtos
               <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-green-400 to-white-500 group-hover:w-full transition-all duration-300"></div>
             </Link>
+            {/* Navigation */}
+            <nav className="hidden md:flex items-center space-x-8">
+              <Link href="/products" className="text-sm font-medium transition-colors hover:text-primary">
+                Produtos
+              </Link>
+              <Link href="/categories" className="text-sm font-medium transition-colors hover:text-primary">
+                Categorias
+              </Link>
+              <Link href="/cliente" className="text-sm font-medium transition-colors hover:text-primary">
+                Área do Cliente
+              </Link>
+              <Link href="/about" className="text-sm font-medium transition-colors hover:text-primary">
+                Sobre
+              </Link>
+              <Link href="/contact" className="text-sm font-medium transition-colors hover:text-primary">
+                Contato
+              </Link>
+            </nav>
           </nav>
+
 
           {/* Right side actions */}
           <div className="flex items-center space-x-2">
@@ -223,6 +241,13 @@ export function Header() {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Produtos
+              </Link>
+              <Link
+                href="/cliente"
+                className="font-elegant text-sm font-medium hover:text-amber-500 transition-colors py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Área do Cliente
               </Link>
               <div className="pt-2">
                 <ThemeToggle />

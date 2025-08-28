@@ -33,6 +33,15 @@ export interface Order {
   userId: string
   items: CartItem[]
   total: number
-  status: "pending" | "processing" | "shipped" | "delivered"
+  status: "pending" | "processing" | "shipped" | "delivered" | "cancelled"
+  customerInfo?: {
+    name: string
+    email: string
+    phone: string
+    address: string
+  }
+  paymentMethod?: "pix" | "credit_card" | "whatsapp"
+  shippingFee: number
   createdAt: Date
+} Date
 }

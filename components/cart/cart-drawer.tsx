@@ -29,8 +29,17 @@ export function CartDrawer() {
           </div>
         )}
 
-        <div className="mt-4 flex justify-end">
-          <Button variant="outline" onClick={() => setIsOpen(false)}>Fechar</Button>
+        <div className="p-4 border-t">
+          <div className="flex justify-between items-center mb-4">
+            <span className="text-lg font-semibold">Total: R$ {total.toFixed(2)}</span>
+          </div>
+          <Button
+            className="w-full"
+            size="lg"
+            onClick={() => window.location.href = "/checkout"}
+          >
+            Finalizar Compra
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import { useRouter } from "next/navigation"
-import { ShoppingCart, Lock, Star, Crown, Zap } from "lucide-react"
+import { ShoppingCart, Lock, Star, Crown, Zap, MessageCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -132,26 +132,40 @@ export function ProductCard({ product }: ProductCardProps) {
       </CardContent>
 
       <CardFooter className="p-4 pt-0">
-        <Button
-          onClick={handleAddToCart}
-          className={`w-full font-elegant font-semibold transition-all duration-300 hover:scale-105 text-sm py-2 ${
-            user
-              ? "bg-gradient-to-r from-black-400 to-green-500 hover:from-black-500 hover:to-green-600 text-black shadow-md hover:shadow-lg"
-              : "bg-gradient-to-r from-gray-400 to-gray-500 hover:from-gray-500 hover:to-gray-600 text-white"
-          }`}
-        >
-          {user ? (
-            <>
-              <ShoppingCart className="w-3 h-3 mr-2" />
-              Adicionar
-            </>
-          ) : (
-            <>
-              <Lock className="w-3 h-3 mr-2" />
-              Login
-            </>
-          )}
-        </Button>
+        <div className="space-y-2">
+          <Button
+            onClick={handleAddToCart}
+            className={`w-full font-elegant font-semibold transition-all duration-300 hover:scale-105 text-sm py-2 ${
+              user
+                ? "bg-gradient-to-r from-black-400 to-green-500 hover:from-black-500 hover:to-green-600 text-black shadow-md hover:shadow-lg"
+                : "bg-gradient-to-r from-gray-400 to-gray-500 hover:from-gray-500 hover:to-gray-600 text-white"
+            }`}
+          >
+            {user ? (
+              <>
+                <ShoppingCart className="w-3 h-3 mr-2" />
+                Adicionar
+              </>
+            ) : (
+              <>
+                <Lock className="w-3 h-3 mr-2" />
+                Login
+              </>
+            )}
+          </Button>
+          <Button
+            variant="outline"
+            className="w-full bg-green-50 hover:bg-green-100 text-green-700 border-green-200"
+            onClick={() => {
+              const message = `Olá! Tenho interesse no produto *${product.title}* (R$ ${product.price.toFixed(2)}). Você pode me dar mais informações?`
+              const whatsappUrl = `https://wa.me/5511999999999?text=${encodeURIComponent(message)}`
+              window.open(whatsappUrl, '_blank')
+            }}
+          >
+            <MessageCircle className="mr-2 h-4 w-4" />
+            Comprar no WhatsApp
+          </Button>
+        </div>
       </CardFooter>
 
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
