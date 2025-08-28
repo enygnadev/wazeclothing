@@ -12,7 +12,7 @@ import { useRouter } from "next/navigation"
 export default function AdminPage() {
   const { user, userProfile, loading, initialized, initializeAuth } = useAuth()
   const [verifying, setVerifying] = useState(true)
-  const [debugInfo, setDebugInfo] = useState<any>(null)
+  const [debugInfo, setDebugInfo] = useState<Record<string, unknown> | null>(null)
   const router = useRouter()
 
   useEffect(() => {

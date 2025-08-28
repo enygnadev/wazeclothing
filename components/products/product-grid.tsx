@@ -9,7 +9,7 @@ export function ProductGrid() {
   const [products, setProducts] = useState<Product[]>([])
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [, setError] = useState<string | null>(null)
 
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [selectedSize, setSelectedSize] = useState("")

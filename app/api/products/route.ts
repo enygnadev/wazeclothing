@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getProducts, getProductsByCategory } from "@/lib/firebase/products"
+import { getProducts } from "@/lib/firebase/products"
 
 export async function GET() {
   try {
     console.log("🔍 API: Iniciando busca de produtos...")
-    
+
     // Verificar se Firebase está configurado
     if (!process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID) {
       console.error("❌ API: Firebase não configurado")
@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
 
     // Importar a função de criação de produto
     const { createProduct } = await import("@/lib/firebase/products")
-    
+
     // Criar o produto no Firestore
     const productData = {
       title: product.title,

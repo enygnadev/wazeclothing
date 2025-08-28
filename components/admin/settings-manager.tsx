@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect } from "react"
@@ -9,7 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Settings, Store, MessageCircle, Shield, Bell } from "lucide-react"
+import { Store, MessageCircle, Shield, Bell } from "lucide-react"
 import { getSettings, updateSettings } from "@/lib/firebase/settings"
 
 interface StoreSettings {
@@ -46,7 +45,7 @@ export function SettingsManager() {
     emailNotifications: true,
     whatsappNotifications: true,
   })
-  
+
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
 
@@ -131,7 +130,7 @@ export function SettingsManager() {
                   onChange={(e) => updateSetting("storeName", e.target.value)}
                 />
               </div>
-              
+
               <div>
                 <Label htmlFor="storeDescription">Descrição</Label>
                 <Textarea
@@ -140,7 +139,7 @@ export function SettingsManager() {
                   onChange={(e) => updateSetting("storeDescription", e.target.value)}
                 />
               </div>
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="storeEmail">E-mail de Contato</Label>
@@ -160,7 +159,7 @@ export function SettingsManager() {
                   />
                 </div>
               </div>
-              
+
               <div>
                 <Label htmlFor="storeAddress">Endereço</Label>
                 <Textarea
@@ -187,7 +186,7 @@ export function SettingsManager() {
                   onChange={(e) => updateSetting("pixKey", e.target.value)}
                 />
               </div>
-              
+
               <div>
                 <Label htmlFor="bankInfo">Dados Bancários</Label>
                 <Textarea
@@ -229,7 +228,7 @@ export function SettingsManager() {
                   />
                 </div>
               </div>
-              
+
               <div>
                 <Label htmlFor="whatsappNumber">WhatsApp para Pedidos</Label>
                 <Input
@@ -262,7 +261,7 @@ export function SettingsManager() {
                   onCheckedChange={(checked) => updateSetting("maintenanceMode", checked)}
                 />
               </div>
-              
+
               <div className="flex items-center justify-between">
                 <div>
                   <Label htmlFor="allowRegistrations">Permitir Cadastros</Label>
@@ -276,7 +275,7 @@ export function SettingsManager() {
                   onCheckedChange={(checked) => updateSetting("allowRegistrations", checked)}
                 />
               </div>
-              
+
               <div className="flex items-center justify-between">
                 <div>
                   <Label htmlFor="emailNotifications">Notificações por E-mail</Label>
@@ -290,7 +289,7 @@ export function SettingsManager() {
                   onCheckedChange={(checked) => updateSetting("emailNotifications", checked)}
                 />
               </div>
-              
+
               <div className="flex items-center justify-between">
                 <div>
                   <Label htmlFor="whatsappNotifications">Notificações no WhatsApp</Label>

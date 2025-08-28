@@ -1,6 +1,5 @@
-
 import { getDb } from "./firestore"
-import { collection, query, getDocs, where, orderBy, limit } from "firebase/firestore"
+import { collection, getDocs, query, orderBy, limit } from "firebase/firestore"
 
 export interface DashboardStats {
   totalProducts: number
@@ -30,7 +29,7 @@ export interface CategoryStats {
 export async function getDashboardStats(): Promise<DashboardStats> {
   try {
     const db = getDb()
-    
+
     // Get total products
     const productsQuery = query(collection(db, "products"))
     const productsSnapshot = await getDocs(productsQuery)
@@ -104,11 +103,11 @@ export async function getMonthlyStats(): Promise<MonthlyStats[]> {
       if (data.createdAt && data.total) {
         const date = data.createdAt.toDate()
         const monthKey = date.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' })
-        
+
         if (!monthlyData[monthKey]) {
           monthlyData[monthKey] = { sales: 0, orders: 0 }
         }
-        
+
         monthlyData[monthKey].sales += data.total
         monthlyData[monthKey].orders += 1
       }
@@ -141,7 +140,7 @@ export async function getCategoryStats(): Promise<CategoryStats[]> {
     })
 
     const colors = ['#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#00ff88', '#ff0088']
-    
+
     return Object.entries(categoryData).map(([name, value], index) => ({
       name,
       value,

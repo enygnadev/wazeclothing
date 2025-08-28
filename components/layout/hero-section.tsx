@@ -2,8 +2,9 @@
 
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Lightbulb, ShoppingBag, Crown } from "lucide-react";
+import { ShoppingBag, Crown } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 const images = ["/banner.gif", "/CLjx.gif"];
 
@@ -100,7 +101,7 @@ export function HeroSection() {
               </Button>
             </Link>
 
-           
+
           </div>
 
           {/* Marcas animadas */}

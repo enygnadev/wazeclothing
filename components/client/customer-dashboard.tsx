@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect } from "react"
@@ -10,7 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { User, Package, MapPin, CreditCard, Bell, Shield } from "lucide-react"
+import { User, Package, MapPin, Shield } from "lucide-react"
 import { useAuth } from "@/components/providers/auth-provider"
 import { getOrdersByUser } from "@/lib/firebase/orders"
 import { updateUserProfile } from "@/lib/firebase/users"
@@ -28,15 +27,9 @@ export function CustomerDashboard() {
     birthDate: "",
   })
 
-  useEffect(() => {
-    if (user) {
-      loadUserOrders()
-    }
-  }, [user])
-
   const loadUserOrders = async () => {
     if (!user) return
-    
+
     try {
       const userOrders = await getOrdersByUser(user.uid)
       setOrders(userOrders)
@@ -46,6 +39,10 @@ export function CustomerDashboard() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    loadUserOrders()
+  }, [loadUserOrders])
 
   const handleProfileUpdate = async () => {
     if (!user) return
@@ -141,7 +138,7 @@ export function CustomerDashboard() {
                           </div>
                           {getStatusBadge(order.status)}
                         </div>
-                        
+
                         <div className="space-y-2">
                           {order.items.map((item, index) => (
                             <div key={index} className="flex justify-between items-center">
@@ -150,7 +147,7 @@ export function CustomerDashboard() {
                             </div>
                           ))}
                         </div>
-                        
+
                         <div className="border-t pt-2 mt-2">
                           <div className="flex justify-between items-center font-medium">
                             <span>Total:</span>
@@ -192,7 +189,7 @@ export function CustomerDashboard() {
                   />
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="phone">Telefone</Label>
@@ -213,7 +210,7 @@ export function CustomerDashboard() {
                   />
                 </div>
               </div>
-              
+
               <div>
                 <Label htmlFor="address">Endereço</Label>
                 <Textarea
@@ -223,7 +220,7 @@ export function CustomerDashboard() {
                   placeholder="Rua, número, bairro, cidade, CEP"
                 />
               </div>
-              
+
               <Button onClick={handleProfileUpdate}>
                 Salvar Alterações
               </Button>
@@ -258,11 +255,11 @@ export function CustomerDashboard() {
                 </p>
                 <Button variant="outline">Alterar Senha</Button>
               </div>
-              
+
               <div>
                 <h4 className="font-medium mb-2">Privacidade</h4>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Seus dados estão protegidos conforme a LGPD. 
+                  Seus dados estão protegidos conforme a LGPD.
                   Você pode solicitar a exportação ou exclusão dos seus dados a qualquer momento.
                 </p>
                 <div className="space-x-2">

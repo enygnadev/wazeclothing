@@ -1,7 +1,7 @@
 
 "use client"
 
-import { useState, useEffect } from "react"
+
 import { Header } from "@/components/layout/header"
 import { CustomerDashboard } from "@/components/client/customer-dashboard"
 import { useAuth } from "@/components/providers/auth-provider"

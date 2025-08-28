@@ -1,4 +1,3 @@
-
 "use client"
 
 import type React from "react"
@@ -42,14 +41,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const loadCart = async () => {
     if (!user) return
-    
+
     try {
       setIsLoading(true)
       const cartData = await getCart(user.uid)
-      
+
       if (cartData?.items) {
         const cartItems: CartItem[] = []
-        
+
         for (const item of cartData.items) {
           const product = await getProductById(item.productId)
           if (product) {
@@ -60,7 +59,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             })
           }
         }
-        
+
         setItems(cartItems)
       }
     } catch (error) {
@@ -118,7 +117,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
       setItems(currentItems => {
         const existingItem = currentItems.find(item => item.id === productId)
-        
+
         let newItems: CartItem[]
         if (existingItem) {
           newItems = currentItems.map(item =>
@@ -131,7 +130,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           newItems = [...currentItems, { id: productId, product, quantity }]
           console.log("Novo produto adicionado ao carrinho")
         }
-        
+
         saveCart(newItems)
         return newItems
       })

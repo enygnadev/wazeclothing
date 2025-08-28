@@ -70,7 +70,7 @@ export function AdminDashboard() {
     const isPositive = change >= 0
     const Icon = isPositive ? TrendingUp : TrendingDown
     const color = isPositive ? "text-green-600" : "text-red-600"
-    
+
     return (
       <p className={`text-xs ${color} flex items-center`}>
         <Icon className="h-3 w-3 mr-1" />

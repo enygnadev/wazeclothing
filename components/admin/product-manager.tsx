@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Plus, Edit, Trash2, Shirt, Flame, Mountain, Sparkles, Crown, Activity, BadgeDollarSign, Stars, ShoppingBag } from "lucide-react";
 import type { Product } from "@/lib/types";
@@ -64,12 +64,12 @@ export function ProductManager() {
   const fetchProducts = async () => {
     try {
       const response = await fetch("/api/products");
-      
+
       if (!response.ok) {
         console.error("API Error:", response.status, response.statusText);
         return;
       }
-      
+
       const contentType = response.headers.get('content-type');
       if (!contentType || !contentType.includes('application/json')) {
         console.error("Response is not JSON:", contentType);
@@ -77,9 +77,9 @@ export function ProductManager() {
         console.error("Response body:", text);
         return;
       }
-      
+
       const data = await response.json();
-      
+
       if (data.success && Array.isArray(data.data)) {
         setProducts(data.data);
       } else if (Array.isArray(data)) {
@@ -129,7 +129,7 @@ export function ProductManager() {
         resetForm();
         fetchProducts();
       }
-    } catch (error) {
+    } catch {
       toast({
         title: "Erro",
         description: "Falha ao salvar produto.",
@@ -176,7 +176,7 @@ export function ProductManager() {
           toast({ title: "Produto excluído!", description: "Removido com sucesso." });
           fetchProducts();
         }
-      } catch (error) {
+      } catch {
         toast({ title: "Erro", description: "Falha ao excluir produto.", variant: "destructive" });
       }
     }
@@ -216,10 +216,10 @@ export function ProductManager() {
                   {categories.map((cat, i) => {
                     const Icon = resolveIcon(cat);
                     return (
-                      <Button 
-                        key={i} 
+                      <Button
+                        key={i}
                         type="button"
-                        variant={formData.category === cat ? "default" : "outline"} 
+                        variant={formData.category === cat ? "default" : "outline"}
                         onClick={() => setFormData({ ...formData, category: cat })}
                       >
                         <Icon className="w-4 h-4 mr-1" />{cat}
@@ -248,10 +248,10 @@ export function ProductManager() {
                 <Label>Tamanho</Label>
                 <div className="flex gap-2 flex-wrap">
                   {sizes.map((s, i) => (
-                    <Button 
-                      key={i} 
+                    <Button
+                      key={i}
                       type="button"
-                      variant={formData.size === s ? "default" : "outline"} 
+                      variant={formData.size === s ? "default" : "outline"}
                       onClick={() => setFormData({ ...formData, size: s })}
                     >
                       {s}

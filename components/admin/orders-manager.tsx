@@ -1,13 +1,11 @@
-
 "use client"
 
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Eye, Package, Truck, CheckCircle, XCircle } from "lucide-react"
+import { Eye } from "lucide-react"
 import { getOrders, updateOrderStatus } from "@/lib/firebase/orders"
 import { OrderDetailsModal } from "./order-details-modal"
 import type { Order } from "@/lib/types"
@@ -36,7 +34,7 @@ export function OrdersManager() {
 
   const handleStatusChange = async (orderId: string, newStatus: string) => {
     try {
-      await updateOrderStatus(orderId, newStatus as any)
+      await updateOrderStatus(orderId, newStatus)
       await loadOrders()
     } catch (error) {
       console.error("Erro ao atualizar status:", error)
@@ -119,7 +117,7 @@ export function OrdersManager() {
                     </div>
                   ))}
                 </div>
-                
+
                 <div className="flex justify-between items-center font-bold">
                   <span>Total:</span>
                   <span>R$ {order.total.toFixed(2)}</span>
@@ -141,7 +139,7 @@ export function OrdersManager() {
                       <SelectItem value="cancelled">Cancelado</SelectItem>
                     </SelectContent>
                   </Select>
-                  
+
                   <Button 
                     variant="outline" 
                     size="sm"

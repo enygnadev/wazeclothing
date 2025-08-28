@@ -1,31 +1,30 @@
 export interface Product {
   id: string
   title: string
-  description: string
   price: number
   image: string
-  category: string // agora obrigatório para garantir filtro por categoria
-  features: string[] // agora obrigatório para consistência de exibição
+  category: string
+  description?: string
   featured: boolean
-  size: string // obrigatório para uso em filtros (ex: GG, M)
-  isSmart: boolean // útil mesmo para roupas (false)
-  createdAt: Date
+  isSmart: boolean
+  sizes?: string[]
+  colors?: string[]
 }
 
 export interface User {
   id: string
   email: string
-  displayName: string
+  name: string
   isAdmin: boolean
-  createdAt: Date
+  createdAt?: Date
 }
 
 export interface CartItem {
   id: string
-  title: string
-  price: number
-  image: string
+  productId: string
   quantity: number
+  size?: string
+  color?: string
 }
 
 export interface Order {
@@ -33,15 +32,19 @@ export interface Order {
   userId: string
   items: CartItem[]
   total: number
-  status: "pending" | "processing" | "shipped" | "delivered" | "cancelled"
+  status: 'pending' | 'processing' | 'paid' | 'cancelled'
+  createdAt: Date
   customerInfo?: {
     name: string
     email: string
     phone: string
     address: string
   }
-  paymentMethod?: "pix" | "credit_card" | "whatsapp"
-  shippingFee: number
-  createdAt: Date
-} Date
+}
+
+export interface Settings {
+  storeName: string
+  storeDescription: string
+  contactEmail: string
+  contactPhone: string
 }

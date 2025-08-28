@@ -301,7 +301,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   )
 
   const signOut = useCallback(
-    async () => {
+    async (): Promise<void> => {
       if (!initialized) return
       const [{ signOut: firebaseSignOut, getAuth }, { app }] = await Promise.all(
         [import("firebase/auth"), import("@/lib/firebase/config")]

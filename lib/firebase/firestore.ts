@@ -22,3 +22,13 @@ export function getStorageInstance() {
 
 // Export for backward compatibility
 export { getDb as db, getStorageInstance as storage }
+
+export const createDocument = async (collectionName: string, data: Record<string, unknown>): Promise<string> => {
+  // Placeholder for actual implementation
+  return Promise.resolve("");
+}
+
+export const updateDocument = async (collectionName: string, docId: string, data: Record<string, unknown>): Promise<void> => {
+  // Placeholder for actual implementation
+  return Promise.resolve();
+}

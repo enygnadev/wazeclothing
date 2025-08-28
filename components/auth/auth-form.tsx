@@ -100,7 +100,7 @@ export function AuthForm({ mode: initialMode = "login" }: AuthFormProps) {
           setLoading(false)
           return
         }
-        
+
         await signUp(email, password)
         toast({
           title: "Conta criada com sucesso!",
@@ -113,7 +113,7 @@ export function AuthForm({ mode: initialMode = "login" }: AuthFormProps) {
       const returnUrl = urlParams.get('returnUrl') || '/'
       router.push(returnUrl)
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       const errorCode = error?.code || ""
       let errorMessage = "Ocorreu um erro. Tente novamente."
 
@@ -154,7 +154,7 @@ export function AuthForm({ mode: initialMode = "login" }: AuthFormProps) {
       const returnUrl = urlParams.get('returnUrl') || '/'
       router.push(returnUrl)
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       const errorCode = error?.code || ""
       let errorMessage = "Erro ao fazer login com Google."
 
@@ -260,7 +260,7 @@ export function AuthForm({ mode: initialMode = "login" }: AuthFormProps) {
           }}
           disabled={loading}
         >
-          {mode === "login" 
+          {mode === "login"
             ? "Não tem uma conta? Criar nova conta"
             : "Já tem uma conta? Fazer login"
           }
