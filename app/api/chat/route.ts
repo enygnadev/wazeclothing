@@ -1,42 +1,25 @@
-import { type NextRequest, NextResponse } from "next/server"
-import { OpenAIStream, StreamingTextResponse } from "ai"
-import OpenAI from "openai"
+import { openai } from '@ai-sdk/openai'
+import { streamText } from 'ai'
+import { type NextRequest } from 'next/server'
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
-
-export async function POST(request: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
-    const { messages } = await request.json()
+    const { messages } = await req.json()
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      stream: true,
-      messages: [
-        {
-          role: "system",
-          content: `Você é um especialista em moda urbana da Waze Clothing, uma loja premium de roupas masculinas.
-
-Ajude os clientes com:
-- Recomendações de roupas e combinações de estilo
-- Sugestões de tamanhos ideais e caimento
-- Informações sobre marcas como Nike, Adidas, Lacoste, Jordan, Puma e peças premium
-- Comparações entre produtos e tendências
-- Dicas de looks para diferentes ocasiões (casual, streetwear, treino, festa)
-
-Seja sempre estiloso, direto, prestativo e focado em moda masculina urbana e contemporânea.`,
-        },
-        ...messages,
-      ],
+    const result = await streamText({
+      model: openai('gpt-3.5-turbo'),
+      messages,
+      system: `Você é um assistente especializado em roupas e moda da loja Waze Clothing. 
+      Ajude os clientes com informações sobre produtos, estilos, tamanhos e tendências de moda.
+      Seja amigável, prestativo e sempre focado em moda e vestuário.`,
     })
 
-    const stream = OpenAIStream(response)
-    return new StreamingTextResponse(stream)
+    return result.toAIStreamResponse()
   } catch (error) {
-      console.error('Erro na API de chat:', error)
-      return NextResponse.json(
-        { error: 'Erro interno do servidor' },
-        { status: 500 })
+    console.error('Chat error:', error)
+    return new Response(JSON.stringify({ error: 'Internal server error' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    })
   }
 }

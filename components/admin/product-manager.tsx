@@ -156,7 +156,7 @@ export function ProductManager() {
     setEditingProduct(product);
     setFormData({
       title: product.title,
-      description: product.description,
+      description: product.description || '',
       price: product.price.toString(),
       image: product.image,
       category: product.category ?? "",
@@ -306,7 +306,7 @@ export function ProductManager() {
                 <p className="text-muted-foreground mb-2">{product.description}</p>
                 <p className="text-xl font-bold text-primary mb-2">R$ {product.price.toFixed(2)}</p>
                 <p className="text-sm text-muted-foreground">Categoria: {resolveCategoryName(product.category)}</p>
-                <p className="text-sm text-muted-foreground">Tamanho: {resolveSizeName(product.size)}</p>
+                <p className="text-sm text-muted-foreground">Tamanho: {product.size ? resolveSizeName(product.size) : 'N/A'}</p>
                 <div className="flex gap-2 mt-4">
                   <Button variant="outline" size="sm" onClick={() => handleEdit(product)}><Edit className="w-4 h-4" /></Button>
                   <Button variant="destructive" size="sm" onClick={() => handleDelete(product.id)}><Trash2 className="w-4 h-4" /></Button>

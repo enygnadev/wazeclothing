@@ -142,7 +142,7 @@ export function CustomerDashboard() {
                         <div className="space-y-2">
                           {order.items.map((item, index) => (
                             <div key={index} className="flex justify-between items-center">
-                              <span className="text-sm">{item.title} x {item.quantity}</span>
+                              <span className="text-sm">{item.title || item.name} x {item.quantity}</span>
                               <span className="text-sm">R$ {(item.price * item.quantity).toFixed(2)}</span>
                             </div>
                           ))}

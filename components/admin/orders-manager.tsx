@@ -112,7 +112,7 @@ export function OrdersManager() {
                   <h4 className="font-medium mb-2">Itens do Pedido:</h4>
                   {order.items.map((item, index) => (
                     <div key={index} className="flex justify-between items-center py-2 border-b">
-                      <span>{item.title} x {item.quantity}</span>
+                      <span>{item.title || item.name} x {item.quantity}</span>
                       <span>R$ {(item.price * item.quantity).toFixed(2)}</span>
                     </div>
                   ))}

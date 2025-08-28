@@ -41,14 +41,13 @@ export function ProductCard({ product }: ProductCardProps) {
       }
 
       console.log("Adicionando produto ao carrinho:", product.title)
-      
-      addItem(product, 1)
 
-      setIsOpen(true)
+      addItem(product)
 
       toast({
         title: "Produto adicionado!",
         description: `${product.title} foi adicionado ao carrinho.`,
+        duration: 2000,
       })
     } catch (error) {
       console.error("Erro ao adicionar produto:", error)

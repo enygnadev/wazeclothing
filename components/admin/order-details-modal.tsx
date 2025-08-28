@@ -171,7 +171,7 @@ export function OrderDetailsModal({ order, isOpen, onClose, onStatusChange }: Or
                       <Package className="w-6 h-6 text-muted-foreground" />
                     </div>
                     <div className="flex-1">
-                      <h4 className="font-medium">{item.title}</h4>
+                      <h4 className="font-medium">{item.title || item.name}</h4>
                       <p className="text-sm text-muted-foreground">
                         Quantidade: {item.quantity}x
                       </p>

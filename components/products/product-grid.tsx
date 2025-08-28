@@ -75,7 +75,7 @@ export function ProductGrid() {
             return
           }
         } else {
-          const errorMessage = error.message || error.toString()
+          const errorMessage = error instanceof Error ? error.message : String(error)
           if (!errorMessage.includes("permission") && !errorMessage.includes("401")) {
             setError("Erro ao carregar produtos. Verifique a conexão.")
           }

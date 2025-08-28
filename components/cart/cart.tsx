@@ -45,7 +45,7 @@ export function Cart() {
             <>
               <div className="flex-1 overflow-y-auto">
                 <div className="space-y-1">
-                  {safeItems.map((item: CartItem) => (
+                  {safeItems.map((item) => (
                     <CartItem key={item.id} item={item} />
                   ))}
                 </div>

@@ -26,7 +26,7 @@ export function Header() {
   try {
     const cart = useCart()
     if (cart) {
-      itemCount = cart.itemCount ?? 0
+      itemCount = cart.getTotalItems()
       setIsOpen = cart.setIsOpen
     }
   } catch {
