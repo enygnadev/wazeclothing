@@ -91,6 +91,15 @@ export function Header() {
               Produtos
               <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-green-400 to-white-500 group-hover:w-full transition-all duration-300" />
             </Link>
+            {user && (
+              <Link
+                href="/cliente"
+                className="font-elegant text-sm font-medium hover:text-green-500 transition-colors relative group"
+              >
+                Minha Conta
+                <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-green-400 to-white-500 group-hover:w-full transition-all duration-300" />
+              </Link>
+            )}
           </nav>
 
           {/* Right side actions */}
@@ -213,6 +222,15 @@ export function Header() {
               >
                 Produtos
               </Link>
+              {user && (
+                <Link
+                  href="/cliente"
+                  className="font-elegant text-sm font-medium hover:text-amber-500 transition-colors py-2"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Minha Conta
+                </Link>
+              )}
               <div className="pt-2">
                 <ThemeToggle />
               </div>
