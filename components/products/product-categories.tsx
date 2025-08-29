@@ -76,6 +76,38 @@ export function ProductCategories({
 
       {/* CATEGORIAS */}
       <div className="flex flex-wrap justify-center gap-2">
+        {/* Categoria "Todos" sempre primeiro */}
+        <Button
+          variant={selectedCategory === "all" || selectedCategory === "" ? "default" : "outline"}
+          size="sm"
+          onClick={() => onCategoryChange("all")}
+          className={`group relative overflow-hidden font-elegant font-semibold transition-all duration-300 hover:scale-105 text-xs px-3 py-2 ${
+            selectedCategory === "all" || selectedCategory === ""
+              ? `bg-gradient-to-r from-gray-700 to-gray-900 text-white shadow-md border-0`
+              : "border border-zinc-300 dark:border-zinc-700 hover:border-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900/20"
+          }`}
+        >
+          {!(selectedCategory === "all" || selectedCategory === "") && (
+            <div className="absolute inset-0 bg-gradient-to-r from-zinc-500 to-zinc-700 opacity-0 group-hover:opacity-10 transition-opacity duration-300" />
+          )}
+
+          <div className="relative flex items-center gap-2">
+            <div className="p-1 rounded-full bg-gradient-to-r from-zinc-700 to-zinc-900">
+              <Sparkles className="h-3 w-3 text-white" />
+            </div>
+            <span className="hidden sm:inline">Todos</span>
+            {(selectedCategory === "all" || selectedCategory === "") && (
+              <Badge variant="secondary" className="ml-1 bg-white/20 text-white border-0 text-xs px-1">
+                <Crown className="w-2 h-2" />
+              </Badge>
+            )}
+          </div>
+
+          {(selectedCategory === "all" || selectedCategory === "") && (
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 animate-shimmer" />
+          )}
+        </Button>
+        
         {categories.map((categoryName) => {
           const Icon = categoryIconMap[categoryName.toLowerCase()] || Sparkles
           const isSelected = selectedCategory === categoryName
