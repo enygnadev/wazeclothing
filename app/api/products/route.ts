@@ -4,51 +4,28 @@ import { getProducts, addProduct } from "@/lib/firebase/products"
 // 📋 GET todos os produtos
 export async function GET(request: NextRequest) {
   try {
-    console.log("🚀 API: Iniciando busca de produtos...")
-
-    const { searchParams } = new URL(request.url)
-    const category = searchParams.get('category')
-    const featured = searchParams.get('featured')
-
-    console.log("🔍 API: Filtros recebidos:", { category, featured })
+    console.log("🔄 API: Iniciando busca de produtos...")
 
     const products = await getProducts()
-    console.log("✅ API: Produtos encontrados:", products.length)
 
-    // Filtrar por categoria se especificada
-    let filteredProducts = products
-    if (category && category !== 'all') {
-      filteredProducts = products.filter(product => 
-        product.category.toLowerCase() === category.toLowerCase()
-      )
-    }
+    console.log(`✅ API: ${products.length} produtos encontrados`)
+    console.log("📋 API: Produtos encontrados:", products.map(p => `${p.id}: ${p.title}`).slice(0, 5))
 
-    // Filtrar por destaque se especificado
-    if (featured === 'true') {
-      filteredProducts = filteredProducts.filter(product => product.featured)
-    }
-
-    console.log("🎯 API: Produtos filtrados:", filteredProducts.length)
-
-    return NextResponse.json(filteredProducts, {
-      headers: {
-        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
-      },
+    return NextResponse.json({
+      success: true,
+      data: products,
+      total: products.length
     })
   } catch (error) {
     console.error("❌ API: Erro ao buscar produtos:", error)
-
-    const errorMessage = error instanceof Error ? error.message : 'Erro interno do servidor'
-    const errorStack = error instanceof Error ? error.stack : undefined
-
-    console.error("❌ API: Stack trace:", errorStack)
-    console.error("❌ API: Erro completo:", error)
+    console.error("🔍 API: Stack trace:", error)
 
     return NextResponse.json(
-      {
-        success: false,
-        error: errorMessage,
-        details: "Verifique os logs para mais informações"
+      { 
+        success: false, 
+        error: "Erro interno do servidor",
+        message: error instanceof Error ? error.message : "Erro desconhecido",
+        stack: error instanceof Error ? error.stack : undefined
       },
       { status: 500 }
     )
