@@ -6,8 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Separator } from "@/components/ui/separator"
-import { ShoppingCart, MessageCircle } from "lucide-react"
+import { ShoppingCart, CreditCard, MessageCircle, Copy } from "lucide-react"
 import { useCart } from "@/components/providers/cart-provider"
 import { useAuth } from "@/components/providers/auth-provider"
 import { createOrder } from "@/lib/firebase/orders"
@@ -17,6 +18,7 @@ interface CheckoutData {
   email: string
   phone: string
   address: string
+  paymentMethod: "pix" | "whatsapp"
   cep: string
   numero: string
   complemento: string
@@ -34,6 +36,7 @@ export function Checkout() {
     email: user?.email || "",
     phone: "",
     address: "",
+    paymentMethod: "whatsapp",
     cep: "",
     numero: "",
     complemento: "",
@@ -52,8 +55,8 @@ export function Checkout() {
           enderecocomprador: data.logradouro,
           municipiocomprador: data.localidade,
           bairrocomprador: data.bairro,
-          complemento: data.uf,
-          address: `${data.logradouro}, ${data.bairro}, ${data.localidade} - ${data.uf}`
+          complemento: data.uf, // Assuming UF can be used as a temporary complement if no specific complement is found
+          address: `${data.logradouro}, ${data.bairro}, ${data.localidade} - ${data.uf}` // Auto-fill main address field
         }));
       } else {
         console.error('CEP não encontrado');
@@ -63,7 +66,7 @@ export function Checkout() {
           municipiocomprador: "",
           bairrocomprador: "",
           complemento: "",
-          address: ""
+          address: "" // Clear address if CEP is not found
         }));
       }
     } catch (error) {
@@ -74,10 +77,11 @@ export function Checkout() {
         municipiocomprador: "",
         bairrocomprador: "",
         complemento: "",
-        address: ""
+        address: "" // Clear address on error
       }));
     }
   };
+
 
   const shippingFee = 15.90
   const freeShippingMinValue = 199.90
@@ -87,7 +91,7 @@ export function Checkout() {
 
   const handleInputChange = (field: keyof CheckoutData, value: string) => {
     setCheckoutData(prev => ({ ...prev, [field]: value }))
-    if (field === "cep" && value.length === 8) {
+    if (field === "cep" && value.length === 8) { // Assuming CEP has 8 digits
         fetchAddressFromCEP(value);
     }
   }
@@ -105,6 +109,7 @@ export function Checkout() {
     message += `Cidade: ${checkoutData.municipiocomprador}\n`
     message += `Estado: ${checkoutData.complemento}\n\n`
 
+
     message += `🛒 *ITENS DO PEDIDO:*\n`
     cartItems.forEach((item: any, index: number) => {
       message += `${index + 1}. ${item.title || item.name}\n`
@@ -118,65 +123,80 @@ export function Checkout() {
     message += `Frete: ${finalShippingFee === 0 ? 'GRÁTIS' : `R$ ${finalShippingFee.toFixed(2)}`}\n`
     message += `*TOTAL: R$ ${total.toFixed(2)}*\n\n`
 
+    message += `💳 *Forma de pagamento:* ${checkoutData.paymentMethod === 'pix' ? 'PIX' : 'WhatsApp'}\n\n`
     message += `✅ Pedido enviado através do site oficial da Waze Clothing`
 
     return encodeURIComponent(message)
   }
 
-  const handleWhatsAppCheckout = async () => {
+  const handleWhatsAppCheckout = () => {
+    const message = generateWhatsAppMessage()
+    const whatsappNumber = "5511999999999" // Número do WhatsApp da loja
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${message}`
+
+    window.open(whatsappUrl, '_blank')
+
+    // Criar pedido no Firebase para controle interno
+    createOrderInFirebase("whatsapp")
+  }
+
+  const handlePixCheckout = async () => {
+    await createOrderInFirebase("pix")
+    // Aqui você pode integrar com uma API de pagamento PIX
+    alert("Instruções de pagamento PIX enviadas por e-mail!")
+  }
+
+  const createOrderInFirebase = async (paymentMethod: "pix" | "whatsapp") => {
+    if (!user) return
+
     setLoading(true)
-
     try {
-      // Criar pedido no Firebase para controle interno
-      if (user) {
-        const orderItems = cartItems.map((item: any) => ({
-          id: item.id,
-          productId: item.productId || item.id,
-          name: item.title || item.name,
-          title: item.title,
-          price: item.price,
-          quantity: item.quantity,
-          image: item.image
-        }))
+      const orderItems = cartItems.map((item: any) => ({
+        id: item.id,
+        productId: item.productId || item.id,
+        name: item.title || item.name,
+        title: item.title,
+        price: item.price,
+        quantity: item.quantity,
+        image: item.image
+      }))
 
-        const order = {
-          userId: user.uid,
-          items: orderItems,
-          total,
-          shippingFee: finalShippingFee,
-          status: "pending" as const,
-          customerInfo: {
-            name: checkoutData.name,
-            email: checkoutData.email,
-            phone: checkoutData.phone,
-            address: checkoutData.address,
-            cep: checkoutData.cep,
-            numero: checkoutData.numero,
-            complemento: checkoutData.complemento,
-          },
-          paymentMethod: "whatsapp" as const,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        }
-
-        await createOrder(order)
-        await clearCart()
+      const order = {
+        userId: user.uid,
+        items: orderItems,
+        total,
+        shippingFee: finalShippingFee,
+        status: "pending" as const,
+        customerInfo: {
+          name: checkoutData.name,
+          email: checkoutData.email,
+          phone: checkoutData.phone,
+          address: checkoutData.address,
+          cep: checkoutData.cep,
+          numero: checkoutData.numero,
+          complemento: checkoutData.complemento,
+        },
+        paymentMethod,
+        createdAt: new Date(),
+        updatedAt: new Date()
       }
 
-      // Redirecionar para WhatsApp
-      const message = generateWhatsAppMessage()
-      const whatsappNumber = "5511999999999" // Número do WhatsApp da loja
-      const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${message}`
+      await createOrder(order)
+      await clearCart()
 
-      window.open(whatsappUrl, '_blank')
-
+      if (paymentMethod === "pix") {
+        // Redirecionar para página de confirmação PIX
+        window.location.href = "/pedido-confirmado"
+      }
     } catch (error) {
-      console.error("Erro ao processar pedido:", error)
+      console.error("Erro ao criar pedido:", error)
       alert("Erro ao processar pedido. Tente novamente.")
     } finally {
       setLoading(false)
     }
   }
+
+  const pixKey = "contato@wazeclothing.com"
 
   if (cartItems.length === 0) {
     return (
@@ -272,8 +292,59 @@ export function Checkout() {
                 value={checkoutData.complemento}
                 onChange={(e) => handleInputChange("complemento", e.target.value)}
                 placeholder="Apto, Bloco, etc."
+                required
               />
             </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Forma de Pagamento</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <RadioGroup
+              value={checkoutData.paymentMethod}
+              onValueChange={(value) => handleInputChange("paymentMethod", value)}
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="whatsapp" id="whatsapp" />
+                <Label htmlFor="whatsapp" className="flex items-center gap-2">
+                  <MessageCircle className="w-4 h-4" />
+                  WhatsApp (Recomendado)
+                </Label>
+              </div>
+              <p className="text-sm text-muted-foreground ml-6">
+                Envie seu pedido diretamente para nosso WhatsApp e finalize a compra
+              </p>
+
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="pix" id="pix" />
+                <Label htmlFor="pix" className="flex items-center gap-2">
+                  <CreditCard className="w-4 h-4" />
+                  PIX
+                </Label>
+              </div>
+              <p className="text-sm text-muted-foreground ml-6">
+                Pagamento instantâneo via PIX
+              </p>
+            </RadioGroup>
+
+            {checkoutData.paymentMethod === "pix" && (
+              <div className="mt-4 p-4 bg-muted rounded-lg">
+                <h4 className="font-medium mb-2">Chave PIX:</h4>
+                <div className="flex items-center gap-2">
+                  <code className="bg-background px-2 py-1 rounded">{pixKey}</code>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigator.clipboard.writeText(pixKey)}
+                  >
+                    <Copy className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -326,38 +397,31 @@ export function Checkout() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <MessageCircle className="w-5 h-5 text-green-600" />
-              Finalizar Pedido
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
-              <h4 className="font-medium text-green-800 dark:text-green-200 mb-2">
-                ✅ Pagamento via WhatsApp
-              </h4>
-              <p className="text-sm text-green-700 dark:text-green-300">
-                Ao clicar em "Finalizar no WhatsApp", você será direcionado para nosso atendimento
-                onde poderá escolher a forma de pagamento (PIX, cartão, etc.) e finalizar sua compra.
-              </p>
-            </div>
-
+        <div className="space-y-3">
+          {checkoutData.paymentMethod === "whatsapp" ? (
             <Button
               onClick={handleWhatsAppCheckout}
               disabled={loading || !checkoutData.name || !checkoutData.phone || !checkoutData.address || !checkoutData.cep || !checkoutData.numero}
-              className="w-full bg-green-600 hover:bg-green-700 h-12 text-lg"
+              className="w-full bg-green-600 hover:bg-green-700"
             >
-              <MessageCircle className="w-5 h-5 mr-2" />
-              {loading ? "Preparando pedido..." : "Finalizar no WhatsApp"}
+              <MessageCircle className="w-4 h-4 mr-2" />
+              Finalizar no WhatsApp
             </Button>
+          ) : (
+            <Button
+              onClick={handlePixCheckout}
+              disabled={loading || !checkoutData.name || !checkoutData.phone || !checkoutData.address || !checkoutData.cep || !checkoutData.numero}
+              className="w-full"
+            >
+              <CreditCard className="w-4 h-4 mr-2" />
+              {loading ? "Processando..." : "Finalizar com PIX"}
+            </Button>
+          )}
 
-            <p className="text-xs text-muted-foreground text-center">
-              Ao finalizar, você concorda com nossos Termos de Uso e Política de Privacidade
-            </p>
-          </CardContent>
-        </Card>
+          <p className="text-xs text-muted-foreground text-center">
+            Ao finalizar a compra, você concorda com nossos Termos de Uso e Política de Privacidade
+          </p>
+        </div>
       </div>
     </div>
   )
