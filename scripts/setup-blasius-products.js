@@ -30,12 +30,25 @@ console.log(`🔥 Conectando ao Firebase: ${firebaseConfig.projectId}`);
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+// Função para gerar URL da imagem baseada no nome e categoria
+function generateImageUrl(title, category, index) {
+  const cleanTitle = title.toLowerCase()
+    .replace(/[^a-z0-9\s]/g, '') // Remove caracteres especiais
+    .replace(/\s+/g, '-') // Substitui espaços por hífen
+    .replace(/#\d+/g, ''); // Remove números de sequência
+  
+  const cleanCategory = category.toLowerCase().replace('-', ' ');
+  
+  // Monta a URL com parâmetros específicos para cada produto
+  return `https://images.unsplash.com/photo-${1500000000000 + index}?auto=format&fit=crop&w=600&q=80&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&shirt=${cleanTitle}&category=${cleanCategory}`;
+}
+
 const BlasiusProducts = [
   {
     "title": "Nike Tech Fleece #1",
     "description": "Camisa Nike modelo Tech Fleece, urbana, confortável e estilosa.",
     "price": 311.19,
-    "image": "https://source.unsplash.com/random/400x400?sig=0&clothes,nike",
+    "image": generateImageUrl("Nike Tech Fleece #1", "nike", 1),
     "category": "nike",
     "features": [
       "Nike",
@@ -52,7 +65,7 @@ const BlasiusProducts = [
     "title": "Nike Tech Fleece #2",
     "description": "Camisa Nike modelo Tech Fleece, urbana, confortável e estilosa.",
     "price": 296.36,
-    "image": "https://source.unsplash.com/random/400x400?sig=2&clothes,nike",
+    "image": generateImageUrl("Nike Tech Fleece #2", "nike", 2),
     "category": "nike",
     "features": [
       "Nike",
@@ -69,7 +82,7 @@ const BlasiusProducts = [
     "title": "Nike Dry Fit #3",
     "description": "Camisa Nike modelo Dry Fit, urbana, confortável e estilosa.",
     "price": 277.12,
-    "image": "https://source.unsplash.com/random/400x400?sig=4&clothes,nike",
+    "image": generateImageUrl("Nike Dry Fit #3", "nike", 3),
     "category": "nike",
     "features": [
       "Nike",
@@ -86,7 +99,7 @@ const BlasiusProducts = [
     "title": "Nike Tech Fleece #4",
     "description": "Camisa Nike modelo Tech Fleece, urbana, confortável e estilosa.",
     "price": 337.86,
-    "image": "https://source.unsplash.com/random/400x400?sig=6&clothes,nike",
+    "image": generateImageUrl("Nike Tech Fleece #4", "nike", 4),
     "category": "nike",
     "features": [
       "Nike",
@@ -103,7 +116,7 @@ const BlasiusProducts = [
     "title": "Nike Dry Fit #5",
     "description": "Camisa Nike modelo Dry Fit, urbana, confortável e estilosa.",
     "price": 239.7,
-    "image": "https://source.unsplash.com/random/400x400?sig=8&clothes,nike",
+    "image": generateImageUrl("Nike Dry Fit #5", "nike", 5),
     "category": "nike",
     "features": [
       "Nike",
@@ -120,7 +133,7 @@ const BlasiusProducts = [
     "title": "Adidas Originals #1",
     "description": "Camisa Adidas modelo Originals, urbana, confortável e estilosa.",
     "price": 359.01,
-    "image": "https://source.unsplash.com/random/400x400?sig=10&clothes,adidas",
+    "image": generateImageUrl("Adidas Originals #1", "adidas", 6),
     "category": "adidas",
     "features": [
       "Adidas",
@@ -137,7 +150,7 @@ const BlasiusProducts = [
     "title": "Adidas 4DFWD #2",
     "description": "Camisa Adidas modelo 4DFWD, urbana, confortável e estilosa.",
     "price": 305.64,
-    "image": "https://source.unsplash.com/random/400x400?sig=12&clothes,adidas",
+    "image": generateImageUrl("Adidas 4DFWD #2", "adidas", 7),
     "category": "adidas",
     "features": [
       "Adidas",
@@ -154,7 +167,7 @@ const BlasiusProducts = [
     "title": "Lacoste Sport #1",
     "description": "Camisa Lacoste modelo Sport, urbana, confortável e estilosa.",
     "price": 187.2,
-    "image": "https://source.unsplash.com/random/400x400?sig=20&clothes,lacoste",
+    "image": generateImageUrl("Lacoste Sport #1", "lacoste", 8),
     "category": "lacoste",
     "features": [
       "Lacoste",
@@ -171,7 +184,7 @@ const BlasiusProducts = [
     "title": "Jordan Essentials #1",
     "description": "Camisa Jordan modelo Essentials, urbana, confortável e estilosa.",
     "price": 203.49,
-    "image": "https://source.unsplash.com/random/400x400?sig=30&clothes,jordan",
+    "image": generateImageUrl("Jordan Essentials #1", "jordan", 9),
     "category": "jordan",
     "features": [
       "Jordan",
@@ -188,7 +201,7 @@ const BlasiusProducts = [
     "title": "Puma Classics #1",
     "description": "Camisa Puma modelo Classics, urbana, confortável e estilosa.",
     "price": 211.75,
-    "image": "https://source.unsplash.com/random/400x400?sig=40&clothes,puma",
+    "image": generateImageUrl("Puma Classics #1", "puma", 10),
     "category": "puma",
     "features": [
       "Puma",
@@ -205,7 +218,7 @@ const BlasiusProducts = [
     "title": "Premium LuxFit #1",
     "description": "Camisa Premium modelo LuxFit, urbana, confortável e estilosa.",
     "price": 246.05,
-    "image": "https://source.unsplash.com/random/400x400?sig=50&clothes,premium",
+    "image": generateImageUrl("Premium LuxFit #1", "premium", 11),
     "category": "premium",
     "features": [
       "Premium",
@@ -222,7 +235,7 @@ const BlasiusProducts = [
     "title": "Mais Vendidos TopTrend #1",
     "description": "Camisa Mais Vendidos modelo TopTrend, urbana, confortável e estilosa.",
     "price": 242.49,
-    "image": "https://source.unsplash.com/random/400x400?sig=60&clothes,mais vendidos",
+    "image": generateImageUrl("Mais Vendidos TopTrend #1", "mais-vendidos", 12),
     "category": "mais-vendidos",
     "features": [
       "Mais Vendidos",
