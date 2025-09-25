@@ -161,18 +161,6 @@ export function ProductCard({ product }: ProductCardProps) {
               </>
             )}
           </Button>
-          <Button
-            variant="outline"
-            className="w-full bg-green-50 hover:bg-green-100 text-green-700 border-green-200"
-            onClick={() => {
-              const message = `Olá! Tenho interesse no produto *${product.title}* (R$ ${product.price.toFixed(2)}). Você pode me dar mais informações?`
-              const whatsappUrl = `https://wa.me/5511999999999?text=${encodeURIComponent(message)}`
-              window.open(whatsappUrl, '_blank')
-            }}
-          >
-            <MessageCircle className="mr-2 h-4 w-4" />
-            Comprar no WhatsApp
-          </Button>
         </div>
       </CardFooter>
 
