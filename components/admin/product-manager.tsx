@@ -106,35 +106,74 @@ export function ProductManager() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Mostrar loading no botão
+    const submitBtn = e.currentTarget.querySelector('button[type="submit"]') as HTMLButtonElement;
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = editingProduct ? "Atualizando..." : "Criando...";
+    }
+
     try {
       const method = editingProduct ? "PUT" : "POST";
       const url = editingProduct ? `/api/products/${editingProduct.id}` : "/api/products";
 
+      const productData = {
+        ...formData,
+        price: Number.parseFloat(formData.price),
+        createdAt: editingProduct?.createdAt || new Date(),
+        updatedAt: new Date(),
+      };
+
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...formData,
-          price: Number.parseFloat(formData.price),
-        }),
+        body: JSON.stringify(productData),
       });
 
       if (response.ok) {
+        const result = await response.json();
+        
+        if (editingProduct) {
+          // Atualizar produto existente na lista local
+          setProducts(prev => prev.map(p => 
+            p.id === editingProduct.id 
+              ? { ...p, ...productData, id: editingProduct.id }
+              : p
+          ));
+        } else {
+          // Adicionar novo produto à lista local
+          const newProduct = {
+            id: result.id || Date.now().toString(),
+            ...productData,
+          };
+          setProducts(prev => [newProduct, ...prev]);
+        }
+
         toast({
           title: editingProduct ? "Produto atualizado!" : "Produto criado!",
           description: "Operação realizada com sucesso.",
         });
+        
         setIsDialogOpen(false);
         setEditingProduct(null);
         resetForm();
-        fetchProducts();
+      } else {
+        throw new Error('Falha na operação');
       }
-    } catch {
+    } catch (error) {
+      console.error('Erro ao salvar produto:', error);
       toast({
         title: "Erro",
         description: "Falha ao salvar produto.",
         variant: "destructive",
       });
+    } finally {
+      // Restaurar botão
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = editingProduct ? "Atualizar Produto" : "Criar Produto";
+      }
     }
   };
 
@@ -170,14 +209,34 @@ export function ProductManager() {
 
   const handleDelete = async (id: string) => {
     if (confirm("Tem certeza que deseja excluir este produto?")) {
+      // Otimistic update - remove da lista imediatamente
+      const productToDelete = products.find(p => p.id === id);
+      setProducts(prev => prev.filter(p => p.id !== id));
+
       try {
         const response = await fetch(`/api/products/${id}`, { method: "DELETE" });
         if (response.ok) {
-          toast({ title: "Produto excluído!", description: "Removido com sucesso." });
-          fetchProducts();
+          toast({ 
+            title: "Produto excluído!", 
+            description: "Removido com sucesso." 
+          });
+        } else {
+          // Se falhou, restaurar o produto na lista
+          if (productToDelete) {
+            setProducts(prev => [productToDelete, ...prev]);
+          }
+          throw new Error('Falha ao excluir');
         }
-      } catch {
-        toast({ title: "Erro", description: "Falha ao excluir produto.", variant: "destructive" });
+      } catch (error) {
+        // Restaurar produto se houve erro
+        if (productToDelete) {
+          setProducts(prev => [productToDelete, ...prev]);
+        }
+        toast({ 
+          title: "Erro", 
+          description: "Falha ao excluir produto.", 
+          variant: "destructive" 
+        });
       }
     }
   };
@@ -284,7 +343,9 @@ export function ProductManager() {
                 <Label className="flex items-center gap-2"><input type="checkbox" checked={formData.isSmart} onChange={(e) => setFormData({ ...formData, isSmart: e.target.checked })} />Inteligente</Label>
               </div>
               <div className="col-span-2">
-                <Button type="submit" className="w-full">{editingProduct ? "Atualizar" : "Criar"} Produto</Button>
+                <Button type="submit" className="w-full" disabled={false}>
+                  {editingProduct ? "Atualizar Produto" : "Criar Produto"}
+                </Button>
               </div>
             </form>
           </DialogContent>
@@ -308,8 +369,19 @@ export function ProductManager() {
                 <p className="text-sm text-muted-foreground">Categoria: {resolveCategoryName(product.category)}</p>
                 <p className="text-sm text-muted-foreground">Tamanho: {product.size ? resolveSizeName(product.size) : 'N/A'}</p>
                 <div className="flex gap-2 mt-4">
-                  <Button variant="outline" size="sm" onClick={() => handleEdit(product)}><Edit className="w-4 h-4" /></Button>
-                  <Button variant="destructive" size="sm" onClick={() => handleDelete(product.id)}><Trash2 className="w-4 h-4" /></Button>
+                  <Button variant="outline" size="sm" onClick={() => handleEdit(product)}>
+                    <Edit className="w-4 h-4 mr-1" />
+                    Editar
+                  </Button>
+                  <Button 
+                    variant="destructive" 
+                    size="sm" 
+                    onClick={() => handleDelete(product.id)}
+                    className="hover:bg-destructive/90"
+                  >
+                    <Trash2 className="w-4 h-4 mr-1" />
+                    Excluir
+                  </Button>
                 </div>
               </CardContent>
             </Card>

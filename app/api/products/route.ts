@@ -36,15 +36,37 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const data = await request.json()
-    const productId = await addProduct(data)
+    console.log("📝 API: Criando produto:", data.title)
+    
+    const productId = await addProduct({
+      ...data,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    })
+
+    if (!productId) {
+      throw new Error("Falha ao criar produto no Firebase")
+    }
+
+    console.log("✅ API: Produto criado com ID:", productId)
 
     return NextResponse.json(
-      { id: productId, message: "Produto criado com sucesso" },
+      { 
+        id: productId, 
+        message: "Produto criado com sucesso",
+        success: true 
+      },
       { status: 201 }
     )
   } catch (error) {
-    console.error("Erro ao criar produto:", error)
+    console.error("❌ API: Erro ao criar produto:", error)
     const errorMessage = error instanceof Error ? error.message : 'Erro interno do servidor'
-    return NextResponse.json({ error: errorMessage }, { status: 500 })
+    return NextResponse.json(
+      { 
+        error: errorMessage, 
+        success: false 
+      }, 
+      { status: 500 }
+    )
   }
 }
