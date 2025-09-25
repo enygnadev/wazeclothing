@@ -18,7 +18,12 @@ export interface Product {
 
 export interface CartItem {
   id: string
+  productId: string
   product: Product
+  title: string
+  name?: string
+  price: number
+  image: string
   quantity: number
   selectedSize?: string
 }
@@ -29,6 +34,7 @@ export interface User {
   name: string
   displayName?: string
   isAdmin: boolean
+  role: 'admin' | 'cliente'
   createdAt: Date
   updatedAt: Date
   consentDate?: Date
@@ -50,12 +56,24 @@ export interface Order {
   updatedAt: Date
   whatsappSent?: boolean
   customerPhone?: string
+  shippingFee?: number
+  customerInfo?: {
+    name: string
+    email: string
+    phone?: string
+    address?: string
+    cep?: string
+    cidade?: string
+    estado?: string
+    complemento?: string
+  }
 }
 
 export interface OrderItem {
   id: string
   productId: string
   title: string
+  name?: string
   price: number
   quantity: number
   selectedSize?: string

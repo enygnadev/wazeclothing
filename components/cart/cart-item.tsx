@@ -1,4 +1,3 @@
-
 "use client"
 
 import Image from "next/image"
@@ -18,17 +17,17 @@ export function CartItem({ item }: CartItemProps) {
     <div className="flex items-start space-x-4 py-4">
       <div className="relative h-16 w-16 overflow-hidden rounded-md">
         <Image
-          src={item.image || "/placeholder.svg?height=64&width=64"}
-          alt={item.title || item.name}
+          src={item.product.image || "/placeholder.svg?height=64&width=64"}
+          alt={item.product.title || item.product.name}
           fill
           className="object-cover"
         />
       </div>
-      
+
       <div className="flex-1 space-y-1">
-        <h4 className="text-sm font-medium line-clamp-2">{item.title || item.name}</h4>
-        <p className="text-sm text-muted-foreground">R$ {item.price.toFixed(2)}</p>
-        
+        <h4 className="text-sm font-medium line-clamp-2">{item.product.title || item.product.name}</h4>
+        <p className="text-sm text-muted-foreground">R$ {item.product.price.toFixed(2)}</p>
+
         <div className="flex items-center space-x-2">
           <Button
             variant="outline"
@@ -38,9 +37,9 @@ export function CartItem({ item }: CartItemProps) {
           >
             <Minus className="h-3 w-3" />
           </Button>
-          
+
           <span className="w-8 text-center text-sm">{item.quantity}</span>
-          
+
           <Button
             variant="outline"
             size="icon"
@@ -49,7 +48,7 @@ export function CartItem({ item }: CartItemProps) {
           >
             <Plus className="h-3 w-3" />
           </Button>
-          
+
           <Button
             variant="ghost"
             size="icon"

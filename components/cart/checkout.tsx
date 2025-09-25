@@ -286,17 +286,18 @@ export function Checkout() {
           <CardContent>
             <div className="space-y-4">
               {cartItems.map((item) => (
-                <div key={item.id} className="flex justify-between items-center">
-                  <div>
-                    <p className="font-medium">{item.title || item.name}</p>
-                    <p className="text-sm text-muted-foreground">
-                      Quantidade: {item.quantity}
+                <div key={item.id} className="flex justify-between items-start">
+                    <div className="flex-1">
+                      <p className="font-medium">{item.product.title || item.product.name}</p>
+                      {item.selectedSize && (
+                        <p className="text-sm text-muted-foreground">Tamanho: {item.selectedSize}</p>
+                      )}
+                    </div>
+                    <p className="text-right">
+                      {item.quantity}x<br/>
+                      R$ {(item.product.price * item.quantity).toFixed(2)}
                     </p>
                   </div>
-                  <p className="font-medium">
-                    R$ {(item.price * item.quantity).toFixed(2)}
-                  </p>
-                </div>
               ))}
 
               <Separator />
