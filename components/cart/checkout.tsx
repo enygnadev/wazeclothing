@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState } from "react"
@@ -7,10 +8,12 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"
-import { ShoppingCart, MessageCircle } from "lucide-react"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { ShoppingCart, MessageCircle, CreditCard, Smartphone } from "lucide-react"
 import { useCart } from "@/components/providers/cart-provider"
 import { useAuth } from "@/components/providers/auth-provider"
 import { createOrder } from "@/lib/firebase/orders"
+import { useRouter } from "next/navigation"
 
 interface CheckoutData {
   name: string
@@ -28,7 +31,9 @@ interface CheckoutData {
 export function Checkout() {
   const { items: cartItems, getTotalPrice, clearCart } = useCart()
   const { user } = useAuth()
+  const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const [paymentMethod, setPaymentMethod] = useState<'whatsapp' | 'pix' | 'credit' | 'debit'>('whatsapp')
   const [checkoutData, setCheckoutData] = useState<CheckoutData>({
     name: user?.displayName || "",
     email: user?.email || "",
@@ -42,53 +47,32 @@ export function Checkout() {
     enderecocomprador: "",
   })
 
+  const subtotal = getTotalPrice()
+  const finalShippingFee = subtotal >= 100 ? 0 : 15
+  const total = subtotal + finalShippingFee
+
   const fetchAddressFromCEP = async (cep: string) => {
     try {
-      const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-      const data = await response.json();
+      const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`)
+      const data = await response.json()
+      
       if (!data.erro) {
         setCheckoutData(prev => ({
           ...prev,
-          enderecocomprador: data.logradouro,
-          municipiocomprador: data.localidade,
-          bairrocomprador: data.bairro,
-          complemento: data.uf,
-          address: `${data.logradouro}, ${data.bairro}, ${data.localidade} - ${data.uf}`
-        }));
-      } else {
-        console.error('CEP não encontrado');
-        setCheckoutData(prev => ({
-          ...prev,
-          enderecocomprador: "",
-          municipiocomprador: "",
-          bairrocomprador: "",
-          complemento: "",
-          address: ""
-        }));
+          enderecocomprador: data.logradouro || "",
+          bairrocomprador: data.bairro || "",
+          municipiocomprador: data.localidade || "",
+        }))
       }
     } catch (error) {
-      console.error('Erro ao buscar CEP:', error);
-      setCheckoutData(prev => ({
-        ...prev,
-        enderecocomprador: "",
-        municipiocomprador: "",
-        bairrocomprador: "",
-        complemento: "",
-        address: ""
-      }));
+      console.error("Erro ao buscar CEP:", error)
     }
-  };
-
-  const shippingFee = 15.90
-  const freeShippingMinValue = 199.90
-  const subtotal = getTotalPrice()
-  const finalShippingFee = subtotal >= freeShippingMinValue ? 0 : shippingFee
-  const total = subtotal + finalShippingFee
+  }
 
   const handleInputChange = (field: keyof CheckoutData, value: string) => {
     setCheckoutData(prev => ({ ...prev, [field]: value }))
     if (field === "cep" && value.length === 8) {
-        fetchAddressFromCEP(value);
+      fetchAddressFromCEP(value)
     }
   }
 
@@ -97,13 +81,12 @@ export function Checkout() {
     message += `👤 *Cliente:* ${checkoutData.name}\n`
     message += `📧 *E-mail:* ${checkoutData.email}\n`
     message += `📱 *Telefone:* ${checkoutData.phone}\n`
-    message += `📍 *Endereço:* ${checkoutData.address}, Nº ${checkoutData.numero}, Complemento: ${checkoutData.complemento || 'N/A'}\n`
-
-    message += `\n*Endereço Detalhado (via CEP):*\n`
-    message += `Logradouro: ${checkoutData.enderecocomprador}\n`
-    message += `Bairro: ${checkoutData.bairrocomprador}\n`
-    message += `Cidade: ${checkoutData.municipiocomprador}\n`
-    message += `Estado: ${checkoutData.complemento}\n\n`
+    message += `📍 *Endereço:* ${checkoutData.address}, Nº ${checkoutData.numero}\n`
+    if (checkoutData.complemento) {
+      message += `Complemento: ${checkoutData.complemento}\n`
+    }
+    message += `CEP: ${checkoutData.cep}\n`
+    message += `Cidade: ${checkoutData.municipiocomprador} - ${checkoutData.bairrocomprador}\n\n`
 
     message += `🛒 *ITENS DO PEDIDO:*\n`
     cartItems.forEach((item: any, index: number) => {
@@ -118,59 +101,74 @@ export function Checkout() {
     message += `Frete: ${finalShippingFee === 0 ? 'GRÁTIS' : `R$ ${finalShippingFee.toFixed(2)}`}\n`
     message += `*TOTAL: R$ ${total.toFixed(2)}*\n\n`
 
+    // Adicionar método de pagamento escolhido
+    const paymentLabels = {
+      whatsapp: 'Via WhatsApp',
+      pix: 'PIX',
+      credit: 'Cartão de Crédito',
+      debit: 'Cartão de Débito'
+    }
+    message += `💳 *Forma de Pagamento:* ${paymentLabels[paymentMethod]}\n\n`
+
     message += `✅ Pedido enviado através do site oficial da Waze Clothing`
 
     return encodeURIComponent(message)
+  }
+
+  const createOrderInFirebase = async () => {
+    if (!user) return null
+
+    const orderItems = cartItems.map((item: any) => ({
+      id: item.id,
+      productId: item.productId || item.id,
+      name: item.title || item.name,
+      title: item.title,
+      price: item.price,
+      quantity: item.quantity,
+      selectedSize: item.selectedSize,
+      image: item.image
+    }))
+
+    const order = {
+      userId: user.uid,
+      userEmail: user.email || checkoutData.email,
+      userName: user.displayName || checkoutData.name,
+      items: orderItems,
+      total,
+      shippingFee: finalShippingFee,
+      status: "pending" as const,
+      paymentMethod,
+      customerInfo: {
+        name: checkoutData.name,
+        email: checkoutData.email,
+        phone: checkoutData.phone,
+        address: checkoutData.address,
+        cep: checkoutData.cep,
+        numero: checkoutData.numero,
+        complemento: checkoutData.complemento,
+        cidade: checkoutData.municipiocomprador,
+        estado: checkoutData.bairrocomprador,
+      },
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }
+
+    return await createOrder(order)
   }
 
   const handleWhatsAppCheckout = async () => {
     setLoading(true)
 
     try {
-      // Criar pedido no Firebase para controle interno
-      if (user) {
-        const orderItems = cartItems.map((item: any) => ({
-          id: item.id,
-          productId: item.productId || item.id,
-          name: item.title || item.name,
-          title: item.title,
-          price: item.price,
-          quantity: item.quantity,
-          image: item.image
-        }))
+      await createOrderInFirebase()
+      await clearCart()
 
-        const order = {
-          userId: user.uid,
-          userEmail: user.email || checkoutData.email,
-          userName: user.displayName || checkoutData.name,
-          items: orderItems,
-          total,
-          shippingFee: finalShippingFee,
-          status: "pending" as const,
-          customerInfo: {
-            name: checkoutData.name,
-            email: checkoutData.email,
-            phone: checkoutData.phone,
-            address: checkoutData.address,
-            cep: checkoutData.cep,
-            numero: checkoutData.numero,
-            complemento: checkoutData.complemento,
-          },
-          paymentMethod: "whatsapp" as const,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        }
-
-        await createOrder(order)
-        await clearCart()
-      }
-
-      // Redirecionar para WhatsApp
       const message = generateWhatsAppMessage()
-      const whatsappNumber = "5511999999999" // Número do WhatsApp da loja
+      const whatsappNumber = "5511999999999"
       const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${message}`
 
       window.open(whatsappUrl, '_blank')
+      router.push('/pedido-confirmado')
 
     } catch (error) {
       console.error("Erro ao processar pedido:", error)
@@ -180,24 +178,72 @@ export function Checkout() {
     }
   }
 
+  const handlePixCheckout = async () => {
+    setLoading(true)
+
+    try {
+      await createOrderInFirebase()
+      await clearCart()
+      router.push('/pedido-confirmado?payment=pix')
+
+    } catch (error) {
+      console.error("Erro ao processar pedido:", error)
+      alert("Erro ao processar pedido. Tente novamente.")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleCardCheckout = async () => {
+    setLoading(true)
+
+    try {
+      await createOrderInFirebase()
+      await clearCart()
+      router.push('/pedido-confirmado?payment=card')
+
+    } catch (error) {
+      console.error("Erro ao processar pedido:", error)
+      alert("Erro ao processar pedido. Tente novamente.")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleCheckout = () => {
+    switch (paymentMethod) {
+      case 'whatsapp':
+        return handleWhatsAppCheckout()
+      case 'pix':
+        return handlePixCheckout()
+      case 'credit':
+      case 'debit':
+        return handleCardCheckout()
+      default:
+        return handleWhatsAppCheckout()
+    }
+  }
+
+  const isFormValid = checkoutData.name && checkoutData.phone && checkoutData.address && 
+                     checkoutData.cep && checkoutData.numero && checkoutData.email
+
   if (cartItems.length === 0) {
     return (
       <div className="text-center py-8">
-        <ShoppingCart className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-        <p className="text-muted-foreground">Seu carrinho está vazio.</p>
-        <Button className="mt-4" onClick={() => window.location.href = "/products"}>
-          Continuar Comprando
-        </Button>
+        <ShoppingCart className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+        <h2 className="text-xl font-semibold mb-2">Carrinho vazio</h2>
+        <p className="text-muted-foreground">Adicione produtos ao carrinho para continuar</p>
       </div>
     )
   }
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      {/* Dados do Cliente */}
       <div className="space-y-6">
         <Card>
           <CardHeader>
-            <CardTitle>Informações de Entrega</CardTitle>
+            <CardTitle>Dados de Entrega</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
@@ -207,41 +253,40 @@ export function Checkout() {
                   id="name"
                   value={checkoutData.name}
                   onChange={(e) => handleInputChange("name", e.target.value)}
-                  required
+                  placeholder="Seu nome completo"
                 />
               </div>
               <div>
-                <Label htmlFor="phone">Telefone</Label>
+                <Label htmlFor="email">E-mail</Label>
                 <Input
-                  id="phone"
-                  value={checkoutData.phone}
-                  onChange={(e) => handleInputChange("phone", e.target.value)}
-                  placeholder="(11) 99999-9999"
-                  required
+                  id="email"
+                  type="email"
+                  value={checkoutData.email}
+                  onChange={(e) => handleInputChange("email", e.target.value)}
+                  placeholder="seu@email.com"
                 />
               </div>
             </div>
-
+            
             <div>
-              <Label htmlFor="email">E-mail</Label>
+              <Label htmlFor="phone">Telefone/WhatsApp</Label>
               <Input
-                id="email"
-                type="email"
-                value={checkoutData.email}
-                onChange={(e) => handleInputChange("email", e.target.value)}
-                required
+                id="phone"
+                value={checkoutData.phone}
+                onChange={(e) => handleInputChange("phone", e.target.value)}
+                placeholder="(11) 99999-9999"
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="col-span-2">
                 <Label htmlFor="cep">CEP</Label>
                 <Input
                   id="cep"
                   value={checkoutData.cep}
                   onChange={(e) => handleInputChange("cep", e.target.value)}
-                  placeholder="Apenas números"
-                  required
+                  placeholder="00000-000"
+                  maxLength={8}
                 />
               </div>
               <div>
@@ -250,115 +295,141 @@ export function Checkout() {
                   id="numero"
                   value={checkoutData.numero}
                   onChange={(e) => handleInputChange("numero", e.target.value)}
-                  placeholder="Nº da casa"
-                  required
+                  placeholder="123"
                 />
               </div>
             </div>
 
             <div>
-              <Label htmlFor="address">Endereço Completo (Rua, Bairro, Cidade, UF)</Label>
-              <Textarea
+              <Label htmlFor="address">Endereço</Label>
+              <Input
                 id="address"
                 value={checkoutData.address}
                 onChange={(e) => handleInputChange("address", e.target.value)}
-                placeholder="Rua, número, complemento, bairro, cidade, CEP"
-                required
+                placeholder="Rua, avenida..."
               />
             </div>
 
             <div>
-              <Label htmlFor="complemento">Complemento</Label>
+              <Label htmlFor="complemento">Complemento (opcional)</Label>
               <Input
                 id="complemento"
                 value={checkoutData.complemento}
                 onChange={(e) => handleInputChange("complemento", e.target.value)}
-                placeholder="Apto, Bloco, etc."
+                placeholder="Apartamento, bloco..."
               />
             </div>
+
+            {checkoutData.enderecocomprador && (
+              <div className="text-sm text-muted-foreground bg-muted p-3 rounded">
+                <p><strong>Endereço encontrado:</strong></p>
+                <p>{checkoutData.enderecocomprador}</p>
+                <p>{checkoutData.bairrocomprador} - {checkoutData.municipiocomprador}</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Forma de Pagamento */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Forma de Pagamento</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <RadioGroup value={paymentMethod} onValueChange={(value: any) => setPaymentMethod(value)}>
+              <div className="flex items-center space-x-2 p-3 border rounded-lg">
+                <RadioGroupItem value="whatsapp" id="whatsapp" />
+                <Label htmlFor="whatsapp" className="flex items-center gap-2 cursor-pointer">
+                  <MessageCircle className="w-4 h-4 text-green-600" />
+                  WhatsApp (Negociar pagamento)
+                </Label>
+              </div>
+              
+              <div className="flex items-center space-x-2 p-3 border rounded-lg">
+                <RadioGroupItem value="pix" id="pix" />
+                <Label htmlFor="pix" className="flex items-center gap-2 cursor-pointer">
+                  <Smartphone className="w-4 h-4 text-blue-600" />
+                  PIX (Pagamento instantâneo)
+                </Label>
+              </div>
+              
+              <div className="flex items-center space-x-2 p-3 border rounded-lg">
+                <RadioGroupItem value="credit" id="credit" />
+                <Label htmlFor="credit" className="flex items-center gap-2 cursor-pointer">
+                  <CreditCard className="w-4 h-4 text-purple-600" />
+                  Cartão de Crédito
+                </Label>
+              </div>
+              
+              <div className="flex items-center space-x-2 p-3 border rounded-lg">
+                <RadioGroupItem value="debit" id="debit" />
+                <Label htmlFor="debit" className="flex items-center gap-2 cursor-pointer">
+                  <CreditCard className="w-4 h-4 text-orange-600" />
+                  Cartão de Débito
+                </Label>
+              </div>
+            </RadioGroup>
           </CardContent>
         </Card>
       </div>
 
+      {/* Resumo do Pedido */}
       <div className="space-y-6">
         <Card>
           <CardHeader>
             <CardTitle>Resumo do Pedido</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {cartItems.map((item) => (
-                <div key={item.id} className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <p className="font-medium">{item.product.title || item.product.name}</p>
-                      {item.selectedSize && (
-                        <p className="text-sm text-muted-foreground">Tamanho: {item.selectedSize}</p>
-                      )}
-                    </div>
-                    <p className="text-right">
-                      {item.quantity}x<br/>
-                      R$ {(item.product.price * item.quantity).toFixed(2)}
-                    </p>
-                  </div>
-              ))}
-
-              <Separator />
-
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span>Subtotal:</span>
-                  <span>R$ {subtotal.toFixed(2)}</span>
+          <CardContent className="space-y-4">
+            {cartItems.map((item: any) => (
+              <div key={item.id} className="flex justify-between items-center py-2 border-b">
+                <div className="flex-1">
+                  <p className="font-medium">{item.title || item.name}</p>
+                  <p className="text-sm text-muted-foreground">Qtd: {item.quantity}</p>
                 </div>
-                <div className="flex justify-between">
-                  <span>Frete:</span>
-                  <span>
-                    {finalShippingFee === 0 ? (
-                      <span className="text-green-600 font-medium">GRÁTIS</span>
-                    ) : (
-                      `R$ ${finalShippingFee.toFixed(2)}`
-                    )}
-                  </span>
-                </div>
-                <Separator />
-                <div className="flex justify-between text-lg font-bold">
-                  <span>Total:</span>
-                  <span>R$ {total.toFixed(2)}</span>
-                </div>
+                <p className="font-medium">R$ {(item.price * item.quantity).toFixed(2)}</p>
+              </div>
+            ))}
+            
+            <Separator />
+            
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span>Subtotal:</span>
+                <span>R$ {subtotal.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Frete:</span>
+                <span>{finalShippingFee === 0 ? 'GRÁTIS' : `R$ ${finalShippingFee.toFixed(2)}`}</span>
+              </div>
+              <div className="flex justify-between font-bold text-lg">
+                <span>Total:</span>
+                <span>R$ {total.toFixed(2)}</span>
               </div>
             </div>
           </CardContent>
         </Card>
 
+        {/* Botão de Finalizar */}
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <MessageCircle className="w-5 h-5 text-green-600" />
-              Finalizar Pedido
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
-              <h4 className="font-medium text-green-800 dark:text-green-200 mb-2">
-                ✅ Pagamento via WhatsApp
-              </h4>
-              <p className="text-sm text-green-700 dark:text-green-300">
-                Ao clicar em "Finalizar no WhatsApp", você será direcionado para nosso atendimento
-                onde poderá escolher a forma de pagamento (PIX, cartão, etc.) e finalizar sua compra.
-              </p>
-            </div>
-
+          <CardContent className="pt-6">
             <Button
-              onClick={handleWhatsAppCheckout}
-              disabled={loading || !checkoutData.name || !checkoutData.phone || !checkoutData.address || !checkoutData.cep || !checkoutData.numero}
-              className="w-full bg-green-600 hover:bg-green-700 h-12 text-lg"
+              onClick={handleCheckout}
+              disabled={loading || !isFormValid}
+              className="w-full h-12 text-lg"
+              size="lg"
             >
-              <MessageCircle className="w-5 h-5 mr-2" />
-              {loading ? "Preparando pedido..." : "Finalizar no WhatsApp"}
+              {loading ? "Processando..." : 
+               paymentMethod === 'whatsapp' ? "Finalizar no WhatsApp" :
+               paymentMethod === 'pix' ? "Pagar com PIX" :
+               "Pagar com Cartão"
+              }
             </Button>
-
-            <p className="text-xs text-muted-foreground text-center">
-              Ao finalizar, você concorda com nossos Termos de Uso e Política de Privacidade
-            </p>
+            
+            {!isFormValid && (
+              <p className="text-sm text-muted-foreground text-center mt-2">
+                Preencha todos os campos obrigatórios
+              </p>
+            )}
           </CardContent>
         </Card>
       </div>
