@@ -1,0 +1,40 @@
+~/workspace$ tsc --noEmit
+components/admin/users-manager.tsx:50:16 - error TS2345: Argument of type '(User | { role: "admin" | "customer"; id: string; email: string; name: string; displayName?: string | undefined; isAdmin: boolean; createdAt: Date; updatedAt: Date; consentDate?: Date | undefined; consentVersion?: string | undefined; })[]' is not assignable to parameter of type 'SetStateAction<User[]>'.
+  Type '(User | { role: "admin" | "customer"; id: string; email: string; name: string; displayName?: string | undefined; isAdmin: boolean; createdAt: Date; updatedAt: Date; consentDate?: Date | undefined; consentVersion?: string | undefined; })[]' is not assignable to type 'User[]'.
+    Type 'User | { role: "admin" | "customer"; id: string; email: string; name: string; displayName?: string | undefined; isAdmin: boolean; createdAt: Date; updatedAt: Date; consentDate?: Date | undefined; consentVersion?: string | undefined; }' is not assignable to type 'User'.
+      Type '{ role: "admin" | "customer"; id: string; email: string; name: string; displayName?: string; isAdmin: boolean; createdAt: Date; updatedAt: Date; consentDate?: Date; consentVersion?: string; }' is not assignable to type 'User'.
+        Types of property 'role' are incompatible.
+          Type '"admin" | "customer"' is not assignable to type '"admin" | "cliente"'.
+            Type '"customer"' is not assignable to type '"admin" | "cliente"'.
+
+50       setUsers(users.map(user =>
+                  ~~~~~~~~~~~~~~~~~
+51         user.id === userId ? { ...user, role: newRole as 'admin' | 'customer' } : user
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+52       ))
+   ~~~~~~~
+
+components/cart/cart-item.tsx:21:11 - error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+
+21           alt={item.product.title || item.product.name}
+             ~~~
+
+  node_modules/next/dist/client/image-component.d.ts:13:5
+    13     alt: string;
+           ~~~
+    The expected type comes from property 'alt' which is declared here on type 'IntrinsicAttributes & Omit<DetailedHTMLProps<ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement>, "ref" | ... 5 more ... | "srcSet"> & { ...; } & RefAttributes<...>'
+
+components/cart/checkout.tsx:162:27 - error TS2345: Argument of type '{ userId: string; items: { id: any; productId: any; name: any; title: any; price: any; quantity: any; image: any; }[]; total: number; shippingFee: number; status: "pending"; customerInfo: { name: string; email: string; ... 4 more ...; complemento: string; }; paymentMethod: "whatsapp"; createdAt: Date; updatedAt: Dat...' is not assignable to parameter of type 'Omit<Order, "id">'.
+  Type '{ userId: string; items: { id: any; productId: any; name: any; title: any; price: any; quantity: any; image: any; }[]; total: number; shippingFee: number; status: "pending"; customerInfo: { name: string; email: string; ... 4 more ...; complemento: string; }; paymentMethod: "whatsapp"; createdAt: Date; updatedAt: Dat...' is missing the following properties from type 'Omit<Order, "id">': userEmail, userName
+
+162         await createOrder(order)
+                              ~~~~~
+
+
+Found 3 errors in 3 files.
+
+Errors  Files
+     1  components/admin/users-manager.tsx:50
+     1  components/cart/cart-item.tsx:21
+     1  components/cart/checkout.tsx:162
