@@ -1,4 +1,5 @@
-// scripts/setupBlasiusProducts.js
+
+// scripts/setup-blasius-products.js
 require("dotenv").config({ path: ".env.local" });
 
 const { initializeApp } = require("firebase/app");
@@ -43,76 +44,120 @@ function generateImageUrl(title, category, index) {
   return `https://images.unsplash.com/photo-${1500000000000 + index}?auto=format&fit=crop&w=600&q=80&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&shirt=${cleanTitle}&category=${cleanCategory}`;
 }
 
+const NOW = new Date();
+
 // Produtos extraídos da NF-e (Big Riders) das imagens
 const BlasiusProducts = [
-  // 1953 — Regata Básica 100% Algodão (R$ 38,10)
+  // 19514 Camiseta Básica 100% Algodão BRANCO – R$ 42,85 (M/G/GG)
   {
-    "title": "1953 Regata Básica 100% Algodão Preto G",
-    "description": "Regata básica 100% algodão, confortável e casual.",
-    "price": 38.10,
-    "image": generateImageUrl("1953 Regata Básica 100% Algodão Preto G", "regata", 1),
-    "category": "regata",
-    "features": ["Regata", "Algodão 100%", "G", "Preto"],
-    "featured": false,
-    "size": "G",
-    "isSmart": false
-  },
-  {
-    "title": "1953 Regata Básica 100% Algodão Branco G",
-    "description": "Regata básica 100% algodão, confortável e casual.",
-    "price": 38.10,
-    "image": generateImageUrl("1953 Regata Básica 100% Algodão Branco G", "regata", 2),
-    "category": "regata",
-    "features": ["Regata", "Algodão 100%", "G", "Branco"],
-    "featured": false,
-    "size": "G",
-    "isSmart": false
-  },
-  {
-    "title": "1953 Regata Básica 100% Algodão Mescla G",
-    "description": "Regata básica 100% algodão, confortável e casual.",
-    "price": 38.10,
-    "image": generateImageUrl("1953 Regata Básica 100% Algodão Mescla G", "regata", 3),
-    "category": "regata",
-    "features": ["Regata", "Algodão 100%", "G", "Mescla"],
-    "featured": false,
-    "size": "G",
-    "isSmart": false
+    title: "19514 Camiseta Básica 100% Algodão BRANCO",
+    name: "Camiseta Básica 100% Algodão",
+    description: "Camiseta básica 100% algodão, confortável e casual. Modelo 19514 na cor branca.",
+    price: 42.85,
+    image: generateImageUrl("19514 Camiseta Básica Branco", "camiseta", 1),
+    category: "camiseta",
+    features: ["19514", "Básica", "Algodão 100%", "Branco"],
+    featured: false,
+    sizes: ["M", "G", "GG"],
+    isSmart: false,
+    createdAt: NOW,
+    updatedAt: NOW,
   },
 
-  // 1095 — Camiseta Básica Premium (R$ 36,35)
+  // 19207 Camiseta Básica 100% Algodão SORTIDA – R$ 36,35 (M/G/GG)
   {
-    "title": "1095 Camiseta Básica Premium Preto G",
-    "description": "Camiseta básica premium em algodão, toque macio e alta durabilidade.",
-    "price": 36.35,
-    "image": generateImageUrl("1095 Camiseta Básica Premium Preto G", "camiseta-premium", 4),
-    "category": "camiseta-premium",
-    "features": ["Camiseta", "Premium", "Algodão", "G", "Preto"],
-    "featured": false,
-    "size": "G",
-    "isSmart": false
+    title: "19207 Camiseta Básica 100% Algodão SORTIDA",
+    name: "Camiseta Básica 100% Algodão",
+    description: "Camiseta básica 100% algodão, cores sortidas. Modelo 19207.",
+    price: 36.35,
+    image: generateImageUrl("19207 Camiseta Básica Sortida", "camiseta", 2),
+    category: "camiseta",
+    features: ["19207", "Básica", "Algodão 100%", "Sortida"],
+    featured: false,
+    sizes: ["M", "G", "GG"],
+    isSmart: false,
+    createdAt: NOW,
+    updatedAt: NOW,
   },
+
+  // 19540 Regata Básica 100% Algodão BRANCO – R$ 42,85 (M/G/GG)
   {
-    "title": "1095 Camiseta Básica Premium Branco G",
-    "description": "Camiseta básica premium em algodão, toque macio e alta durabilidade.",
-    "price": 36.35,
-    "image": generateImageUrl("1095 Camiseta Básica Premium Branco G", "camiseta-premium", 5),
-    "category": "camiseta-premium",
-    "features": ["Camiseta", "Premium", "Algodão", "G", "Branco"],
-    "featured": false,
-    "size": "G",
-    "isSmart": false
+    title: "19540 Regata Básica 100% Algodão BRANCO",
+    name: "Regata Básica 100% Algodão",
+    description: "Regata básica 100% algodão, confortável e casual. Modelo 19540 na cor branca.",
+    price: 42.85,
+    image: generateImageUrl("19540 Regata Básica Branco", "regata", 3),
+    category: "regata",
+    features: ["19540", "Regata", "Algodão 100%", "Branco"],
+    featured: false,
+    sizes: ["M", "G", "GG"],
+    isSmart: false,
+    createdAt: NOW,
+    updatedAt: NOW,
   },
+
+  // 19543 Regata Básica 100% Algodão PRETO – R$ 38,10 (M/G/GG)
   {
-    "title": "1095 Camiseta Básica Premium Mescla G",
-    "description": "Camiseta básica premium em algodão, toque macio e alta durabilidade.",
-    "price": 36.35,
-    "image": generateImageUrl("1095 Camiseta Básica Premium Mescla G", "camiseta-premium", 6),
-    "category": "camiseta-premium",
-    "features": ["Camiseta", "Premium", "Algodão", "G", "Mescla"],
-    "featured": false,
-    "size": "G",
-    "isSmart": false
+    title: "19543 Regata Básica 100% Algodão PRETO",
+    name: "Regata Básica 100% Algodão",
+    description: "Regata básica 100% algodão, confortável e casual. Modelo 19543 na cor preta.",
+    price: 38.10,
+    image: generateImageUrl("19543 Regata Básica Preto", "regata", 4),
+    category: "regata",
+    features: ["19543", "Regata", "Algodão 100%", "Preto"],
+    featured: false,
+    sizes: ["M", "G", "GG"],
+    isSmart: false,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+
+  // 19551 Camiseta Premium OVERSIZED 62%CO/38%PES SORTIDA – R$ 72,72 (M/G/GG)
+  {
+    title: "19551 Camiseta Premium OVERSIZED SORTIDA",
+    name: "Camiseta Premium Oversized",
+    description: "Camiseta premium oversized, 62% algodão / 38% poliéster, cores sortidas. Modelo 19551.",
+    price: 72.72,
+    image: generateImageUrl("19551 Camiseta Premium Oversized", "premium", 5),
+    category: "premium",
+    features: ["19551", "Premium", "Oversized", "62%CO/38%PES", "Sortida"],
+    featured: true,
+    sizes: ["M", "G", "GG"],
+    isSmart: false,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+
+  // 19562 Camiseta Premium CLEAN 100% Algodão PRETO – R$ 36,35 (M/G/GG)
+  {
+    title: "19562 Camiseta Premium CLEAN PRETO",
+    name: "Camiseta Premium Clean",
+    description: "Camiseta premium CLEAN 100% algodão, cor preta. Modelo 19562.",
+    price: 36.35,
+    image: generateImageUrl("19562 Camiseta Premium Clean Preto", "premium", 6),
+    category: "premium",
+    features: ["19562", "Premium", "Clean", "Algodão 100%", "Preto"],
+    featured: false,
+    sizes: ["M", "G", "GG"],
+    isSmart: false,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+
+  // 19563 Camiseta Premium CLEAN 100% Algodão BRANCO – R$ 36,35 (M/G/GG)
+  {
+    title: "19563 Camiseta Premium CLEAN BRANCO",
+    name: "Camiseta Premium Clean",
+    description: "Camiseta premium CLEAN 100% algodão, cor branca. Modelo 19563.",
+    price: 36.35,
+    image: generateImageUrl("19563 Camiseta Premium Clean Branco", "premium", 7),
+    category: "premium",
+    features: ["19563", "Premium", "Clean", "Algodão 100%", "Branco"],
+    featured: false,
+    sizes: ["M", "G", "GG"],
+    isSmart: false,
+    createdAt: NOW,
+    updatedAt: NOW,
   },
 ];
 
