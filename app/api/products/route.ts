@@ -38,11 +38,25 @@ export async function POST(request: NextRequest) {
     const data = await request.json()
     console.log("📝 API: Criando produto:", data.title)
     
-    const productId = await addProduct({
-      ...data,
+    // Filtrar campos undefined antes de criar produto
+    const productData: any = {
+      title: data.title,
+      description: data.description,
+      price: parseFloat(data.price),
+      category: data.category,
+      features: Array.isArray(data.features) ? data.features : [],
+      featured: Boolean(data.featured),
+      isSmart: Boolean(data.isSmart),
       createdAt: new Date(),
       updatedAt: new Date(),
-    })
+    }
+
+    // Só incluir campos opcionais se não forem undefined
+    if (data.image !== undefined) productData.image = data.image
+    if (data.sizes !== undefined && data.sizes !== null) productData.sizes = data.sizes
+    if (data.size !== undefined) productData.size = data.size
+
+    const productId = await addProduct(productData)
 
     if (!productId) {
       throw new Error("Falha ao criar produto no Firebase")

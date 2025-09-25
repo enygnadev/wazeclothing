@@ -25,19 +25,24 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
     console.log("📝 API: Atualizando produto:", id, data.title)
 
-    const success = await updateProduct(id, {
+    // Filtrar valores undefined antes de enviar ao Firestore
+    const updateData: any = {
       title: data.title || data.name,
       description: data.description,
       price: parseFloat(data.price),
-      image: data.image,
       category: data.category,
       features: Array.isArray(data.features) ? data.features : [],
-      featured: data.featured,
-      sizes: data.sizes,
-      size: data.size,
-      isSmart: data.isSmart,
+      featured: Boolean(data.featured),
+      isSmart: Boolean(data.isSmart),
       updatedAt: new Date(),
-    })
+    }
+
+    // Só incluir campos opcionais se não forem undefined
+    if (data.image !== undefined) updateData.image = data.image
+    if (data.sizes !== undefined && data.sizes !== null) updateData.sizes = data.sizes
+    if (data.size !== undefined) updateData.size = data.size
+
+    const success = await updateProduct(id, updateData)
 
     if (!success) {
       throw new Error("Falha ao atualizar produto no Firebase")
