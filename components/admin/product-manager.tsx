@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Plus, Edit, Trash2, Shirt, Flame, Mountain, Sparkles, Crown, Activity, BadgeDollarSign, Stars, ShoppingBag } from "lucide-react";
@@ -364,10 +365,47 @@ export function ProductManager() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground mb-2">{product.description}</p>
+                {/* Miniatura da imagem */}
+                <div className="mb-4 flex justify-center">
+                  <div className="relative w-24 h-24 rounded-lg overflow-hidden border border-gray-200 bg-gray-50">
+                    {product.image ? (
+                      <img
+                        src={product.image}
+                        alt={product.title}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          // Fallback para placeholder se a imagem falhar
+                          const target = e.target as HTMLImageElement;
+                          target.src = "/placeholder.svg?height=96&width=96";
+                        }}
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                        <Icon className="w-8 h-8 text-gray-400" />
+                      </div>
+                    )}
+                  </div>
+                </div>
+                
+                <p className="text-muted-foreground mb-2 text-sm line-clamp-2">{product.description}</p>
                 <p className="text-xl font-bold text-primary mb-2">R$ {product.price.toFixed(2)}</p>
                 <p className="text-sm text-muted-foreground">Categoria: {resolveCategoryName(product.category)}</p>
                 <p className="text-sm text-muted-foreground">Tamanho: {product.size ? resolveSizeName(product.size) : 'N/A'}</p>
+                
+                {/* Badges para destaque e smart */}
+                <div className="flex gap-1 mt-2 mb-4">
+                  {product.featured && (
+                    <Badge className="text-xs bg-yellow-100 text-yellow-800 border-yellow-200">
+                      Destaque
+                    </Badge>
+                  )}
+                  {product.isSmart && (
+                    <Badge className="text-xs bg-blue-100 text-blue-800 border-blue-200">
+                      Smart
+                    </Badge>
+                  )}
+                </div>
+
                 <div className="flex gap-2 mt-4">
                   <Button variant="outline" size="sm" onClick={() => handleEdit(product)}>
                     <Edit className="w-4 h-4 mr-1" />
