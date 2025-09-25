@@ -45,9 +45,10 @@ export function UsersManager() {
   async function handleToggleRole(userId: string, currentRole: string) {
     try {
       const newRole = currentRole === 'admin' ? 'cliente' : 'admin'
-      await updateUserRole(userId, newRole as 'admin' | 'cliente')
+      const isAdmin = newRole === 'admin'
+      await updateUserRole(userId, isAdmin)
       setUsers(users.map(user => 
-        user.id === userId ? { ...user, role: newRole as 'admin' | 'cliente' } : user
+        user.id === userId ? { ...user, role: newRole as 'admin' | 'cliente', isAdmin } : user
       ))
     } catch (error) {
       console.error("Erro ao alterar papel do usuário:", error)
