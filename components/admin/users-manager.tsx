@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect } from "react"
@@ -45,10 +44,10 @@ export function UsersManager() {
 
   async function handleToggleRole(userId: string, currentRole: string) {
     try {
-      const newRole = currentRole === 'admin' ? 'customer' : 'admin'
-      await updateUserRole(userId, newRole === 'admin')
+      const newRole = currentRole === 'admin' ? 'cliente' : 'admin'
+      await updateUserRole(userId, newRole as 'admin' | 'cliente')
       setUsers(users.map(user => 
-        user.id === userId ? { ...user, role: newRole as 'admin' | 'customer' } : user
+        user.id === userId ? { ...user, role: newRole as 'admin' | 'cliente' } : user
       ))
     } catch (error) {
       console.error("Erro ao alterar papel do usuário:", error)

@@ -18,7 +18,7 @@ export function CartItem({ item }: CartItemProps) {
       <div className="relative h-16 w-16 overflow-hidden rounded-md">
         <Image
           src={item.product.image || "/placeholder.svg?height=64&width=64"}
-          alt={item.product.title || item.product.name}
+          alt={item.product.title || item.product.name || "Produto"}
           fill
           className="object-cover"
         />

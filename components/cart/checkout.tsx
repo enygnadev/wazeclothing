@@ -141,6 +141,8 @@ export function Checkout() {
 
         const order = {
           userId: user.uid,
+          userEmail: user.email || checkoutData.email,
+          userName: user.displayName || checkoutData.name,
           items: orderItems,
           total,
           shippingFee: finalShippingFee,
