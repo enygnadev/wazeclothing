@@ -180,6 +180,8 @@ export function CustomerDashboard() {
 
     try {
       console.log("🔄 Iniciando carregamento de dados para:", user.uid)
+      console.log("📧 Email do usuário:", user.email)
+      console.log("👤 Nome do usuário:", user.displayName)
       setLoading(true)
 
       const [userOrders, userAddresses, userPaymentMethods, userWishlist] = await Promise.all([
@@ -195,6 +197,19 @@ export function CustomerDashboard() {
         paymentMethods: userPaymentMethods.length,
         wishlist: userWishlist.length
       })
+
+      if (userOrders.length > 0) {
+        console.log("✅ Pedidos encontrados! Detalhes:")
+        userOrders.forEach((order, index) => {
+          console.log(`  ${index + 1}. ID: ${order.id}`)
+          console.log(`     Status: ${order.status}`)
+          console.log(`     Total: R$ ${order.total}`)
+          console.log(`     Data: ${order.createdAt.toLocaleDateString()}`)
+        })
+      } else {
+        console.log("⚠️ Nenhum pedido encontrado para este usuário")
+        console.log("🔍 Verifique se o pedido foi criado com o userId correto:", user.uid)
+      }
 
       setOrders(userOrders)
       setAddresses(userAddresses as Address[])
@@ -228,19 +243,6 @@ export function CustomerDashboard() {
   useEffect(() => {
     loadUserData()
   }, [user, userProfile])
-
-  // Reload automático após 2 segundos se não houver dados
-  useEffect(() => {
-    if (!loading && user && orders.length === 0) {
-      console.log("🔄 Nenhum pedido encontrado, tentando reload em 3 segundos...")
-      const timeout = setTimeout(() => {
-        console.log("🔄 Executando reload...")
-        loadUserData()
-      }, 3000)
-
-      return () => clearTimeout(timeout)
-    }
-  }, [loading, user, orders.length])
 
   const handleProfileUpdate = async () => {
     if (!user) return
@@ -703,7 +705,17 @@ export function CustomerDashboard() {
               Cliente Verificado
             </Badge>
             <span className="text-sm text-muted-foreground">
-              Membro desde {userProfile?.createdAt ? new Date(userProfile.createdAt).getFullYear() : new Date().getFullYear()}
+              Membro desde {(() => {
+                if (userProfile?.createdAt) {
+                  // Se for um Timestamp do Firebase
+                  if (typeof userProfile.createdAt === 'object' && 'toDate' in userProfile.createdAt) {
+                    return userProfile.createdAt.toDate().getFullYear()
+                  }
+                  // Se for uma string ou Date
+                  return new Date(userProfile.createdAt).getFullYear()
+                }
+                return new Date().getFullYear()
+              })()}
             </span>
           </div>
         </div>
@@ -852,61 +864,29 @@ export function CustomerDashboard() {
                           <Separator />
 
                           <div>
-                            <h4 className="font-medium mb-2">Itens ({(() => {
-                              if (order.items && typeof order.items === 'object') {
-                                // Se items é um mapa, contar as chaves
-                                return Object.keys(order.items).length
-                              }
-                              if (Array.isArray(order.items)) {
-                                // Se items é um array (fallback)
-                                return order.items.length
-                              }
-                              return 0
-                            })()})</h4>
+                            <h4 className="font-medium mb-2">Itens ({Array.isArray(order.items) ? order.items.length : (order.items ? Object.keys(order.items).length : 0)})</h4>
                             {(() => {
-                              if (!order.items) return null
-
-                              let itemsArray: any[] = []
-
-                              if (typeof order.items === 'object' && !Array.isArray(order.items)) {
-                                // Items é um mapa/objeto - converter para array
-                                itemsArray = Object.entries(order.items).map(([key, item]: [string, any]) => ({
-                                  ...item,
-                                  itemId: key,
-                                  // Garantir que title existe
-                                  title: item.title || item.name || `Item ${key}`,
-                                  // Garantir que price existe
-                                  price: item.price || 0,
-                                  // Garantir que quantity existe
-                                  quantity: item.quantity || 1
-                                }))
-                              } else if (Array.isArray(order.items)) {
-                                // Items é um array (fallback)
-                                itemsArray = order.items.map((item, index) => ({
-                                  ...item,
-                                  itemId: index.toString(),
-                                  title: item.title || item.name || `Item ${index + 1}`,
-                                  price: item.price || 0,
-                                  quantity: item.quantity || 1
-                                }))
-                              }
-
-                              if (itemsArray.length === 0) {
+                              if (!order.items) {
                                 return (
-                                  <div className="text-center py-8 text-muted-foreground">
-                                    <Package className="w-8 h-8 mx-auto mb-2" />
-                                    <p>Nenhum item encontrado neste pedido</p>
+                                  <div className="text-center py-4 text-muted-foreground">
+                                    <Package className="w-6 h-6 mx-auto mb-2" />
+                                    <p className="text-sm">Nenhum item neste pedido</p>
                                   </div>
                                 )
                               }
 
-                              return itemsArray.map((item: any, index) => (
-                                <div key={item.itemId || index} className="flex justify-between items-center py-1">
+                              // Converter items para array se necessário
+                              const itemsArray = Array.isArray(order.items) 
+                                ? order.items 
+                                : Object.values(order.items)
+
+                              return itemsArray.map((item: any, index: number) => (
+                                <div key={item.id || item.itemId || index} className="flex justify-between items-center py-1">
                                   <span className="text-sm">
-                                    {item.title} x {item.quantity}
+                                    {item.title || item.name || 'Produto'} x {item.quantity || 1}
                                   </span>
                                   <span className="text-sm font-medium">
-                                    R$ {(item.price * item.quantity).toFixed(2)}
+                                    R$ {((item.price || 0) * (item.quantity || 1)).toFixed(2)}
                                   </span>
                                 </div>
                               ))
