@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState } from "react"
@@ -55,7 +54,7 @@ export function Checkout() {
     try {
       const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`)
       const data = await response.json()
-      
+
       if (!data.erro) {
         setCheckoutData(prev => ({
           ...prev,
@@ -116,44 +115,68 @@ export function Checkout() {
   }
 
   const createOrderInFirebase = async () => {
-    if (!user) return null
+    if (!user) {
+      throw new Error("Usuário não autenticado")
+    }
 
-    const orderItems = cartItems.map((item: any) => ({
-      id: item.id,
-      productId: item.productId || item.id,
-      name: item.title || item.name,
-      title: item.title,
-      price: item.price,
-      quantity: item.quantity,
-      selectedSize: item.selectedSize,
-      image: item.image
-    }))
+    // Preparar items como array, removendo campos undefined
+    const orderItems = cartItems.map((item: any) => {
+      const orderItem: any = {
+        id: item.id,
+        productId: item.productId || item.id,
+        name: item.title || item.name || "Produto",
+        title: item.title || "Produto",
+        price: item.price || 0,
+        quantity: item.quantity || 1,
+      }
+      
+      // Adicionar campos opcionais apenas se existirem
+      if (item.selectedSize) orderItem.selectedSize = item.selectedSize
+      if (item.image) orderItem.image = item.image
+      
+      return orderItem
+    })
 
-    const order = {
-      userId: user.uid,
-      userEmail: user.email || checkoutData.email,
-      userName: user.displayName || checkoutData.name,
-      items: orderItems,
-      total,
+    const orderData: any = {
+      userId: user.uid, // Campo crítico para busca
+      userEmail: user.email || checkoutData.email || "email@nao-informado.com",
+      userName: user.displayName || checkoutData.name || "Cliente",
+      items: orderItems, // Array de items
+      total: total,
       shippingFee: finalShippingFee,
       status: "pending" as const,
       paymentMethod,
       customerInfo: {
-        name: checkoutData.name,
-        email: checkoutData.email,
-        phone: checkoutData.phone,
-        address: checkoutData.address,
-        cep: checkoutData.cep,
-        numero: checkoutData.numero,
-        complemento: checkoutData.complemento,
-        cidade: checkoutData.municipiocomprador,
-        estado: checkoutData.bairrocomprador,
+        name: checkoutData.name || "Nome não informado",
+        email: checkoutData.email || user.email || "email@nao-informado.com",
+        phone: checkoutData.phone || "",
+        address: checkoutData.address || "",
+        cep: checkoutData.cep || "",
+        numero: checkoutData.numero || "",
+        cidade: checkoutData.municipiocomprador || "",
+        estado: checkoutData.bairrocomprador || "",
       },
       createdAt: new Date(),
       updatedAt: new Date()
     }
 
-    return await createOrder(order)
+    // Adicionar complemento apenas se existir
+    if (checkoutData.complemento) {
+      orderData.customerInfo.complemento = checkoutData.complemento
+    }
+
+    console.log("🛒 Criando pedido para userId:", user.uid)
+    console.log("📦 Dados do pedido:", JSON.stringify(orderData, null, 2))
+    const orderId = await createOrder(orderData)
+    console.log("✅ Pedido criado com ID:", orderId)
+
+    if (orderId) {
+      console.log("✅ Pedido salvo com sucesso! Verificando...")
+      // Dar um tempo para o Firestore processar
+      await new Promise(resolve => setTimeout(resolve, 1000))
+    }
+
+    return orderId
   }
 
   const handleWhatsAppCheckout = async () => {
@@ -164,7 +187,7 @@ export function Checkout() {
       await clearCart()
 
       const message = generateWhatsAppMessage()
-      const whatsappNumber = "5511999999999"
+      const whatsappNumber = "5511999999999" // Substitua pelo número real
       const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${message}`
 
       window.open(whatsappUrl, '_blank')
@@ -224,7 +247,7 @@ export function Checkout() {
     }
   }
 
-  const isFormValid = checkoutData.name && checkoutData.phone && checkoutData.address && 
+  const isFormValid = checkoutData.name && checkoutData.phone && checkoutData.address &&
                      checkoutData.cep && checkoutData.numero && checkoutData.email
 
   if (cartItems.length === 0) {
@@ -267,7 +290,7 @@ export function Checkout() {
                 />
               </div>
             </div>
-            
+
             <div>
               <Label htmlFor="phone">Telefone/WhatsApp</Label>
               <Input
@@ -344,7 +367,7 @@ export function Checkout() {
                   WhatsApp (Negociar pagamento)
                 </Label>
               </div>
-              
+
               <div className="flex items-center space-x-2 p-3 border rounded-lg">
                 <RadioGroupItem value="pix" id="pix" />
                 <Label htmlFor="pix" className="flex items-center gap-2 cursor-pointer">
@@ -352,7 +375,7 @@ export function Checkout() {
                   PIX (Pagamento instantâneo)
                 </Label>
               </div>
-              
+
               <div className="flex items-center space-x-2 p-3 border rounded-lg">
                 <RadioGroupItem value="credit" id="credit" />
                 <Label htmlFor="credit" className="flex items-center gap-2 cursor-pointer">
@@ -360,7 +383,7 @@ export function Checkout() {
                   Cartão de Crédito
                 </Label>
               </div>
-              
+
               <div className="flex items-center space-x-2 p-3 border rounded-lg">
                 <RadioGroupItem value="debit" id="debit" />
                 <Label htmlFor="debit" className="flex items-center gap-2 cursor-pointer">
@@ -389,9 +412,9 @@ export function Checkout() {
                 <p className="font-medium">R$ {(item.price * item.quantity).toFixed(2)}</p>
               </div>
             ))}
-            
+
             <Separator />
-            
+
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span>Subtotal:</span>
@@ -418,13 +441,13 @@ export function Checkout() {
               className="w-full h-12 text-lg"
               size="lg"
             >
-              {loading ? "Processando..." : 
+              {loading ? "Processando..." :
                paymentMethod === 'whatsapp' ? "Finalizar no WhatsApp" :
                paymentMethod === 'pix' ? "Pagar com PIX" :
                "Pagar com Cartão"
               }
             </Button>
-            
+
             {!isFormValid && (
               <p className="text-sm text-muted-foreground text-center mt-2">
                 Preencha todos os campos obrigatórios
